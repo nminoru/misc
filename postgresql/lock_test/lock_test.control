@@ -1,0 +1,5 @@
+# lock_test extension
+comment = 'lock test'
+default_version = '1.0'
+module_pathname = '$libdir/lock_test'
+relocatable = false
