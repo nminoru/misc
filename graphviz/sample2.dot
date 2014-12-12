@@ -1,0 +1,25 @@
+digraph hierarchy {
+    node  [shape=record,style=filled,fillcolor=gray95];
+    edge  [arrowtail=empty];
+
+    1 [label = "{<class> struct ibv_device|ops|node_type|transport_type|name|dev_name|dev_path|ibdev_path}"];
+    2 [label = "{<class> struct ibv_context|<device> device|ops|cmd_fd|async_fd|num_comp_vectors}"];
+    3 [label = "{<class> struct ibv_pd|<context> context|handle}"];
+    4 [label = "{<class> struct ibv_qp|<context> context|<pd> pd|<send_cq> send_cq| <recv_cq> recv_cq|<srq> srq|handle|qp_num|state|qp_type}"];
+    5 [label = "{<class> struct ibv_srq|<context> context|<pd> pd|handle}"];
+    6 [label = "{<class> struct ibv_cq|<context> context|<channel> channel|handle|cqe}"];
+    7 [label = "{<class> struct ibv_comp_channel|<context> context|fd}"];
+
+    2 -> 1 [label = "device"];
+    3 -> 2 [label = "context"];
+    4 -> 2 [label = "context"];
+    4 -> 3 [label = "pd"];
+    4 -> 6 [label = "send_cq"];
+    4 -> 6 [label = "recv_cq"];
+    4 -> 5 [label = "srq"];
+    5 -> 2 [label = "context"];
+    5 -> 3 [label = "pd"];
+    6 -> 2 [label = "context"];
+    6 -> 7 [label = "channel"];
+    7 -> 2 [label = "context"];
+}
