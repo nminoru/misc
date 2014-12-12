@@ -1,0 +1,5 @@
+# worker_test extension
+comment = 'worker test'
+default_version = '1.0'
+module_pathname = '$libdir/worker_test'
+relocatable = false
