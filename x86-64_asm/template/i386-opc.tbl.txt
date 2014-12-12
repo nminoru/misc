@@ -1,0 +1,330 @@
+mov1	Reg dst	int imm8		1		0xB0	dst			imm8	
+mov1	Address dst	int imm8		1		0xC6		0	dst	imm8	
+mov1	Reg dst	Any src		1		0x8A		dst	src		
+mov1	Address dst	Reg src		1		0x88		src	dst		
+mov2	Reg dst	int imm16		2	0x66	0xB8	dst		dst	imm16	
+mov2	Address dst	int imm16		2	0x66	0xC7		0	dst	imm16	
+mov2	Reg dst	Any src		2	0x66	0x8B		dst	src		
+mov2	Address dst	Reg src		2	0x66	0x89		src	dst		
+mov4	Reg dst	int imm32		4		0xB8	dst		dst	imm32	
+mov4	Address dst	int imm32		4		0xC7		0	dst	imm32	
+mov4	Reg dst	Any src		4		0x8B		dst	src		
+mov4	Address dst	Reg src		4		0x89		src	dst		
+mov8	Reg dst	int64_t imm64		8	REX.W	0xB8	dst		dst	imm64	
+mov8	Address dst	int imm32		8	REX.W	0xC7		0	dst	imm32	
+mov8	Reg dst	Any src		8	REX.W	0x8B		dst	src		
+mov8	Address dst	Reg src		8	REX.W	0x89		src	dst			
+push8	int imm32					0x68				imm32		
+push8	Reg src					0x50	src					
+push8	Address src			4		0xFF		6	src			
+pop8	Reg dst					0x58	dst					
+pop8	Address dst			4		0x8F		0	dst			
+movsx1	Reg dst	Any src		8	REX.W	0x0FBE		dst	src			1→4
+movsx2	Reg dst	Any src		8	REX.W	0x0FBF		dst	src			2→4
+movsx4	Reg dst	Any src		8	REX.W	0x63		dst	src			4→8
+movzx1	Reg dst	Any src		4		0x0FB6		dst	src			上位に32ビットは自動的に0
+movzx2	Reg dst	Any src		4		0x0FB7		dst	src			
+movzx4	Reg dst	Any src		8	REX.W	0x0FB7		dst	src			不要(単なるmovでいい)
+add1	Any dst	int imm8		1		0x80		0	dst	imm8		
+add1	Reg dst	Any src		1		0x02		dst	src			
+add1	Address dst	Reg src		1		0x00		src	dst			
+add2	Any dst	int imm16		2	0x66	0x81		0	dst	imm16		
+add2	Reg dst	Any src		2	0x66	0x03		dst	src		
+add2	Address dst	Reg src		2	0x66	0x01		src	dst		
+add4	Any dst	int imm32		4		0x81		0	dst	imm32	
+add4	Reg dst	Any src		4		0x03		dst	src		
+add4	Address dst	Reg src		4		0x01		src	dst		
+add8	Any dst	int imm32		8	REX.W	0x81		0	dst	imm32	
+add8	Reg dst	Any src		8	REX.W	0x03		dst	src		
+add8	Address dst	Reg src		8	REX.W	0x01		src	dst		
+adc1	Any dst	int imm8		1		0x80		2	dst	imm8	
+adc1	Reg dst	Any src		1		0x12		dst	src		
+adc1	Address dst	Reg src		1		0x10		src	dst		
+adc2	Any dst	int imm16		2	0x66	0x81		2	dst	imm16	
+adc2	Reg dst	Any src		2	0x66	0x13		dst	src		
+adc2	Address dst	Reg src		2	0x66	0x11		src	dst		
+adc4	Any dst	int imm32		4		0x81		2	dst	imm32	
+adc4	Reg dst	Any src		4		0x13		dst	src		
+adc4	Address dst	Reg src		4		0x11		src	dst		
+adc8	Any dst	int imm32		8	REX.W	0x81		2	dst	imm32	
+adc8	Reg dst	Any src		8	REX.W	0x13		dst	src		
+adc8	Address dst	Reg src		8	REX.W	0x11		src	dst		
+sub1	Any dst	int imm8		1		0x80		5	dst	imm8	
+sub1	Reg dst	Any src		1		0x2A		dst	src		
+sub1	Address dst	Reg src		1		0x28		src	dst		
+sub2	Any dst	int imm16		2	0x66	0x81		5	dst	imm16	
+sub2	Reg dst	Any src		2	0x66	0x2B		dst	src		
+sub2	Address dst	Reg src		2	0x66	0x29		src	dst		
+sub4	Any dst	int imm32		4		0x81		5	dst	imm32	
+sub4	Reg dst	Any src		4		0x2B		dst	src		
+sub4	Address dst	Reg src		4		0x29		src	dst		
+sub8	Any dst	int imm32		8	REX.W	0x81		5	dst	imm32	
+sub8	Reg dst	Any src		8	REX.W	0x2B		dst	src		
+sub8	Address dst	Reg src		8	REX.W	0x29		src	dst		
+sbb1	Any dst	int imm8		1		0x80		3	dst	imm8	
+sbb1	Reg dst	Any src		1		0x1A		dst	src		
+sbb1	Address dst	Reg src		1		0x18		src	dst		
+sbb2	Any dst	int imm16		2	0x66	0x81		3	dst	imm16	
+sbb2	Reg dst	Any src		2	0x66	0x1B		dst	src		
+sbb2	Address dst	Reg src		2	0x66	0x19		src	dst		
+sbb4	Any dst	int imm32		4		0x81		3	dst	imm32	
+sbb4	Reg dst	Any src		4		0x1B		dst	src		
+sbb4	Address dst	Reg src		4		0x19		src	dst		
+sbb8	Any dst	int imm32		8	REX.W	0x81		3	dst	imm32	
+sbb8	Reg dst	Any src		8	REX.W	0x1B		dst	src		
+sbb8	Address dst	Reg src		8	REX.W	0x19		src	dst		
+imul1	Any dst			1		0xF6		5	dst		
+imul2	Any dst			2	0x66	0xF7		5	dst		
+imul2	Reg dst	Any src		2	0x66	0x0FAF		dst	src		
+imul2	Reg dst	Any src	int imm16	2	0x66	0x69		dst	src	imm16	
+imul4	Any dst			4		0xF7		5	dst		
+imul4	Reg dst	Any src		4		0x0FAF		dst	src		
+imul4	Reg dst	Any src	int imm32	4		0x69		dst	src	imm32	
+imul8	Any dst			8	REX.W	0xF7		5	dst		
+imul8	Reg dst	Any src		8	REX.W	0x0FAF		dst	src		
+imul8	Reg dst	Any src	int imm32	8	REX.W	0x69		dst	src	imm32	
+mul1	Any dst			1		0xF6		4	dst		
+mul2	Any dst			2	0x66	0xF7		4	dst		
+mul4	Any dst			4		0xF7		4	dst		
+mul8	Any dst			8	REX.W	0xF7		4	dst		
+idiv1	Any dst			1		0xF6		7	dst		
+idiv2	Any dst			2	0x66	0xF7		7	dst		
+idiv4	Any dst			4		0xF7		7	dst		
+idiv8	Any dst			8	REX.W	0xF7		7	dst		
+div1	Any dst			1		0xF6		6	dst		
+div2	Any dst			2	0x66	0xF7		6	dst		
+div4	Any dst			4		0xF7		6	dst		
+div8	Any dst			8	REX.W	0xF7		6	dst		
+neg1	Any dst			1		0xF6		3	dst		
+neg2	Any dst			2	0x66	0xF7		3	dst		
+neg4	Any dst			4		0xF7		3	dst		
+neg8	Any dst			8	REX.W	0xF7		3	dst		
+inc1	Any dst			1		0xFE		0	dst		
+inc2	Any dst			2	0x66	0xFF		0	dst		
+inc4	Any dst			4		0xFF		0	dst		
+inc8	Any dst			8	REX.W	0xFF		0	dst		
+dec1	Any dst			1		0xFE		1	dst		
+dec2	Any dst			2	0x66	0xFF		1	dst		
+dec4	Any dst			4		0xFF		1	dst		
+dec8	Any dst			8	REX.W	0xFF		1	dst		
+cmp1	Any src1	int imm8		1		0x80		7	src1	imm8	
+cmp1	Any src1	Reg src2		1		0x38		src2	src1		
+cmp1	Reg src1	Address src2		1		0x3A		src1	src2		
+cmp2	Any src1	int imm16		2	0x66	0x81		7	src1	imm16	
+cmp2	Any src1	Reg src2		2	0x66	0x39		src2	src1		
+cmp2	Reg src1	Address src2		2	0x66	0x3B		src1	src2		
+cmp4	Any src1	int imm32		4		0x81		7	src1	imm32	
+cmp4	Any src1	Reg src2		4		0x39		src2	src1		
+cmp4	Reg src1	Address src2		4		0x3B		src1	src2		
+cmp8	Any src1	int imm32		8	REX.W	0x81		7	src1	imm32	
+cmp8	Any src1	Reg src2		8	REX.W	0x39		src2	src1		
+cmp8	Reg src1	Address src2		8	REX.W	0x3B		src1	src2		
+and1	Any dst	int imm8		1		0x80		4	dst	imm8	
+and1	Any dst	Reg src		1		0x20		src	dst		
+and1	Reg dst	Address src		1		0x22		dst	src		
+and2	Any dst	int imm16		2	0x66	0x81		4	dst	imm16	
+and2	Any dst	Reg src		2	0x66	0x21		src	dst		
+and2	Reg dst	Address src		2	0x66	0x23		dst	src		
+and4	Any dst	int imm32		4		0x81		4	dst	imm32	
+and4	Any dst	Reg src		4		0x21		src	dst		
+and4	Reg dst	Address src		4		0x23		dst	src		
+and8	Any dst	int imm32		8	REX.W	0x81		4	dst	imm32	
+and8	Any dst	Reg src		8	REX.W	0x21		src	dst		
+and8	Reg dst	Address src		8	REX.W	0x23		dst	src		
+or1	Any dst	int imm8		1		0x80		1	dst	imm8	
+or1	Any dst	Reg src		1		0x08		src	dst		
+or1	Reg dst	Address src		1		0x0A		dst	src		
+or2	Any dst	int imm16		2	0x66	0x81		1	dst	imm16	
+or2	Any dst	Reg src		2	0x66	0x09		src	dst		
+or2	Reg dst	Address src		2	0x66	0x0B		dst	src		
+or4	Any dst	int imm32		4		0x81		1	dst	imm32	
+or4	Any dst	Reg src		4		0x09		src	dst		
+or4	Reg dst	Address src		4		0x0B		dst	src		
+or8	Any dst	int imm32		8	REX.W	0x81		1	dst	imm32	
+or8	Any dst	Reg src		8	REX.W	0x09		src	dst		
+or8	Reg dst	Address src		8	REX.W	0x0B		dst	src		
+xor1	Any dst	int imm8		1		0x80		6	dst	imm8	
+xor1	Any dst	Reg src		1		0x30		src	dst		
+xor1	Reg dst	Address src		1		0x32		dst	src		
+xor2	Any dst	int imm16		2	0x66	0x81		6	dst	imm16	
+xor2	Any dst	Reg src		2	0x66	0x31		src	dst		
+xor2	Reg dst	Address src		2	0x66	0x33		dst	src		
+xor4	Any dst	int imm32		4		0x81		6	dst	imm32	
+xor4	Any dst	Reg src		4		0x31		src	dst		
+xor4	Reg dst	Address src		4		0x33		dst	src		
+xor8	Any dst	int imm32		8	REX.W	0x81		6	dst	imm32	
+xor8	Any dst	Reg src		8	REX.W	0x31		src	dst		
+xor8	Reg dst	Address src		8	REX.W	0x33		dst	src		
+not1	Any dst			1		0xF6		2	dst		
+not2	Any dst			2	0x66	0xF7		2	dst		
+not4	Any dst			4		0xF7		2	dst			
+not8	Any dst			8	REX.W	0xF7		2	dst			
+sar1	Any dst	int shift		1		0xC0		7	dst	shift	0xD0	
+sar1	Any dst			1		0xD2		7	dst			CLを使う
+sar2	Any dst	int shift		2	0x66	0xC1		7	dst	shift	0xD1	
+sar2	Any dst			2	0x66	0xD3		7	dst			CLを使う
+sar4	Any dst	int shift		4		0xC1		7	dst	shift	0xD1	
+sar4	Any dst			4		0xD3		7	dst			CLを使う
+sar8	Any dst	int shift		8	REX.W	0xC1		7	dst	shift	0xD1	
+sar8	Any dst			8	REX.W	0xD3		7	dst			CLを使う
+shr1	Any dst	int shift		1		0xC0		5	dst	shift	0xD0	
+shr1	Any dst			1		0xD2		5	dst			CLを使う
+shr2	Any dst	int shift		2	0x66	0xC1		5	dst	shift	0xD1	
+shr2	Any dst			2	0x66	0xD3		5	dst			CLを使う
+shr4	Any dst	int shift		4		0xC1		5	dst	shift	0xD1	
+shr4	Any dst			4		0xD3		5	dst			CLを使う
+shr8	Any dst	int shift		8	REX.W	0xC1		5	dst	shift	0xD1	
+shr8	Any dst			8	REX.W	0xD3		5	dst			CLを使う
+shl1	Any dst	int shift		1		0xC0		4	dst	shift	0xD0	
+shl1	Any dst			1		0xD2		4	dst			CLを使う
+shl2	Any dst	int shift		2	0x66	0xC1		4	dst	shift	0xD1	
+shl2	Any dst			2	0x66	0xD3		4	dst			CLを使う
+shl4	Any dst	int shift		4		0xC1		4	dst	shift	0xD1	
+shl4	Any dst			4		0xD3		4	dst			CLを使う
+shl8	Any dst	int shift		8	REX.W	0xC1		4	dst	shift	0xD1	
+shl8	Any dst			8	REX.W	0xD3		4	dst			CLを使う
+rcl1	Any dst	int shift		1		0xC0		2	dst	shift	0xD0	
+rcl1	Any dst			1		0xD2		2	dst			CLを使う
+rcl2	Any dst	int shift		2	0x66	0xC1		2	dst	shift	0xD1	
+rcl2	Any dst			2	0x66	0xD3		2	dst			CLを使う
+rcl4	Any dst	int shift		4		0xC1		2	dst	shift	0xD1	
+rcl4	Any dst			4		0xD3		2	dst			CLを使う
+rcl8	Any dst	int shift		8	REX.W	0xC1		2	dst	shift	0xD1	
+rcl8	Any dst			8	REX.W	0xD3		2	dst			CLを使う
+rcr1	Any dst	int shift		1		0xC0		3	dst	shift	0xD0	
+rcr1	Any dst			1		0xD2		3	dst			CLを使う
+rcr2	Any dst	int shift		2	0x66	0xC1		3	dst	shift	0xD1	
+rcr2	Any dst			2	0x66	0xD3		3	dst			CLを使う
+rcr4	Any dst	int shift		4		0xC1		3	dst	shift	0xD1	
+rcr4	Any dst			4		0xD3		3	dst			CLを使う
+rcr8	Any dst	int shift		8	REX.W	0xC1		3	dst	shift	0xD1	
+rcr8	Any dst			8	REX.W	0xD3		3	dst			CLを使う
+rol1	Any dst	int shift		1		0xC0		0	dst	shift	0xD0	
+rol1	Any dst			1		0xD2		0	dst			CLを使う
+rol2	Any dst	int shift		2	0x66	0xC1		0	dst	shift	0xD1	
+rol2	Any dst			2	0x66	0xD3		0	dst			CLを使う
+rol4	Any dst	int shift		4		0xC1		0	dst	shift	0xD1	
+rol4	Any dst			4		0xD3		0	dst			CLを使う
+rol8	Any dst	int shift		8	REX.W	0xC1		0	dst	shift	0xD1	
+rol8	Any dst			8	REX.W	0xD3		0	dst			CLを使う
+ror1	Any dst	int shift		1		0xC0		1	dst	shift	0xD0	
+ror1	Any dst			1		0xD2		1	dst			CLを使う
+ror2	Any dst	int shift		2	0x66	0xC1		1	dst	shift	0xD1	
+ror2	Any dst			2	0x66	0xD3		1	dst			CLを使う
+ror4	Any dst	int shift		4		0xC1		1	dst	shift	0xD1	
+ror4	Any dst			4		0xD3		1	dst			CLを使う
+ror8	Any dst	int shift		8	REX.W	0xC1		1	dst	shift	0xD1	
+ror8	Any dst			8	REX.W	0xD3		1	dst			CLを使う
+shrd2	Any dst	Reg src	int imm8	2	0x66	0x0FAC		src	dst	imm8		
+shrd2	Any dst	Reg src		2	0x66	0x0FAD		src	dst			CLを使う
+shrd4	Any dst	Reg src	int imm8	4		0x0FAC		src	dst	imm8		
+shrd4	Any dst	Reg src		4		0x0FAD		src	dst			CLを使う
+shrd8	Any dst	Reg src	int imm8	8	REX.W	0x0FAC		src	dst	imm8		
+shrd8	Any dst	Reg src		8	REX.W	0x0FAD		src	dst			CLを使う
+shld2	Any dst	Reg src	int imm8	2	0x66	0x0FA4		src	dst	imm8		
+shld2	Any dst	Reg src		2	0x66	0x0FA5		src	dst			CLを使う
+shld4	Any dst	Reg src	int imm8	4		0x0FA4		src	dst	imm8		
+shld4	Any dst	Reg src		4		0x0FA5		src	dst			CLを使う
+shld8	Any dst	Reg src	int imm8	8	REX.W	0x0FA4		src	dst	imm8		
+shld8	Any dst	Reg src		8	REX.W	0x0FA5		src	dst			CLを使う
+bt2	Any dst	int imm8		2	0x66	0x0FBA		4	dst	imm8		
+bt2	Any dst	Reg src		2	0x66	0x0FA3		src	dst			
+bt4	Any dst	int imm8		4		0x0FBA		4	dst	imm8		
+bt4	Any dst	Reg src		4		0x0FA3		src	dst			
+bt8	Any dst	int imm8		8	REX.W	0x0FBA		4	dst	imm8		
+bt8	Any dst	Reg src		8	REX.W	0x0FA3		src	dst			
+bts2	Any dst	int imm8		2	0x66	0x0FBA		5	dst	imm8		
+bts2	Any dst	Reg src		2	0x66	0x0FAB		src	dst			
+bts4	Any dst	int imm8		4		0x0FBA		5	dst	imm8		
+bts4	Any dst	Reg src		4		0x0FAB		src	dst			
+bts8	Any dst	int imm8		8	REX.W	0x0FBA		5	dst	imm8	
+bts8	Any dst	Reg src		8	REX.W	0x0FAB		src	dst		
+btr2	Any dst	int imm8		2	0x66	0x0FBA		6	dst	imm8	
+btr2	Any dst	Reg src		2	0x66	0x0FB3		src	dst		
+btr4	Any dst	int imm8		4		0x0FBA		6	dst	imm8	
+btr4	Any dst	Reg src		4		0x0FB3		src	dst		
+btr8	Any dst	int imm8		8	REX.W	0x0FBA		6	dst	imm8	
+btr8	Any dst	Reg src		8	REX.W	0x0FB3		src	dst		
+btc2	Any dst	int imm8		2	0x66	0x0FBA		7	dst	imm8	
+btc2	Any dst	Reg src		2	0x66	0x0FBB		src	dst		
+btc4	Any dst	int imm8		4		0x0FBA		7	dst	imm8	
+btc4	Any dst	Reg src		4		0x0FBB		src	dst		
+btc8	Any dst	int imm8		8	REX.W	0x0FBA		7	dst	imm8	
+btc8	Any dst	Reg src		8	REX.W	0x0FBB		src	dst		
+bsf2	Reg dst	Any src		2	0x66	0x0FBC		dst	src		
+bsf4	Reg dst	Any src		4		0x0FBC		dst	src		
+bsf8	Reg dst	Any src		8	REX.W	0x0FBC		dst	src		
+bsr2	Reg dst	Any src		2	0x66	0x0FBD		dst	src		
+bsr4	Reg dst	Any src		4		0x0FBD		dst	src		
+bsr8	Reg dst	Any src		8	REX.W	0x0FBD		dst	src		
+test1	Any src1	int imm8		1		0xF6		0	src1	imm8	
+test1	Any src1	Reg src2		1		0x84		src2	src1		
+test2	Any src1	int imm16		2	0x66	0xF7		0	src1	imm16	
+test2	Any src1	Reg src2		2	0x66	0x85		src2	src1		
+test4	Any src1	int imm32		4		0xF7		0	src1	imm32	
+test4	Any src1	Reg src2		4		0x85		src2	src1		
+test8	Any src1	int imm32		8	REX.W	0xF7		0	src1	imm32	
+test8	Any src1	Reg src2		8	REX.W	0x85		src2	src1		
+movs1				1		0xA4					
+movs2				2	0x66	0xA5					
+movs4				4		0xA5					
+movs8				8	REX.W	0xA5					
+cmps1				1		0xA6					
+cmps2				2	0x66	0xA7					
+cmps4				4		0xA7					
+cmps8				8	REX.W	0xA7					
+scas1				1		0xAE					
+scas2				2	0x66	0xAF					
+scas4				4		0xAF					
+scas8				8	REX.W	0xAF					
+loads1				1		0xAC					
+loads2				2	0x66	0xAD					
+loads4				4		0xAD					
+loads8				8	REX.W	0xAD					
+stos1				1		0xAA					
+stos2				2	0x66	0xAB					
+stos4				4		0xAB					
+stos8				8	REX.W	0xAB					
+lea2	Reg dst	Address address		2	0x66	0x8D		dst	address		
+lea4	Reg dst	Address address		4		0x8D		dst	address		
+lea8	Reg dst	Address address		8	REX.W	0x8D		dst	address		
+xadd1	Any dst	Reg src		1		0x0FC0		src	dst		
+xadd2	Any dst	Reg src		2	0x66	0x0FC1		src	dst		
+xadd4	Any dst	Reg src		4		0x0FC1		src	dst		
+xadd8	Any dst	Reg src		8	REX.W	0x0FC1		src	dst		
+bswap4	Reg dst			4		0x0FC8	dst				
+bswap8	Reg dst			8	REX.W	0x0FC8	dst				
+xchg1	Any dst	Reg src		1		0x86		src	dst		
+xchg2	Any dst	Reg src		2	0x66	0x87		src	dst		
+xchg4	Any dst	Reg src		4		0x87		src	dst		
+xchg8	Any dst	Reg src		8	REX.W	0x87		src	dst		
+cmpxchg1	Any dst	Reg src		1		0x0FB0		src	dst		
+cmpxchg2	Any dst	Reg src		2	0x66	0x0FB1		src	dst		
+cmpxchg4	Any dst	Reg src		4		0x0FB1		src	dst		
+cmpxchg8	Any dst	Reg src		8	REX.W	0x0FB1		src	dst			
+cmpxchg8b	Address dst			4		0x0FC7		1	dst			
+cmpxchg16	Address dst			8	REX.W	0x0FC7		1	dst			サイズはダミー
+movbe2	Reg dst	Address src		2	0x66	0x0F38F0		dst	src			
+movbe2	Address dst	Reg src		2	0x66	0x0F38F1		src	dst			
+movbe4	Reg dst	Address src		4		0x0F38F0		dst	src			
+movbe4	Address dst	Reg src		4		0x0F38F1		src	dst			
+movbe8	Reg dst	Address src		8	REX.W	0x0F38F0		dst	src			
+movbe8	Address dst	Reg src		8	REX.W	0x0F38F1		src	dst			
+stc						0xF9						
+clc						0xF8						
+cmc						0xF5						
+std						0xFD						
+cld						0xFC						
+lahf						0x9F						
+sahf						0x9E						
+pushf						0x9C						
+popf						0x9D						
+nop						0x90						
+ud2						0x91						
+hlt						0x92						
+interrupt	int imm8					0x93				imm8		
+clflush	Address src			4		0x0FAE		7	src			実質的な大きさがないが4バイトオペランドとして扱う。
+lfence						0x0FAEE8						
+sfence						0x0FAEF8						
+mfence						0x0FAEF0						
+cpuid						0x0FA2						
