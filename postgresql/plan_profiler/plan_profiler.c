@@ -4,6 +4,7 @@
 #include <time.h>
 #include "executor/executor.h"
 #include "fmgr.h"
+#include "nodes/nodes.h"
 #include "utils/elog.h"
 
 PG_MODULE_MAGIC;
@@ -16,6 +17,10 @@ static struct itimerspec interval;
 
 static void executor_run_routine(QueryDesc *queryDesc, ScanDirection direction, long count);
 static void plan_profiler_signal_handler(SIGNAL_ARGS);
+
+static unsigned int sampling_count;
+static unsigned int histogram_data[T_LimitState - T_PlanState + 1];
+static void print_statics(void);
 
 void
 _PG_init(void)
@@ -45,6 +50,9 @@ _PG_init(void)
 static void
 executor_run_routine(QueryDesc *queryDesc, ScanDirection direction, long count)
 {
+	sampling_count = 0;
+	memset(&histogram_data, 0, sizeof(histogram_data));
+
 	if (timer_settime(timerid, 0, &interval, NULL) != 0)
 		elog(ERROR, "timer_settime()");
 
@@ -64,10 +72,35 @@ executor_run_routine(QueryDesc *queryDesc, ScanDirection direction, long count)
 	PG_END_TRY();
 
 	timer_settime(timerid, 0, NULL, NULL);
+
+	if (sampling_count >= 100)
+		print_statics();
+}
+
+static void
+print_statics(void)
+{
+	NodeTag t;
+
+	for (t = T_PlanState ; t <= T_LimitState ; t++)
+	{
+		if (histogram_data[t - T_PlanState] > 0)
+		{
+			printf("%3u: %3.2f%%\n", t, 1.0 * histogram_data[t - T_PlanState] / sampling_count);
+		}
+	}
 }
 
 static void
 plan_profiler_signal_handler(SIGNAL_ARGS)
 {
+	NodeTag tag = CurrentExecutingPlanState;
+
+	if ((T_PlanState <= tag) && (tag <= T_LimitState))
+	{
+		sampling_count++;
+		histogram_data[tag - T_PlanState]++;
+	}
+
 	timer_settime(timerid, 0, &interval, NULL);
 }
