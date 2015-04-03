@@ -115,6 +115,4 @@ plan_profiler_signal_handler(SIGNAL_ARGS)
 		sampling_count++;
 		histogram_data[tag - T_PlanState]++;
 	}
-
-	/* timer_settime(timerid, 0, &interval, NULL); */
 }
