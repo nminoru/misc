@@ -1,0 +1,17 @@
+#! /usr/bin/stap
+
+global pagefault_counter
+
+probe begin
+{
+  printf("probe start!\n");
+}
+
+probe vm.pagefault {
+  pagefault_counter++
+
+  if (100000 < pagefault_counter) {
+      pagefault_counter = 0;
+      printf("%d:%s:%s:%p\n", pid(), execname(), (write_access ? "W" : "R"), address);
+  }
+}
