@@ -1,0 +1,4 @@
+comment = 'Transaction ID'
+default_version = '1.0'
+module_pathname = '$libdir/xid_boost'
+relocatable = false
