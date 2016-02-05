@@ -1,4 +1,4 @@
-CREATE FUNCTION public.xid_boost()
-RETURNS void
+CREATE FUNCTION public.xid_boost(IN workers int)
+RETURNS int
 AS 'MODULE_PATHNAME'
 LANGUAGE C VOLATILE STRICT;

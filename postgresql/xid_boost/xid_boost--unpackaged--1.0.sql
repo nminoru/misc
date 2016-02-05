@@ -1,2 +1,3 @@
-DROP FUNCTION public.xid_boost() CASCADE;
+DROP FUNCTION public.xid_boost(int) CASCADE;
+
 
