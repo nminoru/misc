@@ -6,6 +6,8 @@ OBJS = exec_sql_twice.o
 EXTENSION = exec_sql_twice
 DATA = exec_sql_twice--1.0.sql
 
+REGRESS = test_exec_sql_twice
+
 # ifdef USE_PGXS
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
