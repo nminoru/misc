@@ -53,5 +53,5 @@ call_bar(int flags)
 void
 foo(void)
 {
-    printf("foo()\n");
+    printf("foo() in main\n");
 }
