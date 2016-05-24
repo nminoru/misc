@@ -1,0 +1,5 @@
+# pltcl extension
+comment = 'PL/sample procedural language'
+default_version = '1.0'
+module_pathname = '$libdir/plsample'
+relocatable = true
