@@ -13,7 +13,7 @@ RETURNS void
 AS 'MODULE_PATHNAME'
 LANGUAGE C;
 
-CREATE PROCEDURAL LANGUAGE plsample
+CREATE TRUSTED PROCEDURAL LANGUAGE plsample
     HANDLER     plsample_call_handler
     INLINE      plsample_inline_handler
     VALIDATOR   plsample_validator;

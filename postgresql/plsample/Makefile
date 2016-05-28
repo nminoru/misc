@@ -6,6 +6,8 @@ OBJS = plsample.o
 EXTENSION = plsample
 DATA = plsample--1.0.sql
 
+REGRESS = plsample
+
 # ifdef USE_PGXS
 PG_CONFIG = pg_config
 PGXS := $(shell $(PG_CONFIG) --pgxs)
