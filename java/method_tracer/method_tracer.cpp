@@ -12,11 +12,19 @@
 #include <jni.h>
 #include <jvmti.h>
 
+#define MAX_STACK_DEPTH  (256)
+
+struct stack_info {
+    char name[512];
+};
+
 struct thread_local_data {
     thread_local_data() : stack_level(0) {};
 
     int thread_id;
     int stack_level;
+
+    stack_info stack[MAX_STACK_DEPTH];
 };
 
 static jvmtiEnv*        jvmti;
@@ -170,10 +178,20 @@ vm_method_entry(jvmtiEnv* jvmti, JNIEnv* jni_env, jthread thread, jmethodID meth
         abort();
     }
 
-    tld->stack_level++;
+    if (tld->stack_level < MAX_STACK_DEPTH)
+    {
+        snprintf(tld->stack[tld->stack_level].name, sizeof(stack_info), "%s %s %s %s %s",
+                 class_signature, class_generic, method_name, method_signature, method_generic);
 
-    printf("thread-%d: %d %s %s %s %s %s\n", tld->thread_id, tld->stack_level,
-           class_signature, class_generic, method_name, method_signature, method_generic);
+        printf("thread-%03d: ENTER %3d %s\n", tld->thread_id, tld->stack_level + 1,
+               tld->stack[tld->stack_level].name);
+    }
+    else
+    {
+        printf("thread-%03d: ENTER %3d\n", tld->thread_id, tld->stack_level + 1);
+    }
+
+    tld->stack_level++;
 }
 
 static void JNICALL
@@ -186,7 +204,10 @@ vm_method_exit(jvmtiEnv* jvmti, JNIEnv* jni_env, jthread thread, jmethodID metho
     if (tld == NULL)
         return;
 
-    printf("thread-%d: %d\n", tld->thread_id, tld->stack_level);
+    if ((0 < tld->stack_level) && (tld->stack_level < MAX_STACK_DEPTH))
+        printf("thread-%03d: EXIT  %3d %s\n", tld->thread_id, tld->stack_level, tld->stack[tld->stack_level - 1].name);
+    else
+        printf("thread-%03d: EXIT  %3d\n", tld->thread_id, tld->stack_level);
 
     tld->stack_level--;
 }
