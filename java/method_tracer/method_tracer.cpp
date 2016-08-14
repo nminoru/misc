@@ -38,6 +38,8 @@ static void JNICALL vm_thread_start(jvmtiEnv* jvmti, JNIEnv* jni_env, jthread th
 static void JNICALL vm_thread_end(jvmtiEnv* jvmti, JNIEnv* jni_env, jthread thread);
 static void JNICALL vm_method_entry(jvmtiEnv* jvmti, JNIEnv* jni_env,  jthread thread, jmethodID method);
 static void JNICALL vm_method_exit(jvmtiEnv* jvmti, JNIEnv* jni_env, jthread thread, jmethodID method, jboolean was_popped_by_exception, jvalue return_value);
+static size_t parseJavaSignature(char *dest, const size_t limit, const char *src);
+static size_t _parseJavaSignature(char *dest, const size_t limit, const char **src_p);
 
 
 JNIEXPORT jint JNICALL
@@ -180,9 +182,26 @@ vm_method_entry(jvmtiEnv* jvmti, JNIEnv* jni_env, jthread thread, jmethodID meth
 
     if (tld->stack_level < MAX_STACK_DEPTH)
     {
-        snprintf(tld->stack[tld->stack_level].name, sizeof(stack_info), "%s %s %s %s %s",
-                 class_signature, class_generic, method_name, method_signature, method_generic);
+        char *dest = tld->stack[tld->stack_level].name;
+        size_t size = 0;
+        const size_t limit = sizeof(stack_info);
 
+        size += parseJavaSignature(dest, limit, class_signature);
+
+        if (limit < size + 2)
+            goto parse_done;
+
+        dest[size] = '.';
+        size++;
+
+        size += snprintf(dest + size, limit - size, "%s", method_name);
+
+        if (limit < size + 1)
+            goto parse_done;
+
+        size += parseJavaSignature(dest + size, limit - size, method_signature);
+
+    parse_done:
         printf("thread-%03d: ENTER %3d %s\n", tld->thread_id, tld->stack_level + 1,
                tld->stack[tld->stack_level].name);
     }
@@ -192,6 +211,12 @@ vm_method_entry(jvmtiEnv* jvmti, JNIEnv* jni_env, jthread thread, jmethodID meth
     }
 
     tld->stack_level++;
+
+    jvmti->Deallocate((unsigned char*) class_signature);
+    jvmti->Deallocate((unsigned char*) class_generic);
+    jvmti->Deallocate((unsigned char*) method_name);
+    jvmti->Deallocate((unsigned char*) method_signature);
+    jvmti->Deallocate((unsigned char*) method_generic);
 }
 
 static void JNICALL
@@ -211,3 +236,161 @@ vm_method_exit(jvmtiEnv* jvmti, JNIEnv* jni_env, jthread thread, jmethodID metho
 
     tld->stack_level--;
 }
+
+static size_t
+parseJavaSignature(char *dest, const size_t limit, const char *src)
+{
+    return _parseJavaSignature(dest, limit, &src);
+}
+
+static size_t
+_parseJavaSignature(char *dest, const size_t limit, const char **src_p)
+{
+    const char* src;
+    size_t size = 0;
+
+    src = *src_p;
+
+    if (limit <= 1)
+        return 0;
+
+    if (!src)
+        goto done;
+
+    switch (*src) {
+
+    case 'Z':
+        size = snprintf(dest, limit, "boolean");
+        src++;
+        break;
+
+    case 'B':
+        size = snprintf(dest, limit, "byte");
+        src++;
+        break;
+
+    case 'C':
+        size = snprintf(dest, limit, "char");
+        src++;
+        break;
+
+    case 'S':
+        size = snprintf(dest, limit, "short");
+        src++;
+        break;
+
+    case 'I':
+        size = snprintf(dest, limit, "int");
+        src++;
+        break;
+
+    case 'J':
+        size = snprintf(dest, limit, "long");
+        src++;
+        break;
+        
+    case 'F':
+        size = snprintf(dest, limit, "float");
+        src++;
+        break;
+
+    case 'D':
+        size = snprintf(dest, limit, "double");
+        src++;
+        break;
+
+    case 'L': {
+        bool class_name_end = false;
+
+        src++; // skip 'L';
+
+        while (*src && !class_name_end) {
+            if (limit < size + 1)
+                goto done;
+
+            switch (*src) {
+
+            case '/':
+                dest[size] = '.';
+                size++;
+                break;
+
+            case ';':
+                class_name_end = true;
+                break;
+
+            default:
+                dest[size] = *src;
+                size++;
+                break;
+            }
+
+            src++;
+        }
+        break;
+    }
+
+    case '[':
+        if (limit < size + 1)
+            goto done;
+
+        src++;
+        size = _parseJavaSignature(dest, limit, &src);
+
+        if (limit < size + 2)
+            goto done;
+
+        dest[size++] = '[';
+        dest[size++] = ']';
+        break;
+
+    case '(': {
+        bool some_arguments = false;
+
+        dest[size++] = '(';
+        src++;
+
+        do {
+            if (*src == ')') {
+                if (limit < size + 2)
+                    goto done;
+
+                dest[size++] = ')';
+                dest[size++] = ' ';
+                src++;
+                break;
+            } else {
+                if (some_arguments) {
+                    if (limit < size + 2)
+                        goto done;
+
+                    dest[size++] = ',';
+                    dest[size++] = ' ';
+                }
+
+                if (limit < size + 1)
+                    goto done;
+
+                size += _parseJavaSignature(dest + size, limit - size, &src);
+                some_arguments = true;
+            }
+        } while (*src);
+
+        if (limit < size + 1)
+            goto done;
+
+        size += _parseJavaSignature(dest + size, limit - size, &src);
+        break;
+    }
+
+    default:
+        break;
+    }
+
+done:
+    dest[size] = '\0';
+    *src_p = src;
+
+    return size;
+}
+

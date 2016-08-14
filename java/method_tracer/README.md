@@ -1,7 +1,6 @@
 method_tracer
 =============
 
-
 Build
 =====
 
@@ -9,6 +8,7 @@ JAVA_HOME
 
 Run
 ===
-java -agentlib:method_tracer
 
+First, add to LD_LIBRARY_PATH the directory where libmethod_tracer.so exists. 
 
+  java -agentlib:method_tracer ...
