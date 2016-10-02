@@ -1,0 +1,4 @@
+# sample_fdw extension
+comment = 'Sample FDW'
+default_version = '1.0'
+module_pathname = '$libdir/sample_fdw'

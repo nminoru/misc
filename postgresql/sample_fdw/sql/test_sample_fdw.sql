@@ -1,0 +1,25 @@
+CREATE EXTENSION IF NOT EXISTS sample_fdw;
+
+CREATE SERVER loopback FOREIGN DATA WRAPPER sample_fdw;
+CREATE USER MAPPING FOR CURRENT_USER SERVER loopback;
+
+DROP TABLE IF EXISTS t1 CASCADE;
+
+CREATE TABLE t1 (c1 int, c2 int, c3 int);
+
+INSERT INTO t1 (c1, c2, c3) SELECT i % 7, i % 11, i % 13 FROM GENERATE_SERIES(1, 1000) AS i;
+
+CREATE FOREIGN TABLE ft1 (
+       c1 int,
+       c2 int,
+       c3 int
+) SERVER loopback OPTIONS (table_name 'public.t1');
+
+SELECT c1 AS key, sum(c2) AS sum FROM ft1 WHERE c2 > 0 GROUP BY c1 ORDER BY c1 LIMIT 5;
+
+-- EXPLAIN (COSTS OFF, VERBOSE ON) SELECT c1 AS key, sum(c2) AS sum FROM ft1 WHERE c2 > 0 GROUP BY c1 ORDER BY c1 LIMIT 5;
+
+DROP TABLE t1;
+DROP FOREIGN TABLE ft1;
+DROP SERVER loopback CASCADE;
+
