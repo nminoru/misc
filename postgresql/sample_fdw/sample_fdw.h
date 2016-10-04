@@ -13,7 +13,9 @@
 #include "executor/tuptable.h"
 #include "foreign/foreign.h"
 #include "nodes/nodes.h"
+#include "nodes/relation.h"
 #include "utils/relcache.h"
+
 
 
 /* Default CPU cost to start up a foreign query. */
@@ -58,5 +60,9 @@ typedef struct SampleFdwScanState
 	int				last_remote_var;
 
 } SampleFdwScanState;
+
+
+extern List *build_path_tlist_external(PlannerInfo *root, Path *path);
+
 
 #endif   /* SAMPLE_FDW_H */

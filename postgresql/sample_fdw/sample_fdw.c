@@ -14,9 +14,9 @@
 #include "access/relscan.h"
 #include "access/sdir.h"
 #include "c.h"
+#include "catalog/namespace.h"
 #include "catalog/pg_attribute.h"
 #include "commands/defrem.h"
-#include "commands/explain.h"
 #include "commands/explain.h"
 #include "executor/executor.h"
 #include "executor/tuptable.h"
@@ -32,6 +32,7 @@
 #include "optimizer/cost.h"
 #include "optimizer/pathnode.h"
 #include "optimizer/planmain.h"
+#include "optimizer/planner.h"
 #include "optimizer/restrictinfo.h"
 #include "optimizer/var.h"
 #include "utils/builtins.h"
@@ -41,7 +42,8 @@
 #include "utils/rel.h"
 #include "utils/relcache.h"
 
-#include "catalog/namespace.h"
+#include "nodes/params.h"
+#include "optimizer/planner.h"
 
 #include "sample_fdw.h"
 
@@ -55,6 +57,14 @@
 
 PG_MODULE_MAGIC;
 
+extern void _PG_init(void);
+
+static bool use_sample_fdw;
+
+static planner_hook_type planner_hook_prev;
+
+static PlannedStmt *sample_fdw_palnner(Query *parse, int cursorOptions, ParamListInfo boundParams);
+
 /*
  * FDW callback routines
  */
@@ -65,6 +75,12 @@ static List *charToQualifiedNameList(const char *name);
 static void sampleFdwGetForeignPaths(PlannerInfo *root,
 									 RelOptInfo *baserel,
 									 Oid foreigntableid);
+static void sampleFdwGetForeignJoinPaths(PlannerInfo *root,
+										 RelOptInfo *joinrel,
+										 RelOptInfo *outerrel,
+										 RelOptInfo *innerrel,
+										 JoinType jointype,
+										 JoinPathExtraData *extra);
 static ForeignScan *sampleFdwGetForeignPlan(PlannerInfo *root,
 											RelOptInfo *baserel,
 											Oid foreigntableid,
@@ -103,6 +119,14 @@ static TupleTableSlot *sampleFdwExecForeignDelete(EState *estate,
 static void sampleFdwEndForeignModify(EState *estate,
 									  ResultRelInfo *resultRelInfo);
 static int	sampleFdwIsForeignRelUpdatable(Relation rel);
+static RowMarkType sampleFdwGetForeignRowMarkType(RangeTblEntry *rte,
+												  LockClauseStrength strength);
+static HeapTuple sampleFdwRefetchForeignRow(EState *estate,
+											ExecRowMark *erm,
+											Datum rowid,
+											bool *updated);
+static bool sampleFdwRecheckForeignScan(ForeignScanState *node,
+										TupleTableSlot *slot);
 static void sampleFdwExplainForeignScan(ForeignScanState *node,
 										ExplainState *es);
 static void sampleFdwExplainForeignModify(ModifyTableState *mtstate,
@@ -116,6 +140,32 @@ static bool sampleFdwAnalyzeForeignTable(Relation relation,
 static List *sampleFdwImportForeignSchema(ImportForeignSchemaStmt *stmt,
 										  Oid serverOid);
 
+void
+_PG_init(void)
+{
+	planner_hook_prev =	planner_hook;
+	planner_hook = sample_fdw_palnner;
+}
+
+static PlannedStmt * 
+sample_fdw_palnner(Query *parse, int cursorOptions, ParamListInfo boundParams)
+{
+	PlannedStmt *result;
+
+	use_sample_fdw = false;
+
+	if (planner_hook_prev)
+		result = (*planner_hook_prev)(parse, cursorOptions, boundParams);
+	else
+		result = standard_planner(parse, cursorOptions, boundParams);
+
+	if (use_sample_fdw)
+	{
+		/* @todo */
+	}
+
+	return result;
+}
 
 PG_FUNCTION_INFO_V1(sample_fdw_handler);
 Datum
@@ -132,6 +182,9 @@ sample_fdw_handler(PG_FUNCTION_ARGS)
 	routine->ReScanForeignScan = sampleFdwReScanForeignScan;
 	routine->EndForeignScan = sampleFdwEndForeignScan;
 
+	/* Functions for remote-join planning */
+	routine->GetForeignJoinPaths = sampleFdwGetForeignJoinPaths;
+
 	/* Functions for updating foreign tables */
 	routine->AddForeignUpdateTargets = sampleFdwAddForeignUpdateTargets;
 	routine->PlanForeignModify = sampleFdwPlanForeignModify;
@@ -141,6 +194,11 @@ sample_fdw_handler(PG_FUNCTION_ARGS)
 	routine->ExecForeignDelete = sampleFdwExecForeignDelete;
 	routine->EndForeignModify = sampleFdwEndForeignModify;
 	routine->IsForeignRelUpdatable = sampleFdwIsForeignRelUpdatable;
+
+	/* Functions for SELECT FOR UPDATE/SHARE row locking */
+	routine->GetForeignRowMarkType = sampleFdwGetForeignRowMarkType;
+	routine->RefetchForeignRow = sampleFdwRefetchForeignRow;
+	routine->RecheckForeignScan = sampleFdwRecheckForeignScan;
 
 	/* Support functions for EXPLAIN */
 	routine->ExplainForeignScan = sampleFdwExplainForeignScan;
@@ -172,8 +230,8 @@ sample_fdw_validator(PG_FUNCTION_ARGS)
 
 static void
 sampleFdwGetForeignRelSize(PlannerInfo *root,
-					  RelOptInfo *baserel,
-					  Oid foreigntableid)
+						   RelOptInfo *baserel,
+						   Oid foreigntableid)
 {
 	SampleFdwRelationInfo *fdw_rel_info;
 	Oid table_oid = (Oid) 0;
@@ -296,8 +354,6 @@ sampleFdwGetForeignPaths(PlannerInfo *root,
 {
 	SampleFdwRelationInfo *fdw_rel_info = (SampleFdwRelationInfo *) baserel->fdw_private;
 	ForeignPath *path;
-	List	   *ppi_list;
-	ListCell   *lc;
 
 	path = create_foreignscan_path(root, baserel,
 								   fdw_rel_info->rows,
@@ -309,6 +365,16 @@ sampleFdwGetForeignPaths(PlannerInfo *root,
 								   NIL);	/* no fdw_private list */
 
 	add_path(baserel, (Path *) path);
+}
+
+static void
+sampleFdwGetForeignJoinPaths(PlannerInfo *root,
+							 RelOptInfo *joinrel,
+							 RelOptInfo *outerrel,
+							 RelOptInfo *innerrel,
+							 JoinType jointype,
+							 JoinPathExtraData *extra)
+{
 }
 
 static ForeignScan *
@@ -327,6 +393,15 @@ sampleFdwGetForeignPlan(PlannerInfo *root,
 	List	   *fdw_scan_tlist = NIL;
 	List	   *fdw_recheck_quals = NIL;
 
+	/*
+	 * This `tlist' parameter may be a scan-all-rows targetlist generated by
+	 * build_physical_tlist(). I want the original targetlist needed by by the
+	 * query.
+	 */
+	tlist = build_path_tlist_external(root, &best_path->path);
+
+	use_sample_fdw = true;
+
 	fdw_private = list_make1_oid(fdw_rel_info->remote_tableoid);
 
 	scan_clauses = extract_actual_clauses(scan_clauses, false);
@@ -344,7 +419,7 @@ sampleFdwGetForeignPlan(PlannerInfo *root,
 static void
 sampleFdwBeginForeignScan(ForeignScanState *node, int eflags)
 {
-	ForeignScan *fsplan = (ForeignScan *) node->ss.ps.plan;
+	ForeignScan *fscan = (ForeignScan *) node->ss.ps.plan;
 	EState	   *estate = node->ss.ps.state;
 	SampleFdwScanState *inner_state;
 	TupleDesc	fdwTupleDesc;
@@ -358,7 +433,7 @@ sampleFdwBeginForeignScan(ForeignScanState *node, int eflags)
 	inner_state = (SampleFdwScanState *) palloc0(sizeof(SampleFdwScanState));
 	node->fdw_state = (void *) inner_state;
 
-	inner_state->remote_tableoid = linitial_oid(fsplan->fdw_private);
+	inner_state->remote_tableoid = linitial_oid(fscan->fdw_private);
 
 	inner_state->remote_relation = heap_open(inner_state->remote_tableoid, AccessShareLock);
 	inner_state->remote_scandesc = heap_beginscan(inner_state->remote_relation,
@@ -571,6 +646,41 @@ static int
 sampleFdwIsForeignRelUpdatable(Relation rel)
 {
 	return 0;
+}
+
+static RowMarkType
+sampleFdwGetForeignRowMarkType(RangeTblEntry *rte,
+							   LockClauseStrength strength)
+{
+	ereport(ERROR,
+			(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+			 errmsg("GetForeignRowMarkType callback does not implemented")));
+
+	return ROW_MARK_EXCLUSIVE;
+}
+
+static HeapTuple
+sampleFdwRefetchForeignRow(EState *estate,
+						   ExecRowMark *erm,
+						   Datum rowid,
+						   bool *updated)
+{
+	ereport(ERROR,
+			(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+			 errmsg("RefetchForeignRow callback does not implemented")));
+
+	return NULL;
+}
+
+static bool
+sampleFdwRecheckForeignScan(ForeignScanState *node,
+							TupleTableSlot *slot)
+{
+	ereport(ERROR,
+			(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
+			 errmsg("RecheckForeignScan callback does not implemented")));
+
+	return false;
 }
 
 static void
