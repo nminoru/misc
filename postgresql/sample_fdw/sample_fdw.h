@@ -10,6 +10,7 @@
 #ifndef SAMPLE_FDW_H
 #define SAMPLE_FDW_H
 
+#include "access/heapam.h"
 #include "executor/tuptable.h"
 #include "foreign/foreign.h"
 #include "nodes/nodes.h"
@@ -19,7 +20,7 @@
 
 
 /* Default CPU cost to start up a foreign query. */
-#define DEFAULT_FDW_STARTUP_COST	(100.0)
+#define DEFAULT_FDW_STARTUP_COST	(1.0)
 
 /* Default CPU cost to process 1 row (above and beyond cpu_tuple_cost). */
 #define DEFAULT_FDW_TUPLE_COST		(0.01)
@@ -61,6 +62,8 @@ typedef struct SampleFdwScanState
 
 } SampleFdwScanState;
 
+extern void sample_fdw_correct_path_cost_size(Path *path, Oid fwdOid);
+extern bool path_tree_walker(Path *path, bool (*walker)(Path *path, void *context), void *context);
 
 extern List *build_path_tlist_external(PlannerInfo *root, Path *path);
 

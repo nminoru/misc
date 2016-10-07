@@ -25,12 +25,14 @@
 #include "miscadmin.h"
 #include "nodes/execnodes.h"
 #include "nodes/nodes.h"
+#include "nodes/params.h"
 #include "nodes/parsenodes.h"
 #include "nodes/pg_list.h"
 #include "nodes/plannodes.h"
 #include "nodes/relation.h"
 #include "optimizer/cost.h"
 #include "optimizer/pathnode.h"
+#include "optimizer/paths.h"
 #include "optimizer/planmain.h"
 #include "optimizer/planner.h"
 #include "optimizer/restrictinfo.h"
@@ -38,12 +40,11 @@
 #include "utils/builtins.h"
 #include "utils/elog.h"
 #include "utils/errcodes.h"
+#include "utils/lsyscache.h"
 #include "utils/palloc.h"
 #include "utils/rel.h"
 #include "utils/relcache.h"
-
-#include "nodes/params.h"
-#include "optimizer/planner.h"
+#include "utils/syscache.h"
 
 #include "sample_fdw.h"
 
@@ -59,11 +60,19 @@ PG_MODULE_MAGIC;
 
 extern void _PG_init(void);
 
+static Oid sample_fdw_oid;
 static bool use_sample_fdw;
 
 static planner_hook_type planner_hook_prev;
+static set_join_pathlist_hook_type set_join_pathlist_hook_prev;
 
 static PlannedStmt *sample_fdw_palnner(Query *parse, int cursorOptions, ParamListInfo boundParams);
+static void sample_fdw_set_join_pathlist(PlannerInfo *root,
+										 RelOptInfo *joinrel,
+										 RelOptInfo *outerrel,
+										 RelOptInfo *innerrel,
+										 JoinType jointype,
+										 JoinPathExtraData *extra);
 
 /*
  * FDW callback routines
@@ -139,18 +148,25 @@ static bool sampleFdwAnalyzeForeignTable(Relation relation,
 										 BlockNumber *totalpages);
 static List *sampleFdwImportForeignSchema(ImportForeignSchemaStmt *stmt,
 										  Oid serverOid);
+static Oid sampleFdwGetTableOid(List *table_options);
+
 
 void
 _PG_init(void)
 {
 	planner_hook_prev =	planner_hook;
 	planner_hook = sample_fdw_palnner;
+
+	set_join_pathlist_hook_prev = set_join_pathlist_hook;
+	set_join_pathlist_hook = sample_fdw_set_join_pathlist;
 }
 
 static PlannedStmt * 
 sample_fdw_palnner(Query *parse, int cursorOptions, ParamListInfo boundParams)
 {
 	PlannedStmt *result;
+
+	printf("*** %s ***\n", __func__);
 
 	use_sample_fdw = false;
 
@@ -165,6 +181,36 @@ sample_fdw_palnner(Query *parse, int cursorOptions, ParamListInfo boundParams)
 	}
 
 	return result;
+}
+
+static void
+sample_fdw_set_join_pathlist(PlannerInfo *root,
+							 RelOptInfo *joinrel,
+							 RelOptInfo *outerrel,
+							 RelOptInfo *innerrel,
+							 JoinType jointype,
+							 JoinPathExtraData *extra)
+{
+	if (set_join_pathlist_hook_prev)
+		(*set_join_pathlist_hook_prev)(root, joinrel, outerrel, innerrel, jointype, extra);
+
+	if (use_sample_fdw)
+	{
+#if 0
+		ListCell *lc;
+
+		printf("*** %s : %d ***\n", __func__, list_length(joinrel->pathlist));
+
+		foreach(lc, joinrel->pathlist)
+		{
+			Path *path = (Path *) lfirst(lc);
+
+			printf("\tnode=%d %d, rows=%f, startup_cost=%f, total_cost=%f\n",
+				   path->type, path->pathtype, path->rows, path->startup_cost, path->total_cost);
+		}
+		/* @todo */
+#endif
+	}
 }
 
 PG_FUNCTION_INFO_V1(sample_fdw_handler);
@@ -235,6 +281,9 @@ sampleFdwGetForeignRelSize(PlannerInfo *root,
 {
 	SampleFdwRelationInfo *fdw_rel_info;
 	Oid table_oid = (Oid) 0;
+	HeapTuple tuple;
+	Form_pg_class reltuple;
+	float4 numtuples;
 	List *quals = NIL;
 	ListCell *lc;
 
@@ -246,6 +295,8 @@ sampleFdwGetForeignRelSize(PlannerInfo *root,
 	fdw_rel_info->fdw_startup_cost = DEFAULT_FDW_STARTUP_COST;
 	fdw_rel_info->fdw_tuple_cost = DEFAULT_FDW_TUPLE_COST;
 
+	sample_fdw_oid = fdw_rel_info->server->fdwid;
+
 #if 0
 	foreach(lc, fdw_rel_info->server->options)
 	{
@@ -253,23 +304,19 @@ sampleFdwGetForeignRelSize(PlannerInfo *root,
 	}
 #endif
 
-	foreach(lc, fdw_rel_info->table->options)
-	{
-		DefElem	   *def = (DefElem *) lfirst(lc);
-
-		if (strcmp(def->defname, "table_name") == 0)
-		{
-			RangeVar   *relvar;
-
-			relvar = makeRangeVarFromNameList(charToQualifiedNameList(defGetString(def)));
-			table_oid = RangeVarGetRelid(relvar, AccessShareLock, false);
-		}
-	}
+	table_oid = sampleFdwGetTableOid(fdw_rel_info->table->options);
 
 	if (table_oid == 0)
 		ereport(ERROR,
 				(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
 				 errmsg("fff")));
+
+	tuple = SearchSysCache1(RELOID, ObjectIdGetDatum(table_oid));
+	if (!HeapTupleIsValid(tuple))
+		elog(ERROR, "cache lookup failed for relation %d", table_oid);
+	reltuple = (Form_pg_class) GETSTRUCT(tuple);
+	numtuples = reltuple->reltuples;
+	ReleaseSysCache(tuple);
 
 	fdw_rel_info->remote_tableoid = table_oid;
 	fdw_rel_info->attrs_used = NULL;
@@ -306,12 +353,10 @@ sampleFdwGetForeignRelSize(PlannerInfo *root,
 
 	set_baserel_size_estimates(root, baserel);
 
-#if 0
-	estimate_path_cost_size(root, baserel, NIL,
-							&fdw_rel_info->rows, &fdw_rel_info->width,
-							&fdw_rel_info->startup_cost, &fdw_rel_info->total_cost);
-#endif
-
+	fdw_rel_info->rows = numtuples;
+	fdw_rel_info->width = baserel->width;
+	fdw_rel_info->startup_cost = fdw_rel_info->fdw_startup_cost;
+	fdw_rel_info->total_cost = fdw_rel_info->fdw_startup_cost + fdw_rel_info->fdw_tuple_cost * fdw_rel_info->rows;
 }
 
 static List *
@@ -375,6 +420,27 @@ sampleFdwGetForeignJoinPaths(PlannerInfo *root,
 							 JoinType jointype,
 							 JoinPathExtraData *extra)
 {
+	SampleFdwRelationInfo *fdw_rel_info;
+	ListCell *lc;
+
+	printf("*** %s : %d ***\n", __func__, list_length(joinrel->pathlist));
+
+	foreach(lc, joinrel->pathlist)
+	{
+		Path *path = (Path *) lfirst(lc);
+
+		printf("\tnode=%d %d, rows=%f, startup_cost=%f, total_cost=%f\n",
+			   path->type, path->pathtype, path->rows, path->startup_cost, path->total_cost);
+	}
+
+#if 0
+	if (joinrel->fdw_private)
+		return;
+
+	fdw_rel_info = (SampleFdwRelationInfo *) palloc0(sizeof(SampleFdwRelationInfo));
+
+	joinrel->fdw_private = (void *) fdw_rel_info;
+#endif
 }
 
 static ForeignScan *
@@ -480,6 +546,9 @@ sampleFdwBeginForeignScan(ForeignScanState *node, int eflags)
 		for (remoteAttrNum = 1 ; remoteAttrNum <= remoteTupleDesc->natts; remoteAttrNum++)
 		{
 			Form_pg_attribute remoteAttr = remoteTupleDesc->attrs[remoteAttrNum - 1];
+
+			if (remoteAttr->attisdropped)
+				continue;
 			
 			if (strcmp(column_name, NameStr(remoteAttr->attname)) == 0)
 			{
@@ -534,8 +603,8 @@ sampleFdwIterateForeignScan(ForeignScanState *node)
 
 			if (i != 0)
 			{
-				scan_tts->tts_values[attrnum - 1] = remote_tts->tts_values[i];
-				scan_tts->tts_isnull[attrnum - 1] = remote_tts->tts_isnull[i];
+				scan_tts->tts_values[attrnum - 1] = remote_tts->tts_values[i - 1];
+				scan_tts->tts_isnull[attrnum - 1] = remote_tts->tts_isnull[i - 1];
 			}
 			else
 			{
@@ -688,35 +757,65 @@ sampleFdwExplainForeignScan(ForeignScanState *node,
 							ExplainState *es)
 {
 	ForeignScan *fsplan = (ForeignScan *) node->ss.ps.plan;
-	Oid tableoid;
+ 	Oid tableoid;
+	ForeignServer *server;
+
+	server = GetForeignServer(fsplan->fs_server);
+
+	ExplainPropertyText("FDW", "sample_fdw", es);
+	ExplainPropertyText("Remote Server", server->servername, es);
 
 	tableoid = linitial_oid(fsplan->fdw_private);
 
-	ExplainPropertyInteger("Remote Table Oid", tableoid, es);
+	ExplainPropertyText("Remote Table",
+						quote_qualified_identifier(get_namespace_name(get_rel_namespace(tableoid)),
+												   get_rel_name(tableoid)),
+						es);
 }
 
 static void
 sampleFdwExplainForeignModify(ModifyTableState *mtstate,
-						 ResultRelInfo *rinfo,
-						 List *fdw_private,
-						 int subplan_index,
-						 ExplainState *es)
+							  ResultRelInfo *rinfo,
+							  List *fdw_private,
+							  int subplan_index,
+							  ExplainState *es)
 {
 }
 
 static bool
 sampleFdwAnalyzeForeignTable(Relation relation,
-						AcquireSampleRowsFunc *func,
-						BlockNumber *totalpages)
+							 AcquireSampleRowsFunc *func,
+							 BlockNumber *totalpages)
 {
 	return false;
 }
 
 static List *
 sampleFdwImportForeignSchema(ImportForeignSchemaStmt *stmt,
-						Oid serverOid)
+							 Oid serverOid)
 {
 	ereport(ERROR,
 			(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
 			 errmsg("ImportForeignSchema callback does not implemented")));
+}
+
+static Oid
+sampleFdwGetTableOid(List *table_options)
+{
+	ListCell *lc;
+
+	foreach(lc, table_options)
+	{
+		DefElem	   *def = (DefElem *) lfirst(lc);
+
+		if (strcmp(def->defname, "table_name") == 0)
+		{
+			RangeVar   *relvar;
+
+			relvar = makeRangeVarFromNameList(charToQualifiedNameList(defGetString(def)));
+			return RangeVarGetRelid(relvar, AccessShareLock, false);
+		}
+	}
+
+	return (Oid) 0;
 }

@@ -14,7 +14,6 @@
  *
  *-------------------------------------------------------------------------
  */
-
 #include "postgres.h"
 
 #include <limits.h>
@@ -47,8 +46,10 @@
 #include "sample_fdw.h"
 
 static List *build_path_tlist(PlannerInfo *root, Path *path);
+
 static Node *replace_nestloop_params(PlannerInfo *root, Node *expr);
 static Node *replace_nestloop_params_mutator(Node *node, PlannerInfo *root);
+
 
 List *
 build_path_tlist_external(PlannerInfo *root, Path *path)
@@ -56,6 +57,9 @@ build_path_tlist_external(PlannerInfo *root, Path *path)
 	return build_path_tlist(root, path);
 }
 
+/*
+ * Build a target list (ie, a list of TargetEntry) for the Path's output.
+ */
 static List *
 build_path_tlist(PlannerInfo *root, Path *path)
 {
@@ -86,6 +90,7 @@ build_path_tlist(PlannerInfo *root, Path *path)
 	}
 	return tlist;
 }
+
 
 /*****************************************************************************
  *
@@ -214,3 +219,4 @@ replace_nestloop_params_mutator(Node *node, PlannerInfo *root)
 								   replace_nestloop_params_mutator,
 								   (void *) root);
 }
+
