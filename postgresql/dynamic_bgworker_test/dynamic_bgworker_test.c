@@ -67,7 +67,12 @@ worker_test(PG_FUNCTION_ARGS)
 
 	nworkers = PG_GETARG_INT32(0);
 
-	seg = dsm_create(sizeof(test_shm_mq_header));
+#if PG_VERSION_NUM >= 90500
+	seg = dsm_create(sizeof(test_shm_mq_header), 0);
+#else
+	seg = dsm_create(sizeof(test_shm_mq_header)
+#endif
+
 	hdr = dsm_segment_address(seg);
 
 	printf("begin worker_test: %d, %p\n", dsm_segment_handle(seg), hdr);
@@ -302,7 +307,7 @@ worker_test_main(Datum main_arg)
 
 	pqsignal(SIGHUP,  handle_sighup);
 	pqsignal(SIGTERM, handle_sigterm);
-	ImmediateInterruptOK = false;
+
 	BackgroundWorkerUnblockSignals();
 
 	printf("worker_test_main: %d\n", DatumGetInt32(main_arg));

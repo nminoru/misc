@@ -33,7 +33,7 @@ myexplain(PG_FUNCTION_ARGS)
 {
 	text		   *sql;
 	const char	   *sql_str;
-	ExplainState	es;
+	ExplainState   *es;
 	DestReceiver   *dest = None_Receiver;
 	QueryDesc	   *queryDesc;
 	PlannedStmt	   *plannedstmt;
@@ -44,17 +44,22 @@ myexplain(PG_FUNCTION_ARGS)
 	sql	= PG_GETARG_TEXT_P(0);
 
 	sql_str = TextDatumGetCString(sql);
-	
+
+#if PG_VERSION_NUM >= 90500
+	es = NewExplainState();
+#else
+	es = (ExplainState *) palloc0(sizeof(ExplainState));
 	ExplainInitState(&es);
+#endif
 
-	es.analyze	= false;
-	es.verbose	= true;
-	es.costs	= false;
-	es.buffers	= false;
-	es.timing	= false;
-	es.format	= EXPLAIN_FORMAT_TEXT;
+	es->analyze	= false;
+	es->verbose	= true;
+	es->costs	= false;
+	es->buffers	= false;
+	es->timing	= false;
+	es->format	= EXPLAIN_FORMAT_TEXT;
 
-	ExplainBeginOutput(&es);
+	ExplainBeginOutput(es);
 
 	plannedstmt = translate_sql(sql_str);
 
@@ -64,18 +69,18 @@ myexplain(PG_FUNCTION_ARGS)
 
 	ExecutorStart(queryDesc, EXEC_FLAG_EXPLAIN_ONLY);
 
-	ExplainPrintPlan(&es, queryDesc);
+	ExplainPrintPlan(es, queryDesc);
 	ExecutorEnd(queryDesc);
 	FreeQueryDesc(queryDesc);
 
-	ExplainEndOutput(&es);
+	ExplainEndOutput(es);
 
 	tupdesc = CreateTemplateTupleDesc(1, false);
 	TupleDescInitEntry(tupdesc, (AttrNumber) 1, "QUERY PLAN", TEXTOID, -1, 0);
 	tstate = begin_tup_output_tupdesc(dest, tupdesc);
-	do_text_output_multiline(tstate, es.str->data);
-	output = cstring_to_text(es.str->data);
-	pfree(es.str->data);
+	do_text_output_multiline(tstate, es->str->data);
+	output = cstring_to_text(es->str->data);
+	pfree(es->str->data);
 
 	PG_RETURN_TEXT_P(output);
 }
