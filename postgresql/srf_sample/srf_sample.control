@@ -1,0 +1,5 @@
+# srf_sample extension
+comment = 'srf_sample extension'
+default_version = '1.0'
+module_pathname = '$libdir/srf_sample'
+
