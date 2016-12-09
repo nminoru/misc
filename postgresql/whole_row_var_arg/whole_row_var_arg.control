@@ -1,0 +1,6 @@
+# whole_row_var_arg extension
+comment = 'whole_row_var_arg'
+default_version = '1.0'
+module_pathname = '$libdir/whole_row_var_arg'
+relocatable = false
+schema = public

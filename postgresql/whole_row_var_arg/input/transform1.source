@@ -1,0 +1,10 @@
+SET client_min_messages TO 'warning';
+
+CREATE EXTENSION IF NOT EXISTS whole_row_var_arg;
+
+CREATE TABLE T1 (C1 INT, C2 TEXT, C3 FLOAT8);
+INSERT INTO T1 (C1, C2, C3) SELECT i, i + 1, i + 2 FROM generate_series(1, 1000) AS i;
+
+SELECT *, whole_row_var_arg('@abs_srcdir@/data/transform1.py', T1.*) FROM T1;
+
+DROP TABLE T1 CASCADE;
