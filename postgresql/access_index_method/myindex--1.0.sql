@@ -1,74 +1,74 @@
-CREATE FUNCTION myindex_build(internal, internal, internal)
+CREATE FUNCTION pg_catalog.myindex_build(internal, internal, internal)
 RETURNS internal
 AS 'MODULE_PATHNAME'
 LANGUAGE C VOLATILE STRICT;
 
-CREATE FUNCTION myindex_buildempty(internal)
+CREATE FUNCTION pg_catalog.myindex_buildempty(internal)
 RETURNS void
 AS 'MODULE_PATHNAME'
 LANGUAGE C VOLATILE STRICT;
 
-CREATE FUNCTION myindex_insert(internal, internal, internal, internal, internal, internal)
+CREATE FUNCTION pg_catalog.myindex_insert(internal, internal, internal, internal, internal, internal)
 RETURNS bool
 AS 'MODULE_PATHNAME'
 LANGUAGE C VOLATILE STRICT;
 
-CREATE FUNCTION myindex_bulkdelete(internal, internal, internal, internal)
+CREATE FUNCTION pg_catalog.myindex_bulkdelete(internal, internal, internal, internal)
 RETURNS internal
 AS 'MODULE_PATHNAME'
 LANGUAGE C VOLATILE STRICT;
 
-CREATE FUNCTION myindex_vacuumcleanup(internal, internal)
+CREATE FUNCTION pg_catalog.myindex_vacuumcleanup(internal, internal)
 RETURNS internal
 AS 'MODULE_PATHNAME'
 LANGUAGE C VOLATILE STRICT;
 
-CREATE FUNCTION myindex_canreturn(internal)
+CREATE FUNCTION pg_catalog.myindex_canreturn(internal)
 RETURNS bool
 AS 'MODULE_PATHNAME'
 LANGUAGE C STABLE STRICT;
 
-CREATE FUNCTION myindex_costestimate(internal, internal, internal, internal, internal, internal, internal)
+CREATE FUNCTION pg_catalog.myindex_costestimate(internal, internal, internal, internal, internal, internal, internal)
 RETURNS void
 AS 'MODULE_PATHNAME'
 LANGUAGE C VOLATILE STRICT;
 
-CREATE FUNCTION myindex_options(_text, bool)
+CREATE FUNCTION pg_catalog.myindex_options(_text, bool)
 RETURNS bytea
 AS 'MODULE_PATHNAME'
 LANGUAGE C VOLATILE STRICT;
 
-CREATE FUNCTION myindex_beginscan(internal, internal, internal)
+CREATE FUNCTION pg_catalog.myindex_beginscan(internal, internal, internal)
 RETURNS internal
 AS 'MODULE_PATHNAME'
 LANGUAGE C VOLATILE STRICT;
 
-CREATE FUNCTION myindex_rescan(internal, internal, internal, internal, internal)
+CREATE FUNCTION pg_catalog.myindex_rescan(internal, internal, internal, internal, internal)
 RETURNS void
 AS 'MODULE_PATHNAME'
 LANGUAGE C VOLATILE STRICT;
 
-CREATE FUNCTION myindex_gettuple(internal, internal)
+CREATE FUNCTION pg_catalog.myindex_gettuple(internal, internal)
 RETURNS bool
 AS 'MODULE_PATHNAME'
 LANGUAGE C VOLATILE STRICT;
 
-CREATE FUNCTION myindex_getbitmap(internal, internal)
+CREATE FUNCTION pg_catalog.myindex_getbitmap(internal, internal)
 RETURNS int8
 AS 'MODULE_PATHNAME'
 LANGUAGE C VOLATILE STRICT;
 
-CREATE FUNCTION myindex_endscan(internal)
+CREATE FUNCTION pg_catalog.myindex_endscan(internal)
 RETURNS void
 AS 'MODULE_PATHNAME'
 LANGUAGE C VOLATILE STRICT;
 
-CREATE FUNCTION myindex_markpos(internal)
+CREATE FUNCTION pg_catalog.myindex_markpos(internal)
 RETURNS void
 AS 'MODULE_PATHNAME'
 LANGUAGE C VOLATILE STRICT;
 
-CREATE FUNCTION myindex_restrpos(internal)
+CREATE FUNCTION pg_catalog.myindex_restrpos(internal)
 RETURNS void
 AS 'MODULE_PATHNAME'
 LANGUAGE C VOLATILE STRICT;
@@ -76,34 +76,30 @@ LANGUAGE C VOLATILE STRICT;
 INSERT INTO pg_am VALUES ('myindex',
        1, 0,
        false, false, false, false, true, false, false, false, false, false, false, 0,
-       (SELECT oid FROM pg_proc WHERE proname = 'myindex_insert'       ),
-       (SELECT oid FROM pg_proc WHERE proname = 'myindex_beginscan'    ),
-       (SELECT oid FROM pg_proc WHERE proname = 'myindex_gettuple'     ),
-       (SELECT oid FROM pg_proc WHERE proname = 'myindex_getbitmap'    ),
-       (SELECT oid FROM pg_proc WHERE proname = 'myindex_rescan'       ),
-       (SELECT oid FROM pg_proc WHERE proname = 'myindex_endscan'      ),
-       (SELECT oid FROM pg_proc WHERE proname = 'myindex_markpos'      ),
-       (SELECT oid FROM pg_proc WHERE proname = 'myindex_restrpos'     ),
-       (SELECT oid FROM pg_proc WHERE proname = 'myindex_build'        ),
-       (SELECT oid FROM pg_proc WHERE proname = 'myindex_buildempty'   ),
-       (SELECT oid FROM pg_proc WHERE proname = 'myindex_bulkdelete'   ),
-       (SELECT oid FROM pg_proc WHERE proname = 'myindex_vacuumcleanup'),
-       (SELECT oid FROM pg_proc WHERE proname = 'myindex_canreturn'    ),
-       (SELECT oid FROM pg_proc WHERE proname = 'myindex_costestimate' ),
-       (SELECT oid FROM pg_proc WHERE proname = 'myindex_options'));
+       'pg_catalog.myindex_insert'::regproc,
+       'pg_catalog.myindex_beginscan'::regproc,
+       'pg_catalog.myindex_gettuple'::regproc,
+       'pg_catalog.myindex_getbitmap'::regproc,
+       'pg_catalog.myindex_rescan'::regproc,
+       'pg_catalog.myindex_endscan'::regproc,
+       'pg_catalog.myindex_markpos'::regproc,
+       'pg_catalog.myindex_restrpos'::regproc,
+       'pg_catalog.myindex_build'::regproc,
+       'pg_catalog.myindex_buildempty'::regproc,
+       'pg_catalog.myindex_bulkdelete'::regproc,
+       'pg_catalog.myindex_vacuumcleanup'::regproc,
+       'pg_catalog.myindex_canreturn'::regproc,
+       'pg_catalog.myindex_costestimate'::regproc,
+       'pg_catalog.myindex_options'::regproc);
 
 CREATE OPERATOR CLASS bool_ops DEFAULT FOR TYPE bool USING myindex AS OPERATOR 1 =;
 CREATE OPERATOR CLASS bytea_ops DEFAULT FOR TYPE bytea USING myindex AS OPERATOR 1 =;
--- CREATE OPERATOR CLASS char_ops DEFAULT FOR TYPE char USING myindex AS OPERATOR 1 =;
+CREATE OPERATOR CLASS char_ops DEFAULT FOR TYPE "char" USING myindex AS OPERATOR 1 =;
 CREATE OPERATOR CLASS name_ops DEFAULT FOR TYPE name USING myindex AS OPERATOR 1 =;
--- CREATE OPERATOR CLASS name_ops DEFAULT FOR TYPE name USING myindex AS OPERATOR 1 =;
 CREATE OPERATOR CLASS int8_ops DEFAULT FOR TYPE int8 USING myindex AS OPERATOR 1 =;
 CREATE OPERATOR CLASS int2_ops DEFAULT FOR TYPE int2 USING myindex AS OPERATOR 1 =;
 CREATE OPERATOR CLASS int4_ops DEFAULT FOR TYPE int4 USING myindex AS OPERATOR 1 =;
 CREATE OPERATOR CLASS text_ops DEFAULT FOR TYPE text USING myindex AS OPERATOR 1 =;
--- CREATE OPERATOR CLASS varchar_ops FOR TYPE text USING myindex AS OPERATOR 1 =;
--- CREATE OPERATOR CLASS var_pattern_ops FOR TYPE text USING myindex AS OPERATOR 1 =;
--- CREATE OPERATOR CLASS text_pattern_ops FOR TYPE text USING myindex AS OPERATOR 1 =;
 CREATE OPERATOR CLASS oid_ops DEFAULT FOR TYPE oid USING myindex AS OPERATOR 1 =;
 CREATE OPERATOR CLASS tid_ops DEFAULT FOR TYPE tid USING myindex AS OPERATOR 1 =;
 CREATE OPERATOR CLASS oidvector_ops DEFAULT FOR TYPE oidvector USING myindex AS OPERATOR 1 =;
@@ -117,7 +113,6 @@ CREATE OPERATOR CLASS macaddr_ops DEFAULT FOR TYPE macaddr USING myindex AS OPER
 CREATE OPERATOR CLASS inet_ops DEFAULT FOR TYPE inet USING myindex AS OPERATOR 1 =;
 -- CREATE OPERATOR CLASS cidr_ops FOR TYPE cidr USING myindex AS OPERATOR 1 =;
 CREATE OPERATOR CLASS bpchar_ops DEFAULT FOR TYPE bpchar USING myindex AS OPERATOR 1 =;
--- CREATE OPERATOR CLASS bpchar_pattern_ops FOR TYPE bpchar USING myindex AS OPERATOR 1 =;
 CREATE OPERATOR CLASS date_ops DEFAULT FOR TYPE date USING myindex AS OPERATOR 1 =;
 CREATE OPERATOR CLASS time_ops DEFAULT FOR TYPE time USING myindex AS OPERATOR 1 =;
 CREATE OPERATOR CLASS timestamp_ops DEFAULT FOR TYPE timestamp USING myindex AS OPERATOR 1 =;

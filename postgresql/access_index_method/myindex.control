@@ -3,3 +3,8 @@ comment = 'myindex'
 default_version = '1.0'
 module_pathname = '$libdir/myindex'
 relocatable = false
+schema = pg_catalog
+
+
+
+

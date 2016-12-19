@@ -1,8 +1,13 @@
 #include "postgres.h"
 
-#include <limits.h>
+#include <float.h>
 
+#include "access/genam.h"
 #include "fmgr.h"
+#include "nodes/execnodes.h"
+#include "nodes/nodes.h"
+#include "nodes/relation.h"
+#include "utils/relcache.h"
 
 
 PG_MODULE_MAGIC;
