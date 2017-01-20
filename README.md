@@ -1,9 +1,5 @@
 Miscellaneous
 =============
 
-これは雑多なテストコードを置いておくリポジトリ。
-
-
-
-
+This repository is for my personal experimentation.
 
