@@ -13,6 +13,7 @@ main(int argc, char **argv)
     mongoc_collection_t *collection;
     bson_error_t error;
     int64_t count;
+    bson_t reply;
     bson_t *query;
     mongoc_cursor_t *cursor;
     const bson_t *doc;
@@ -29,6 +30,22 @@ main(int argc, char **argv)
     } else {
         printf ("count: %" PRId64 "\n", count);
     }
+
+    if (mongoc_collection_stats (collection, NULL, &reply, &error))
+    {
+        bson_iter_t iter;
+
+        if (bson_iter_init (&iter, &reply)) {
+            while (bson_iter_next (&iter)) {
+                if (strcmp(bson_iter_key (&iter), "size") == 0) {
+                    printf("size: %ld\n", bson_iter_as_int64 (&iter));
+                }
+                else if (strcmp(bson_iter_key (&iter), "count") == 0) {
+                    printf("count: %ld\n", bson_iter_as_int64 (&iter));
+                }
+            }
+        }
+    } 
 
     /* Scan all documents in the collection */
     query = bson_new ();
