@@ -1,0 +1,7 @@
+# shm_test extension
+comment = 'shm_test'
+default_version = '1.0'
+module_pathname = '$libdir/shm_test'
+relocatable = false
+schema = public
+
