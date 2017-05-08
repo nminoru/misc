@@ -8,6 +8,7 @@
 #include "access/tupdesc.h"
 #include "catalog/pg_proc.h"
 #include "catalog/pg_type.h"
+#include "commands/event_trigger.h"
 #include "commands/trigger.h"
 #include "executor/execdesc.h"
 #include "executor/executor.h"
@@ -24,12 +25,11 @@
 #include "tcop/pquery.h"
 #include "tcop/tcopprot.h"
 #include "utils/builtins.h"
-#include "utils/elog.h"
-#include "utils/errcodes.h"
-#include "utils/palloc.h"
 #include "utils/snapmgr.h"
 #include "utils/syscache.h"
 #include "utils/tuplestore.h"
+
+
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC;
@@ -43,7 +43,6 @@ typedef struct
 
 
 static PlannedStmt *generate_plannedstmt(const char *sql_string);
-static bool equalTupleDescsIgnoringAttName(TupleDesc tupdesc1, TupleDesc tupdesc2);
 
 
 PG_FUNCTION_INFO_V1(plsample_call_handler);
@@ -53,7 +52,6 @@ plsample_call_handler(PG_FUNCTION_ARGS)
 {
 	PLsample_function *function;
 	FmgrInfo	   *flinfo = fcinfo->flinfo;
-	const char	   *pl_src;
 	ReturnSetInfo  *rsi;
 	TupleDesc		tupdesc;
 	MemoryContext	oldcontext;
@@ -107,6 +105,7 @@ plsample_call_handler(PG_FUNCTION_ARGS)
 		rsi->expectedDesc == NULL)
 	{
 		printf("rsi: %p\n", rsi);
+
 		if (rsi)
 		{
 			if (IsA(rsi, ReturnSetInfo))
@@ -114,6 +113,7 @@ plsample_call_handler(PG_FUNCTION_ARGS)
 			else
 				printf("***\n");
 		}
+
 		ereport(ERROR,
 				(errcode(ERRCODE_FEATURE_NOT_SUPPORTED),
 				 errmsg("set-valued function called in context that cannot accept a set")));
@@ -131,17 +131,18 @@ plsample_call_handler(PG_FUNCTION_ARGS)
 
 	rsi->setDesc = CreateTupleDescCopy(tupdesc);
 	BlessTupleDesc(rsi->setDesc);
-	rsi->setResult = tuplestore_begin_heap(rsi->allowedModes & SFRM_Materialize_Random, false, work_mem);
+	rsi->setResult = tuplestore_begin_heap(rsi->allowedModes & SFRM_Materialize_Random,
+										   false, work_mem);
 
 	MemoryContextSwitchTo(oldcontext);
 
 	dest = CreateDestReceiver(DestTuplestore);
 	SetTuplestoreDestReceiverParams(dest, rsi->setResult, CurrentMemoryContext, false);
 
-	plannedstmt = generate_plannedstmt(pl_src);
+	plannedstmt = generate_plannedstmt(function->sql_string);
 
 	query_desc = CreateQueryDesc(plannedstmt,
-								 pl_src,
+								 function->sql_string,
 								 GetActiveSnapshot(), InvalidSnapshot,
 								 dest, NULL, 0);
 
@@ -175,6 +176,9 @@ plsample_validator(PG_FUNCTION_ARGS)
 
 	funcOid = PG_GETARG_OID(0);
 
+	if (!CheckFunctionValidatorAccess(fcinfo->flinfo->fn_oid, funcOid))
+		PG_RETURN_VOID();
+
 	procTup = SearchSysCache1(PROCOID, ObjectIdGetDatum(funcOid));
 	if (!HeapTupleIsValid(procTup))
 		elog(ERROR, "cache lookup failed for cuntion %u", funcOid);
@@ -185,7 +189,7 @@ plsample_validator(PG_FUNCTION_ARGS)
 
 	pl_src = TextDatumGetCString(proSrc);
 
-	/* TBD: insert checking code */
+	/* @todo insert checking code */
 
 	ReleaseSysCache(procTup);
 
@@ -257,60 +261,4 @@ generate_plannedstmt(const char *sql_string)
 				 errmsg("plsample's DO block must have only one statement")));
 
 	return (PlannedStmt *) stmt;
-}
-
-static bool 
-equalTupleDescsIgnoringAttName(TupleDesc tupdesc1, TupleDesc tupdesc2)
-{
-	int			i;
-
-	if (tupdesc1->natts != tupdesc2->natts)
-		return false;
-	if (tupdesc1->tdtypeid != tupdesc2->tdtypeid)
-		return false;
-	if (tupdesc1->tdhasoid != tupdesc2->tdhasoid)
-		return false;
-
-	for (i = 0; i < tupdesc1->natts; i++)
-	{
-		Form_pg_attribute attr1 = tupdesc1->attrs[i];
-		Form_pg_attribute attr2 = tupdesc2->attrs[i];
-
-#if 0
-		if (strcmp(NameStr(attr1->attname), NameStr(attr2->attname)) != 0)
-			return false;
-#endif
-
-		if (attr1->atttypid != attr2->atttypid)
-			return false;
-		if (attr1->attstattarget != attr2->attstattarget)
-			return false;
-		if (attr1->attlen != attr2->attlen)
-			return false;
-		if (attr1->attndims != attr2->attndims)
-			return false;
-		if (attr1->atttypmod != attr2->atttypmod)
-			return false;
-		if (attr1->attbyval != attr2->attbyval)
-			return false;
-		if (attr1->attstorage != attr2->attstorage)
-			return false;
-		if (attr1->attalign != attr2->attalign)
-			return false;
-		if (attr1->attnotnull != attr2->attnotnull)
-			return false;
-		if (attr1->atthasdef != attr2->atthasdef)
-			return false;
-		if (attr1->attisdropped != attr2->attisdropped)
-			return false;
-		if (attr1->attislocal != attr2->attislocal)
-			return false;
-		if (attr1->attinhcount != attr2->attinhcount)
-			return false;
-		if (attr1->attcollation != attr2->attcollation)
-			return false;
-		/* attacl, attoptions and attfdwoptions are not even present... */
-	}
-
-	return true;
 }
