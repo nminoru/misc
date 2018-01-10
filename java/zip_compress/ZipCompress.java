@@ -1,5 +1,5 @@
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -15,7 +15,7 @@ public class ZipCompress {
         ZipOutputStream zipfile = null;
 
         try {
-            zipfile = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(zipFilename)));
+            zipfile = new ZipOutputStream(new FileOutputStream(zipFilename));
 
             for (String fileName : inputFilenames) {
                 File file = new File(fileName);
@@ -29,23 +29,17 @@ public class ZipCompress {
 
     void addFile(ZipOutputStream zipFile, String base, File file) throws IOException {
         String fileName = file.getName();
-        String filePath;
-        
-        filePath = base.equals("") ? fileName : base + File.separator + fileName;
+
+        if (!file.exists())
+            return;
+
+        String filePath = base.equals("") ? fileName : base + File.separator + fileName;
 
         if (file.isFile()) {
             zipFile.putNextEntry(new ZipEntry(filePath));
             
-            BufferedInputStream inputFile = new BufferedInputStream(new FileInputStream(file));
+            Files.copy(file.toPath(), zipFile);
 
-            byte buffer[] = new byte[1024];
-
-            int readBytes;
-            while ((readBytes = inputFile.read(buffer, 0, buffer.length)) != -1) {
-                zipFile.write(buffer, 0, readBytes);
-            }
-
-            inputFile.close();
             zipFile.closeEntry();
 
         } else if (file.isDirectory()) {
