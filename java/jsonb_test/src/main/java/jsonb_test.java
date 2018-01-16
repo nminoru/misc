@@ -1,21 +1,15 @@
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.Jsonb;
 
-import org.junit.Assert;
-import org.junit.Test;
-
-class Dog {
-    public String name;
-    public int age;
-    public boolean bitable;
-}
-
 public class jsonb_test {
 
-    @Test
-    public void testRun() {
-        System.out.println("*** jsonb_test.testRun() ***");
+    static public class Dog {
+        public String name;
+        public int age;
+        public boolean bitable;
+    }
 
+    public static void main(String[] args) {
         // Create a dog instance
         Dog dog = new Dog();
         dog.name = "Falco";
@@ -24,13 +18,14 @@ public class jsonb_test {
 
         // Create Jsonb and serialize
         Jsonb jsonb = JsonbBuilder.create();
-        String result = jsonb.toJson(dog);
 
-        Assert.assertNotNull(result);
+        String result = jsonb.toJson(dog);
 
         System.out.println(result);
 
         // Deserialize back
         dog = jsonb.fromJson("{\"name\":\"Falco\",\"age\":4,\"bitable\":false}", Dog.class);
     }
-} 
+}
+
+
