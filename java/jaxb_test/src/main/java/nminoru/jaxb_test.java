@@ -20,6 +20,7 @@ public class jaxb_test {
         public int age;
         public boolean bitable;
         public List<String> dogs;
+        public List<List<String>> multidimarr;
 
         private String phoneNumbers;
 
@@ -51,6 +52,15 @@ public class jaxb_test {
         dog.dogs.add("A");
         dog.dogs.add("B");
         dog.dogs.add("C");
+
+        List<String> array = new ArrayList<>();
+        array.add("123");
+        array.add("456"); 
+        dog.multidimarr = new ArrayList<>();
+        dog.multidimarr.add(array);
+        dog.multidimarr.add(array);
+        dog.multidimarr.add(array);
+
         dog.setPhoneNumbers("foo");
 
         marshaller.marshal(dog, System.out);
