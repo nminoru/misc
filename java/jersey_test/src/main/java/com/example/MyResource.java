@@ -58,4 +58,34 @@ public class MyResource {
 
         return fileDisposition.getName();
     }
+
+    public static class MyRequest {
+        public String foo;
+    }
+
+    public static class MyResponse {
+        public String bar;
+        public String baz;
+        public String[][] qux; // 多次元配列が JSON 化できることの
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/json")
+    public MyResponse json(MyRequest request) {
+        MyResponse response = new MyResponse();
+        
+        response.bar = "bar";
+        response.baz = request.foo;
+        response.qux = new String[2][];
+        response.qux[0] = new String[2];
+        response.qux[0][0] = "abc";
+        response.qux[0][1] = "def";
+        response.qux[1] = new String[2];
+        response.qux[1][0] = "ghi";
+        response.qux[1][1] = "jkl";
+
+        return response;
+    }
 }
