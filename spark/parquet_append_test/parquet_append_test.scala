@@ -15,7 +15,7 @@ object parquet_append_test {
 
 		import spark.implicits._
 
-		val caseClassDS = Seq(Person("Andy", 32)).toDS()
+		val caseClassDS = Seq(Person("Alice", 32), Person("Bob", 21), Person("Charlie", 27)).toDS()
 		caseClassDS.show()
 
 		caseClassDS.write.format("parquet").mode("overwrite").save("person.parquet");
