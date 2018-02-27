@@ -39,7 +39,7 @@ import org.apache.hadoop.fs.Path;
 
 import org.apache.parquet.column.ColumnDescriptor;
 import org.apache.parquet.column.ColumnReader;
-import org.apache.parquet.column.impl.ColumnReadStoreImpl;
+// import org.apache.parquet.column.impl.ColumnReadStoreImpl;
 import org.apache.parquet.column.page.DataPage;
 import org.apache.parquet.column.page.DataPage.Visitor;
 import org.apache.parquet.column.page.DataPageV1;
@@ -61,6 +61,8 @@ import org.apache.parquet.schema.MessageType;
 import org.apache.parquet.tools.util.MetadataUtils;
 import org.apache.parquet.tools.util.PrettyPrintWriter;
 import org.apache.parquet.tools.util.PrettyPrintWriter.WhiteSpaceHandler;
+
+import nminoru.parquet.column.impl.ColumnReadStoreImpl;
 
 import com.google.common.base.Joiner;
 
