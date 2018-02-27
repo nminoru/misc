@@ -63,6 +63,7 @@ import org.apache.parquet.tools.util.PrettyPrintWriter;
 import org.apache.parquet.tools.util.PrettyPrintWriter.WhiteSpaceHandler;
 
 import nminoru.parquet.column.impl.ColumnReadStoreImpl;
+import nminoru.parquet.column.impl.ColumnReaderImpl;
 
 import com.google.common.base.Joiner;
 
@@ -167,8 +168,11 @@ public class DumpCommand extends ArgsOnlyCommand {
                     out.format("row group %d%n", group++);
                     out.rule('-');
 
-
                     List<ColumnChunkMetaData> ccmds = block.getColumns();
+                    for (ColumnChunkMetaData ccmd : ccmds) {
+                        out.format("%d %d %d\n", ccmd.getFirstDataPageOffset(), ccmd.getValueCount(), ccmd.getTotalSize());
+                    } 
+                    
                     if (showColumns != null) {
                         ccmds = new ArrayList<ColumnChunkMetaData>();
                         for (ColumnChunkMetaData ccmd : block.getColumns()) {
@@ -220,9 +224,11 @@ public class DumpCommand extends ArgsOnlyCommand {
                         conf, meta.getFileMetaData(), inpath, blocks, Collections.singletonList(column));
                     PageReadStore store = freader.readNextRowGroup();
                     while (store != null) {
+                        out.rule('*');
                         ColumnReadStoreImpl crstore = new ColumnReadStoreImpl(
                             store, new DumpGroupConverter(), schema,
                             meta.getFileMetaData().getCreatedBy());
+                        out.rule('=');
                         dump(out, crstore, column, page++, total, offset);
 
                         offset += store.getRowCount();
@@ -299,6 +305,7 @@ public class DumpCommand extends ArgsOnlyCommand {
     public static void dump(PrettyPrintWriter out, ColumnReadStoreImpl crstore, ColumnDescriptor column, long page, long total, long offset) throws IOException {
         int dmax = column.getMaxDefinitionLevel();
         ColumnReader creader = crstore.getColumnReader(column);
+        ColumnReaderImpl creaderImpl = (ColumnReaderImpl)creader;
         out.format("*** row group %d of %d, values %d to %d ***%n", page, total, offset, offset + creader.getTotalValueCount() - 1);
 
         for (long i = 0, e = creader.getTotalValueCount(); i < e; ++i) {

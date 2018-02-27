@@ -457,6 +457,10 @@ public class ColumnReaderImpl implements ColumnReader {
     return path;
   }
 
+  public ValuesReader getDataColumn() {
+    return dataColumn;
+  }  
+
   /**
    * Reads the value into the binding.
    */
