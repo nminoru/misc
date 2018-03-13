@@ -5,7 +5,7 @@ import org.apache.spark.sql.types._
 
 object parquet_append_test {
 
-    case class Person(name: String, age: Long)
+    case class Person(name: String, age: Long, exist: Boolean)
 
     def main(args: Array[String]) {
         val spark = SparkSession
@@ -15,7 +15,7 @@ object parquet_append_test {
 
 		import spark.implicits._
 
-		val caseClassDS = Seq(Person("Alice", 32), Person("Bob", 21), Person("Charlie", 27)).toDS()
+		val caseClassDS = Seq(Person("Alice", 32, false), Person("Bob", 21, false), Person("Charlie", 27, true)).toDS()
 		caseClassDS.show()
 
 		caseClassDS.write.format("parquet").mode("overwrite").save("person.parquet");
