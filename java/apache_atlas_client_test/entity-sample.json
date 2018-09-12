@@ -1,0 +1,34 @@
+{
+    "entities": [
+	{
+	    "typeName": "test_path",
+	    "attributes": {
+		"qualifiedName": "/foo@hdpcluster",
+		"path": "/foo",
+		"name": "/foo",
+		"title": "FOO",
+		"description": "OOF"
+	    }
+	},
+	{
+	    "typeName": "test_path",
+	    "attributes": {
+		"qualifiedName": "/bar@hdpcluster",
+		"name": "/bar",
+		"path": "/bar",
+		"title": "BAR",
+		"description": "RAB"
+	    }
+	},
+	{
+	    "typeName": "test_path",
+	    "attributes": {
+		"qualifiedName": "/baz@hdpcluster",
+		"name": "/baz",
+		"path": "/baz",
+		"title": "BAZ",
+		"description": "ZAB"
+	    }
+	}
+    ]
+}

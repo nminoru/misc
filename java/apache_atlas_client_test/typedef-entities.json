@@ -1,0 +1,55 @@
+{
+    "entityDefs" : [
+	{
+	    "category" : "ENTITY",
+	    "name" : "test_path",
+	    "description" : "test_path",
+	    "typeVersion" : "1.0",
+	    "superTypes" : [
+		"fs_path"
+	    ],
+	    "attributeDefs": [
+		{
+		    "name": "title",
+		    "typeName": "string", 
+		    "cardinality": "SINGLE", 
+		    "valuesMinCount": 1,
+		    "valuesMaxCount": 1,
+		    "isOptional": true,
+		    "isUnique": false, 
+		    "isIndexable": false
+		},
+		{
+		    "name": "description",
+		    "typeName": "string", 
+		    "cardinality": "SINGLE", 
+		    "valuesMinCount": 1,
+		    "valuesMaxCount": 1,
+		    "isOptional": true,
+		    "isUnique": false, 
+		    "isIndexable": false
+		},		
+		{
+		    "name": "tags",
+		    "typeName": "array<string>",
+		    "cardinality": "SET",
+		    "valuesMinCount": 0,
+		    "valuesMaxCount": 1,
+		    "isOptional": true,
+		    "isUnique": false, 
+		    "isIndexable": false
+		}		
+	    ]
+	},
+	{
+	    "category" : "ENTITY",
+	    "name" : "test_process",
+	    "description" : "test_process",
+	    "typeVersion" : "1.0",
+	    "superTypes" : [
+		"Process"
+	    ]
+	}	
+    ]
+}
+
