@@ -1,0 +1,33 @@
+{
+    "entities": [
+	{
+	    "typeName": "test_process",
+	    "attributes": {
+		"qualifiedName": "abc@def",
+		"name": "abc",
+		"inputs": [
+		    {
+			"typeName": "test_path",
+			"uniqueAttributes": {
+			    "qualifiedName": "/foo@hdpcluster"
+			}
+		    },
+		    {
+			"typeName": "test_path",
+			"uniqueAttributes": {
+			    "qualifiedName": "/bar@hdpcluster"
+			}
+		    }
+		],
+		"outputs": [
+		    {
+			"typeName": "test_path",
+			"uniqueAttributes": {
+			    "qualifiedName": "/baz@hdpcluster"
+			}			
+		    }
+		]
+	    }
+	}
+    ]
+}
