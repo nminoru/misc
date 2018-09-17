@@ -21,10 +21,12 @@ public class ClientTest {
     public static void main(String[] args) {
         ClientTest test = new ClientTest();
 
-        List<String> result = test.testSearchDSL();
-        for(String guid: result) {
-            AtlasEntityWithExtInfo entity = test.testGetEntity(guid);
-            System.out.println(entity.entity.guid);
+        {
+            List<String> result = test.testSearchDSL();
+            for(String guid: result) {
+                AtlasEntityWithExtInfo entity = test.testGetEntity(guid);
+                System.out.println(entity.entity.guid);
+            }
         }
     }
 
@@ -56,6 +58,26 @@ public class ClientTest {
         AtlasSearchResult response = target
             .path("/v2/search/dsl")
             .queryParam("typeName", "test_path")
+            .request(MediaType.APPLICATION_JSON)
+            .get(AtlasSearchResult.class);
+        
+        // assertTrue(response.success);
+
+        List<String> result = new ArrayList<>();
+        
+        for (AtlasEntityHeader entity : response.entities)
+            result.add(entity.guid);
+
+        return result;
+    }
+
+    public List<String> testSearchDSL2() {
+        WebTarget target = generateTarget();
+
+        AtlasSearchResult response = target
+            .path("/v2/search/dsl")
+            .queryParam("typeName", "test_path")
+            .queryParam("query", "WHERE title = FOO")
             .request(MediaType.APPLICATION_JSON)
             .get(AtlasSearchResult.class);
         
