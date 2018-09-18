@@ -5,7 +5,7 @@ import javax.json.bind.Jsonb;
 
 public class jsonb_test {
 
-    static public class Dog {
+    public static class Dog {
         public String name;
         public int age;
         public boolean bitable;
@@ -13,6 +13,13 @@ public class jsonb_test {
     }
 
     public static void main(String[] args) {
+        jsonb_test test = new jsonb_test();
+
+        test.testPojo1();
+        test.testPojo2();
+    }
+
+    void testPojo1() {
         // Create a dog instance
         Dog dog = new Dog();
         dog.name = "Falco";
@@ -37,6 +44,16 @@ public class jsonb_test {
         // Deserialize back
         dog = jsonb.fromJson(result, Dog.class);
     }
+
+    void testPojo2() {
+        // Create Jsonb and serialize
+        Jsonb jsonb = JsonbBuilder.create();
+
+        // 定義していない "abc" というフィールドをデシリアライズ
+        Dog dog = jsonb.fromJson("{\"name\":\"hoge\", \"abc\":\"hoge\"}", Dog.class);
+        String result = jsonb.toJson(dog);
+        System.out.println(result);
+    }    
 }
 
 
