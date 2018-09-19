@@ -1,6 +1,5 @@
 package com.example;
 
-<<<<<<< HEAD
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
@@ -8,10 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
-=======
-import java.util.ArrayList;
-import java.util.List;
->>>>>>> 855bfdc483cf3874d848c14e48b2c688537e20ac
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -36,12 +31,9 @@ public class ClientTest {
         return client.target("http://127.0.0.1:80/api/v4/");
     }
 
-<<<<<<< HEAD
     /**
      * リポジトリの一覧を表示
      */
-=======
->>>>>>> 855bfdc483cf3874d848c14e48b2c688537e20ac
     public void testProjects() {
         WebTarget target = generateTarget();
 
@@ -50,7 +42,6 @@ public class ClientTest {
             .request(MediaType.APPLICATION_JSON)
             .header("PRIVATE-TOKEN", "qGm5VgrCzA6PpqstUXtb")
             .get(String.class);
-<<<<<<< HEAD
 
         System.out.println(response);
 
@@ -74,12 +65,6 @@ public class ClientTest {
             
             System.out.println();
         }
-=======
-        
-        // assertTrue(response.success);
-
-        System.out.println(response);
->>>>>>> 855bfdc483cf3874d848c14e48b2c688537e20ac
     }
 }
 

@@ -27,15 +27,12 @@
   </dependencyManagement>
 
   <dependencies>
-<<<<<<< HEAD
     
     <dependency>
       <groupId>org.glassfish</groupId>
       <artifactId>javax.json</artifactId>
       <version>1.1.2</version>
     </dependency>    
-=======
->>>>>>> 855bfdc483cf3874d848c14e48b2c688537e20ac
 
     <!-- Jersey client specific features without the server side -->
     <dependency>
@@ -56,7 +53,6 @@
       <version>${jersey.version}</version>      
     </dependency>
 
-<<<<<<< HEAD
     <!-- JSON-B API -->
     <dependency>
       <groupId>javax.json.bind</groupId>
@@ -73,8 +69,6 @@
     </dependency>
 
     <!-- JUnit -->
-=======
->>>>>>> 855bfdc483cf3874d848c14e48b2c688537e20ac
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
