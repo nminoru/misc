@@ -42,6 +42,7 @@ public class ClientTest {
         c.createProject("abc");
         c.createProject("def");
         c.createProject("hij");
+        c.createProject("abc");
         
         List<Project> projects = c.listProjects();
         
@@ -71,20 +72,27 @@ public class ClientTest {
     public List<Project> listProjects() {
         WebTarget target = generateTarget();
 
-        String response = target
+        Response response = target
             .path("/projects")
             .request(MediaType.APPLICATION_JSON)
             .header("PRIVATE-TOKEN", "qGm5VgrCzA6PpqstUXtb")
-            .get(String.class);
+            .get();
 
-        // System.out.println(response);
+        System.out.println("listProjects: " + response.getStatus());
+        
+        if (!response.getStatusInfo().equals(Response.Status.OK))
+            return null;
+
+        System.out.println("done");
+
+        String content = response.readEntity(String.class);
 
         Jsonb jsonb = JsonbBuilder.create();
 
         // Type hashMapType = new HashMap<String, Object>(){}.getClass().getGenericSuperclass();
         // Type hashMapType = new HashMap<String, Object>(){}.getClass();
         // Map<String, Object> result = jsonb.fromJson(response, hashMapType);
-        List repositories = jsonb.fromJson(response, List.class);
+        List repositories = jsonb.fromJson(content, List.class);
 
         List<Project> result = new ArrayList<>();
         for (Object object : repositories) {
@@ -106,31 +114,43 @@ public class ClientTest {
     public void createProject(String projectName) {
         WebTarget target = generateTarget();
 
-        String response = target
+        Response response = target        
             .path("/projects")
             .queryParam("name", projectName)
             .queryParam("tag_list", "project")
             .request(MediaType.APPLICATION_JSON)
             .header("PRIVATE-TOKEN", "qGm5VgrCzA6PpqstUXtb")
-            .post(null, String.class);
+            .post(null);
 
-        // System.out.println(response);
+        System.out.println("createProject: " + response.getStatus());
+
+        if (!response.getStatusInfo().equals(Response.Status.CREATED))
+            return;
+        
+        System.out.println("done");        
     }
 
     public void listBranches(int projectId) {
         WebTarget target = generateTarget();
 
-        String response = target
+        Response response = target
             .path(String.format("/projects/%d/repository/branches", projectId))
             .request(MediaType.APPLICATION_JSON)
             .header("PRIVATE-TOKEN", "qGm5VgrCzA6PpqstUXtb")
-            .get(String.class);
+            .get();
 
-        System.out.println(response);
+        System.out.println("listBranches: " + response.getStatus());
+        
+        if (!response.getStatusInfo().equals(Response.Status.OK))
+            return;
+        
+        System.out.println("done");        
+
+        String content = response.readEntity(String.class);        
 
         Jsonb jsonb = JsonbBuilder.create();
 
-        List branches = jsonb.fromJson(response, List.class);
+        List branches = jsonb.fromJson(content, List.class);
 
         List<Project> result = new ArrayList<>();
         
@@ -152,10 +172,13 @@ public class ClientTest {
             .request(MediaType.APPLICATION_JSON)
             .header("PRIVATE-TOKEN", "qGm5VgrCzA6PpqstUXtb")
             .delete();
+
+        System.out.println("deleteProject: " + response.getStatus());
         
-        // System.out.println("status: " + response.getStatus());
-        
-        assertTrue(response.getStatusInfo().getStatusCode() == Response.Status.ACCEPTED.getStatusCode());
+        if (!response.getStatusInfo().equals(Response.Status.ACCEPTED))
+            return;
+
+        System.out.println("done");
     }
 
     void printMap(Map<String, Object> map) {
