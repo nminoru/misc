@@ -24,17 +24,52 @@ public class ClientTest {
         public String name;
         public int id;
         public String http_url_to_repo;
+        public String description;
+        public List tag_list;
         
         public Project() {
         }
 
-        public Project(String name, int id, String http_url_to_repo) {
+        public Project(String name, int id, String http_url_to_repo, String description, List tag_list) {
             this.name = name;
             this.id = id;
             this.http_url_to_repo = http_url_to_repo;
+            this.description = description;
+            this.tag_list = tag_list;
         }
     }
+
+    public static class Branch {
+        public String name;
+        public Commit commit;
         
+        public Branch() {
+        }
+
+        public Branch(String name, Commit commit) {
+            this.name = name;
+            this.commit = commit;
+        }
+    }
+
+    public static class Commit {
+        public String id;
+        public String short_id;
+        public String message;
+        public String title;
+        public String committed_date;
+        
+        public Commit() {
+        }
+
+        public Commit(String id, String short_id, String message, String title, String committed_date) {
+            this.id = id;
+            this.short_id = short_id;
+            this.message = message;
+            this.title = title;
+            this.committed_date = committed_date;
+        }
+    }    
 
     public static void main(String[] args) {
         ClientTest c = new ClientTest();
@@ -42,7 +77,6 @@ public class ClientTest {
         c.createProject("abc");
         c.createProject("def");
         c.createProject("hij");
-        c.createProject("abc");
         
         List<Project> projects = c.listProjects();
         
@@ -53,9 +87,10 @@ public class ClientTest {
             System.out.println("http_url_to_repo: " + project.http_url_to_repo);
             System.out.println();
 
-            // c.listBranches(project.id);
+            c.listBranches(project.id);
+            c.listCommits(project.id);
             
-            c.deleteProject(project.id);
+            // c.deleteProject(project.id);
         }
     }
 
@@ -101,8 +136,10 @@ public class ClientTest {
             String name = (String)map.get("name");
             int id = ((BigDecimal)map.get("id")).intValue();
             String http_url_to_repo = (String)map.get("http_url_to_repo");
+            String description = (String)map.get("description");
+            List tag_list = (List)map.get("tag_list");
             
-            result.add(new Project(name, id, http_url_to_repo));
+            result.add(new Project(name, id, http_url_to_repo, description, tag_list));
         }
         
         return result;
@@ -117,7 +154,6 @@ public class ClientTest {
         Response response = target        
             .path("/projects")
             .queryParam("name", projectName)
-            .queryParam("tag_list", "project")
             .request(MediaType.APPLICATION_JSON)
             .header("PRIVATE-TOKEN", "qGm5VgrCzA6PpqstUXtb")
             .post(null);
@@ -152,14 +188,60 @@ public class ClientTest {
 
         List branches = jsonb.fromJson(content, List.class);
 
-        List<Project> result = new ArrayList<>();
-        
+        List<Branch> result = new ArrayList<>();
+
         for (Object object : branches) {
             Map<String, Object> map = (Map<String, Object>) object;
 
-            printMap(map);
+            String name = (String)map.get("name");
+            Map commit = (Map)map.get("commit");
+
+            String id = (String)commit.get("id");
+            String short_id = (String)commit.get("short_id");
+            String message = (String)commit.get("message");
+            String title = (String)commit.get("title");
+            String committed_date = (String)commit.get("committed_date");
+
+            result.add(new Branch(name, new Commit(id, short_id, message, title, committed_date)));
         }        
     }
+
+    public void listCommits(int projectId) {
+        WebTarget target = generateTarget();
+
+        Response response = target
+            .path(String.format("/projects/%d/repository/commits", projectId))
+            .request(MediaType.APPLICATION_JSON)
+            .header("PRIVATE-TOKEN", "qGm5VgrCzA6PpqstUXtb")
+            .get();
+
+        System.out.println("listCommits: " + response.getStatus());
+        
+        if (!response.getStatusInfo().equals(Response.Status.OK))
+            return;
+        
+        System.out.println("done");
+
+        String content = response.readEntity(String.class);        
+
+        Jsonb jsonb = JsonbBuilder.create();
+
+        List commits = jsonb.fromJson(content, List.class);
+
+        List<Commit> result = new ArrayList<>();
+
+        for (Object object : commits) {
+            Map<String, Object> map = (Map<String, Object>) object;
+
+            String id = (String)map.get("id");
+            String short_id = (String)map.get("short_id");
+            String message = (String)map.get("message");
+            String title = (String)map.get("title");
+            String committed_date = (String)map.get("committed_date");
+
+            result.add(new Commit(id, short_id, message, title, committed_date));
+        }        
+    }    
 
     /**
      * リポジトリの一覧を表示
