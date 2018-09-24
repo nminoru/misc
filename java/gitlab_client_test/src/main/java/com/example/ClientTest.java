@@ -83,6 +83,8 @@ public class ClientTest {
         c.createProject("hij");
         
         List<Project> projects = c.listProjects();
+
+        int lastProjectId = -1;
         
         for (Project project : projects) {
 
@@ -95,7 +97,12 @@ public class ClientTest {
             c.listCommits(project.id);
             
             // c.deleteProject(project.id);
+            
+            lastProjectId = project.id;
         }
+
+        if (lastProjectId > 0)
+            c.forkProject(lastProjectId);
     }
 
     public WebTarget generateTarget() {
@@ -105,9 +112,6 @@ public class ClientTest {
         return client.target("http://127.0.0.1:80/api/v4/");
     }
 
-    /**
-     * リポジトリの一覧を表示
-     */
     public List<Project> listProjects() {
         WebTarget target = generateTarget();
 
@@ -131,13 +135,14 @@ public class ClientTest {
         List<Project> projectList =
             jsonb.fromJson(content,
                            new ArrayList<Project>(){}.getClass().getGenericSuperclass());
+
+        for (Project project: projectList) {
+            System.out.println("id: " + project.id + " ,name: " + project.name);
+        }
         
         return projectList;
     }
 
-    /**
-     * リポジトリの一覧を表示
-     */
     public Project createProject(String projectName) {
         WebTarget target = generateTarget();
 
@@ -163,6 +168,58 @@ public class ClientTest {
 
         return project;
     }
+
+    public Project forkProject(int projectId) {
+        WebTarget target = generateTarget();
+
+        Response response = target        
+            .path(String.format("/projects/%d/fork", projectId))
+            .request(MediaType.APPLICATION_JSON)
+            .header("PRIVATE-TOKEN", "qGm5VgrCzA6PpqstUXtb")
+            .post(null);
+
+        System.out.println("forkProject: " + response.getStatus());
+
+        System.out.println("\t" + response.getStatus());
+
+        if (!response.getStatusInfo().equals(Response.Status.CREATED))
+            return null;
+
+        System.out.println("done");
+
+        String content = response.readEntity(String.class);
+
+        Jsonb jsonb = JsonbBuilder.create();
+
+        Project project = jsonb.fromJson(content, Project.class);
+
+        return project;
+    }    
+
+    public Project getProjectById(int projectId) {
+        WebTarget target = generateTarget();
+
+        Response response = target        
+            .path(String.format("/projects/%d", projectId))
+            .request(MediaType.APPLICATION_JSON)
+            .header("PRIVATE-TOKEN", "qGm5VgrCzA6PpqstUXtb")
+            .get();
+
+        System.out.println("getProject(" + Integer.toString(projectId) + "): " + response.getStatus());
+
+        if (!response.getStatusInfo().equals(Response.Status.OK))
+            return null;
+
+        System.out.println("done");
+
+        String content = response.readEntity(String.class);
+
+        Jsonb jsonb = JsonbBuilder.create();
+
+        Project project = jsonb.fromJson(content, Project.class);
+
+        return project;        
+    }    
 
     public List<Branch> listBranches(int projectId) {
         WebTarget target = generateTarget();
@@ -218,9 +275,6 @@ public class ClientTest {
         return commitList;
     }    
 
-    /**
-     * リポジトリの一覧を表示
-     */
     public void deleteProject(int projectId) {
         WebTarget target = generateTarget();
 
