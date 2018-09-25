@@ -1,9 +1,12 @@
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.Jsonb;
 
 public class jsonb_test {
+    Jsonb jsonb = JsonbBuilder.create();    
 
     public static class Dog {
         public String name;
@@ -17,10 +20,14 @@ public class jsonb_test {
 
         test.testPojo1();
         test.testPojo2();
+        test.testPojo3();
+        test.testPojo4();
     }
 
+    /**
+     * 配列の配列を含む Java オブジェクトを JSON 文字列へマーシャリング
+     */    
     void testPojo1() {
-        // Create a dog instance
         Dog dog = new Dog();
         dog.name = "Falco";
         dog.age = 4;
@@ -34,26 +41,69 @@ public class jsonb_test {
         dog.multidimarr.add(array);
         dog.multidimarr.add(array);
 
-        // Create Jsonb and serialize
-        Jsonb jsonb = JsonbBuilder.create();
-
         String result = jsonb.toJson(dog);
 
-        System.out.println(result);
+        System.out.println("test1: " + result);
 
-        // Deserialize back
         dog = jsonb.fromJson(result, Dog.class);
     }
 
+    /**
+     * 定義していない "abc" というフィールドを含む JSON 文字列を Java クラスへアンマーシャリング
+     */
     void testPojo2() {
-        // Create Jsonb and serialize
-        Jsonb jsonb = JsonbBuilder.create();
-
-        // 定義していない "abc" というフィールドをデシリアライズ
         Dog dog = jsonb.fromJson("{\"name\":\"hoge\", \"abc\":\"hoge\"}", Dog.class);
         String result = jsonb.toJson(dog);
-        System.out.println(result);
-    }    
+        
+        System.out.println("test2: " + result);
+    }
+
+    /**
+     * 配列からはじまる JSON 文字列を Java クラスへアンマーシャリング
+     */
+    void testPojo3() {
+        List<Dog> dogList =
+            jsonb.fromJson("[{\"name\":\"foo\", \"abc\":\"ABC\"}, {\"name\":\"baz\", \"abc\":\"XYZ\"}]",
+                           new ArrayList<Dog>(){}.getClass().getGenericSuperclass());
+
+        String result = jsonb.toJson(dogList);
+        System.out.println("test3: " + result);
+    }
+
+    /**
+     * 配列からはじまる JSON 文字列を Java クラスへアンマーシャリング
+     */
+    void testPojo4() {
+        Map<String, Object> jsonMap =
+            jsonb.fromJson("{\"abc\":\"ABC\", \"def\":\"DEF\", \"ghi\":{\"F1\":1, \"F2\":2, \"F3\":3}}",
+                           new HashMap<String, Object>(){}.getClass().getGenericSuperclass());
+
+        printMap(0, jsonMap);
+    }
+
+    void printMap(int level, Map<String, Object> jsonMap) {
+        for (String key : jsonMap.keySet()) {
+            Object value = jsonMap.get(key);
+            
+            if (value instanceof Map) {
+                for (int i = 0 ; i < level ; i++)
+                    System.out.print("    ");
+                
+                System.out.println(key + ": {");
+                
+                printMap(level + 1, (Map<String, Object>)value);
+
+                for (int i = 0 ; i < level ; i++)
+                    System.out.print("    ");                
+                System.out.println("}");
+            } else {
+                for (int i = 0 ; i < level ; i++)
+                    System.out.print("    ");
+                
+                System.out.println(key + ": " + value.toString());
+            }
+        }        
+    }
 }
 
 
