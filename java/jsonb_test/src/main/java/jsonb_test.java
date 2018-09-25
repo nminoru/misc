@@ -15,6 +15,33 @@ public class jsonb_test {
         public List<List<String>> multidimarr;
     }
 
+    public static class Bar {
+        public String name;
+
+        public Bar() {
+        }
+
+        public Bar(String name) {
+            this.name = name;
+        }
+    }
+
+    public static class Baz {
+        public String name;
+
+        public Baz() {
+        }
+
+        public Baz(String name) {
+            this.name = name;
+        }        
+    }    
+
+    public static class Foo {
+        public List<Bar> bars;
+        public List<Baz> bazs;
+    }    
+
     public static void main(String[] args) {
         jsonb_test test = new jsonb_test();
 
@@ -22,6 +49,7 @@ public class jsonb_test {
         test.testPojo2();
         test.testPojo3();
         test.testPojo4();
+        test.testPojo5();
     }
 
     /**
@@ -80,6 +108,25 @@ public class jsonb_test {
 
         printMap(0, jsonMap);
     }
+
+    void testPojo5() {
+        Foo foo = new Foo();
+
+        foo.bars = new ArrayList<>();
+        foo.bazs = new ArrayList<>();
+
+        foo.bars.add(new Bar("1"));
+        foo.bars.add(new Bar("2"));
+        foo.bars.add(new Bar("3"));
+
+        foo.bazs.add(new Baz("A"));
+        foo.bazs.add(new Baz("B"));
+        foo.bazs.add(new Baz("C"));
+
+        String result = jsonb.toJson(foo);
+
+        System.out.println("test5: " + result);
+    }    
 
     void printMap(int level, Map<String, Object> jsonMap) {
         for (String key : jsonMap.keySet()) {
