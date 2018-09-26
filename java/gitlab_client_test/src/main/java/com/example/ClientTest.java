@@ -22,9 +22,37 @@ import static org.junit.Assert.*;
 public class ClientTest {
 
     public static class Project {
-        public String name;
         public int id;
+        public String name;
+        public String name_with_namespace;
+        public String path_with_namespace;
+        public String created_at;
+        public String default_branch;
+        public String ssh_url_to_repo;
         public String http_url_to_repo;
+        public String web_url;
+        public String readme_url;
+        public String avatar_url;
+        public int star_count;
+        public int forks_count;
+        public String last_activity_at;
+        // namespace
+        public boolean archived;
+        public String visibility;
+        // owner
+        public boolean resolve_outdated_diff_discussions;
+        public boolean container_registry_enabled;
+        public boolean issues_enabled;
+        public boolean merge_requests_enabled;
+        public boolean wiki_enabled;
+        public boolean jobs_enabled;
+        public boolean snippets_enabled;
+        public boolean shared_runners_enabled;
+        public boolean lfs_enabled;
+        public String import_status;
+        public int creator_id;
+        public int open_issues_count;
+        public boolean public_jobs;
         public String description;
         public List tag_list;
         
@@ -39,6 +67,8 @@ public class ClientTest {
             this.tag_list = tag_list;
         }
     }
+
+    static final String PrivateToken = "qGm5VgrCzA6PpqstUXtb";
 
     public static class Branch {
         public String name;
@@ -93,6 +123,8 @@ public class ClientTest {
             System.out.println("http_url_to_repo: " + project.http_url_to_repo);
             System.out.println();
 
+            // c.updateProject(project.id, project);
+            
             c.listBranches(project.id);
             c.listCommits(project.id);
             
@@ -118,18 +150,19 @@ public class ClientTest {
         Response response = target
             .path("/projects")
             .request(MediaType.APPLICATION_JSON)
-            .header("PRIVATE-TOKEN", "qGm5VgrCzA6PpqstUXtb")
+            .header("PRIVATE-TOKEN", PrivateToken)
             .get();
 
         System.out.println("listProjects: " + response.getStatus());
-        
-        if (!response.getStatusInfo().equals(Response.Status.OK))
+
+        // Expected 200 OK
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL))
             return null;
 
         System.out.println("done");
 
         String content = response.readEntity(String.class);
-
+        
         Jsonb jsonb = JsonbBuilder.create();
 
         List<Project> projectList =
@@ -150,12 +183,13 @@ public class ClientTest {
             .path("/projects")
             .queryParam("name", projectName)
             .request(MediaType.APPLICATION_JSON)
-            .header("PRIVATE-TOKEN", "qGm5VgrCzA6PpqstUXtb")
+            .header("PRIVATE-TOKEN", PrivateToken)
             .post(null);
 
         System.out.println("createProject: " + response.getStatus());
 
-        if (!response.getStatusInfo().equals(Response.Status.CREATED))
+        // Expected 201 CREATED
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL))        
             return null;
 
         System.out.println("done");
@@ -169,20 +203,46 @@ public class ClientTest {
         return project;
     }
 
+    public Project updateProject(int projectId, Project request) {
+        WebTarget target = generateTarget();
+
+        Response response = target        
+            .path(String.format("/projects/%d", projectId))
+            .request(MediaType.APPLICATION_JSON)
+            .header("PRIVATE-TOKEN", PrivateToken)
+            .put(Entity.entity(request, MediaType.APPLICATION_JSON_TYPE));
+        
+        System.out.println("updateProject: " + response.getStatus());
+        
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL))        
+            return null;        
+
+        System.out.println("done");
+
+        String content = response.readEntity(String.class);
+
+        Jsonb jsonb = JsonbBuilder.create();
+
+        Project project = jsonb.fromJson(content, Project.class);
+
+        return project;
+    }    
+
     public Project forkProject(int projectId) {
         WebTarget target = generateTarget();
 
         Response response = target        
             .path(String.format("/projects/%d/fork", projectId))
             .request(MediaType.APPLICATION_JSON)
-            .header("PRIVATE-TOKEN", "qGm5VgrCzA6PpqstUXtb")
+            .header("PRIVATE-TOKEN", PrivateToken)
             .post(null);
 
         System.out.println("forkProject: " + response.getStatus());
 
         System.out.println("\t" + response.getStatus());
 
-        if (!response.getStatusInfo().equals(Response.Status.CREATED))
+        // Expected 201 CREATED
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL))        
             return null;
 
         System.out.println("done");
@@ -202,18 +262,19 @@ public class ClientTest {
         Response response = target        
             .path(String.format("/projects/%d", projectId))
             .request(MediaType.APPLICATION_JSON)
-            .header("PRIVATE-TOKEN", "qGm5VgrCzA6PpqstUXtb")
+            .header("PRIVATE-TOKEN", PrivateToken)
             .get();
 
         System.out.println("getProject(" + Integer.toString(projectId) + "): " + response.getStatus());
 
-        if (!response.getStatusInfo().equals(Response.Status.OK))
+        // Expected 200 OK
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL))        
             return null;
-
+        
         System.out.println("done");
 
         String content = response.readEntity(String.class);
-
+        
         Jsonb jsonb = JsonbBuilder.create();
 
         Project project = jsonb.fromJson(content, Project.class);
@@ -227,12 +288,13 @@ public class ClientTest {
         Response response = target
             .path(String.format("/projects/%d/repository/branches", projectId))
             .request(MediaType.APPLICATION_JSON)
-            .header("PRIVATE-TOKEN", "qGm5VgrCzA6PpqstUXtb")
+            .header("PRIVATE-TOKEN", PrivateToken)
             .get();
 
         System.out.println("listBranches: " + response.getStatus());
-        
-        if (!response.getStatusInfo().equals(Response.Status.OK))
+
+        // Expected 200 OK
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL))        
             return null;
         
         System.out.println("done");        
@@ -254,12 +316,13 @@ public class ClientTest {
         Response response = target
             .path(String.format("/projects/%d/repository/commits", projectId))
             .request(MediaType.APPLICATION_JSON)
-            .header("PRIVATE-TOKEN", "qGm5VgrCzA6PpqstUXtb")
+            .header("PRIVATE-TOKEN", PrivateToken)
             .get();
 
         System.out.println("listCommits: " + response.getStatus());
-        
-        if (!response.getStatusInfo().equals(Response.Status.OK))
+
+        // Expected 200 OK
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL))        
             return null;
         
         System.out.println("done");
@@ -281,12 +344,13 @@ public class ClientTest {
         Response response = target
             .path(String.format("/projects/%d", projectId))
             .request(MediaType.APPLICATION_JSON)
-            .header("PRIVATE-TOKEN", "qGm5VgrCzA6PpqstUXtb")
+            .header("PRIVATE-TOKEN", PrivateToken)
             .delete();
 
         System.out.println("deleteProject: " + response.getStatus());
-        
-        if (!response.getStatusInfo().equals(Response.Status.ACCEPTED))
+
+        // Expected 202 Accepted
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL))        
             return;
 
         System.out.println("done");
