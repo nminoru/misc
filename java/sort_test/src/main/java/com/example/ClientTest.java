@@ -7,9 +7,11 @@ import java.util.Comparator;
 
 public class ClientTest {
     public static class TagStruct {
+        public String key;
         public List<String> tags;
         
-        public TagStruct(List<String> tags) {
+        public TagStruct(String key, List<String> tags) {
+            this.key = key;
             this.tags = tags;
         }
     }
@@ -17,11 +19,12 @@ public class ClientTest {
     public static void main(String[] args) {
         List<TagStruct> tagStructs = new ArrayList<>();
         
-        tagStructs.add(new TagStruct(Arrays.asList(new String[]{"abc", "def", "ghi"})));
-        tagStructs.add(new TagStruct(Arrays.asList(new String[]{"abc",        "ghi"})));
-        tagStructs.add(new TagStruct(Arrays.asList(new String[]{       "def", "ghi"})));
-        tagStructs.add(new TagStruct(Arrays.asList(new String[]{"abc", "def"       })));
+        tagStructs.add(new TagStruct("foo", Arrays.asList(new String[]{"abc", "def", "ghi"})));
+        tagStructs.add(new TagStruct("bar", Arrays.asList(new String[]{"abc",        "ghi"})));
+        tagStructs.add(new TagStruct("baz", Arrays.asList(new String[]{       "def", "ghi"})));
+        tagStructs.add(new TagStruct(null,  Arrays.asList(new String[]{"abc", "def"       })));
 
+        // tags 配列を並び替え
         tagStructs.sort(new Comparator<TagStruct>() {
                 @Override
                 public int compare(TagStruct o1, TagStruct o2) {
@@ -40,7 +43,20 @@ public class ClientTest {
                 }
             });
 
+        System.out.println("*** tags[] ***");
+        print(tagStructs);
+        System.out.println();
+        
+        // key 配列を並び替え
+        System.out.println("*** key ***");
+        tagStructs.sort(Comparator.comparing(ts -> ts.key, Comparator.nullsLast(Comparator.naturalOrder())));
+        print(tagStructs);
+        System.out.println();
+    }
+    
+    static void print(List<TagStruct> tagStructs) {
         for (TagStruct tagStruct : tagStructs) {
+            System.out.print(tagStruct.key + ": ");
             for (String tag : tagStruct.tags) {
                 System.out.print(tag + " ");
             }
