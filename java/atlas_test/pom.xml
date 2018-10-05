@@ -6,6 +6,7 @@
   <properties>
     <jersey.version>2.27</jersey.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>1.8</java.version>    
   </properties>
 
   <groupId>apache_atlas_client_test</groupId>
@@ -43,8 +44,21 @@
 
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
+      <artifactId>jersey-media-moxy</artifactId>      
+      <version>${jersey.version}</version>      
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-json-jackson</artifactId>
       <version>${jersey.version}</version>      
+    </dependency>    
+
+    <!-- Apache Commons IO -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.6</version>
     </dependency>
 
     <!-- JSON-P RI -->
@@ -84,18 +98,18 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.5.1</version>
+        <version>3.8.0</version>
         <inherited>true</inherited>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>${java.version}</source>
+          <target>${java.version}</target>	  
         </configuration>
       </plugin>
-
+      
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>1.2.1</version>
+        <version>1.6.0</version>
         <executions>
           <execution>
             <goals>
@@ -104,7 +118,7 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>com.example.ClientTest</mainClass>
+          <mainClass>jp.nminoru.atlas_test.ClientTest</mainClass>
         </configuration>
       </plugin>
 

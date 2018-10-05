@@ -1,8 +1,9 @@
-package com.example;
+package jp.nminoru.atlas_test;
 
 import java.util.List;
-import com.example.AtlasStruct;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class AtlasEntityHeader extends AtlasStruct {
     public String       guid;
     public String       status;

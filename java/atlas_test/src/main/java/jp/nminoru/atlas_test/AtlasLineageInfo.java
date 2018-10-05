@@ -1,9 +1,10 @@
-package com.example;
+package jp.nminoru.atlas_test;
 
 import java.util.List;
 import java.util.Map;
-import com.example.AtlasEntityHeader;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class AtlasLineageInfo {
     public static class LineageRelation {
         public String fromEntityId;

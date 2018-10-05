@@ -1,9 +1,10 @@
-package com.example;
+package jp.nminoru.atlas_test;
 
 import java.util.Date;
 import java.util.Map;
-import com.example.AtlasStruct;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class AtlasEntity extends AtlasStruct {
     public String guid;
     public String status;

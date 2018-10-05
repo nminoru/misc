@@ -1,7 +1,9 @@
-package com.example;
+package jp.nminoru.atlas_test;
 
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class AtlasSearchResult {
     public String                         queryType;
     // public SearchParameters               searchParameters;

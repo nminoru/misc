@@ -1,10 +1,10 @@
-package com.example;
+package jp.nminoru.atlas_test;
 
 import java.util.List;
 import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import com.example.AtlasEntityHeader;
-
+@JsonIgnoreProperties(ignoreUnknown=true)
 public class EntityMutationResponse {
     public Map<String, List<AtlasEntityHeader>> mutatedEntities;
     public Map<String, String>                  guidAssignments;    
