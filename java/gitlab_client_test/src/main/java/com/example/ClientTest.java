@@ -13,16 +13,26 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlElement;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.jsonb.JsonBindingFeature;
+import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
 import static org.junit.Assert.*;
 
 public class ClientTest {
 
+    static final String PrivateToken = "qGm5VgrCzA6PpqstUXtb";
+
+    @JsonIgnoreProperties(ignoreUnknown=true)    
     public static class Project {
         public int id;
+        public String description;
         public String name;
         public String name_with_namespace;
         public String path_with_namespace;
@@ -53,13 +63,12 @@ public class ClientTest {
         public int creator_id;
         public int open_issues_count;
         public boolean public_jobs;
-        public String description;
-        public List tag_list;
+        public List<String> tag_list;
         
         public Project() {
         }
 
-        public Project(String name, int id, String http_url_to_repo, String description, List tag_list) {
+        public Project(String name, int id, String http_url_to_repo, String description, List<String> tag_list) {
             this.name = name;
             this.id = id;
             this.http_url_to_repo = http_url_to_repo;
@@ -68,12 +77,12 @@ public class ClientTest {
         }
     }
 
-    static final String PrivateToken = "qGm5VgrCzA6PpqstUXtb";
-
+    @JsonIgnoreProperties(ignoreUnknown=true)    
     public static class Branch {
         public String name;
         public Commit commit;
 
+        @XmlElement(name = "protected")
         @JsonbProperty(value = "protected")
         public boolean _protected;
         
@@ -86,6 +95,7 @@ public class ClientTest {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown=true)    
     public static class Commit {
         public String id;
         public String short_id;
@@ -108,9 +118,11 @@ public class ClientTest {
     public static void main(String[] args) {
         ClientTest c = new ClientTest();
 
-        c.createProject("abc");
-        c.createProject("def");
-        c.createProject("hij");
+        Project p;
+        
+        p = c.createProject("abc");
+        p = c.createProject("def");
+        p = c.createProject("hij");
         
         List<Project> projects = c.listProjects();
 
@@ -128,7 +140,7 @@ public class ClientTest {
             c.listBranches(project.id);
             c.listCommits(project.id);
             
-            // c.deleteProject(project.id);
+            c.deleteProject(project.id);
             
             lastProjectId = project.id;
         }
@@ -138,8 +150,11 @@ public class ClientTest {
     }
 
     public WebTarget generateTarget() {
-        Client client = ClientBuilder.newBuilder()
-            .build();
+        Client client = ClientBuilder.newBuilder().build();
+        
+        // client.register(MoxyJsonFeature.class);
+        // client.register(JsonBindingFeature.class);
+        client.register(JacksonFeature.class);
 
         return client.target("http://127.0.0.1:80/api/v4/");
     }
@@ -161,19 +176,7 @@ public class ClientTest {
 
         System.out.println("done");
 
-        String content = response.readEntity(String.class);
-        
-        Jsonb jsonb = JsonbBuilder.create();
-
-        List<Project> projectList =
-            jsonb.fromJson(content,
-                           new ArrayList<Project>(){}.getClass().getGenericSuperclass());
-
-        for (Project project: projectList) {
-            System.out.println("id: " + project.id + " ,name: " + project.name);
-        }
-        
-        return projectList;
+        return response.readEntity(new GenericType<List<Project>>(){});
     }
 
     public Project createProject(String projectName) {
@@ -189,18 +192,12 @@ public class ClientTest {
         System.out.println("createProject: " + response.getStatus());
 
         // Expected 201 CREATED
-        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL))        
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL))
             return null;
 
         System.out.println("done");
-
-        String content = response.readEntity(String.class);
-
-        Jsonb jsonb = JsonbBuilder.create();
-
-        Project project = jsonb.fromJson(content, Project.class);
-
-        return project;
+        
+        return response.readEntity(Project.class);
     }
 
     public Project updateProject(int projectId, Project request) {
@@ -219,13 +216,12 @@ public class ClientTest {
 
         System.out.println("done");
 
-        String content = response.readEntity(String.class);
+        // String content = response.readEntity(String.class);
+        // Jsonb jsonb = JsonbBuilder.create();
+        // Project project = jsonb.fromJson(content, Project.class);
+        // return project;
 
-        Jsonb jsonb = JsonbBuilder.create();
-
-        Project project = jsonb.fromJson(content, Project.class);
-
-        return project;
+        return response.readEntity(Project.class);
     }    
 
     public Project forkProject(int projectId) {
@@ -247,13 +243,7 @@ public class ClientTest {
 
         System.out.println("done");
 
-        String content = response.readEntity(String.class);
-
-        Jsonb jsonb = JsonbBuilder.create();
-
-        Project project = jsonb.fromJson(content, Project.class);
-
-        return project;
+        return response.readEntity(Project.class);
     }    
 
     public Project getProjectById(int projectId) {
@@ -273,13 +263,7 @@ public class ClientTest {
         
         System.out.println("done");
 
-        String content = response.readEntity(String.class);
-        
-        Jsonb jsonb = JsonbBuilder.create();
-
-        Project project = jsonb.fromJson(content, Project.class);
-
-        return project;        
+        return response.readEntity(Project.class);
     }    
 
     public List<Branch> listBranches(int projectId) {
@@ -297,17 +281,9 @@ public class ClientTest {
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL))        
             return null;
         
-        System.out.println("done");        
-
-        String content = response.readEntity(String.class);        
-
-        Jsonb jsonb = JsonbBuilder.create();
-
-        List<Branch> branchList =
-            jsonb.fromJson(content,
-                           new ArrayList<Branch>(){}.getClass().getGenericSuperclass());
+        System.out.println("done");
         
-        return branchList;
+        return response.readEntity(new GenericType<List<Branch>>(){});
     }
 
     public List<Commit> listCommits(int projectId) {
@@ -327,15 +303,7 @@ public class ClientTest {
         
         System.out.println("done");
 
-        String content = response.readEntity(String.class);        
-
-        Jsonb jsonb = JsonbBuilder.create();
-
-        List<Commit> commitList =
-            jsonb.fromJson(content,
-                           new ArrayList<Commit>(){}.getClass().getGenericSuperclass());
-        
-        return commitList;
+        return response.readEntity(new GenericType<List<Commit>>(){});
     }    
 
     public void deleteProject(int projectId) {
