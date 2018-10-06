@@ -5,6 +5,10 @@ import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 
+import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
+import org.glassfish.jersey.jsonb.JsonBindingFeature;
+
 import java.io.IOException;
 import java.net.URI;
 
@@ -25,6 +29,12 @@ public class Main {
         // in com.example package
         final ResourceConfig rc = new ResourceConfig()
             .packages("com.example")
+
+            // 下のうち1つを選択する
+            // .register(MoxyJsonFeature.class)
+            // .register(JacksonFeature.class)
+            .register(JsonBindingFeature.class)
+            
             .register(MultiPartFeature.class);
 
         // create and start a new instance of grizzly http server
