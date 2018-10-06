@@ -2,7 +2,9 @@ package nminoru;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -17,15 +19,15 @@ import org.eclipse.persistence.jaxb.MarshallerProperties;
 
 public class jaxb_test {
 
-    static public class Dog {
+    public static class Dog {
         public String name;
         public int age;
         public boolean bitable;
         public List<String> dogs;
         public List<List<String>> multidimarr;
-
         private String phoneNumbers;
-
+        public Map<String, Object> attributes;
+        
         @XmlElement(name="phone-number")
         public String getPhoneNumbers() {
             return phoneNumbers;
@@ -34,9 +36,8 @@ public class jaxb_test {
         public void setPhoneNumbers(String phoneNumbers) {
             this.phoneNumbers = phoneNumbers;
         }
-
     }
-
+    
     public static void main(String[] args) throws JAXBException, PropertyException {
         // JAXBContext jaxbContext = JAXBContext.newInstance(Dog.class);
         Dog dog = new Dog();
@@ -72,7 +73,15 @@ public class jaxb_test {
 
         System.out.println("name: " + dog.name);
         System.out.println("age: " + dog.age);
-        System.out.println();        
+        System.out.println();
+
+        dog = new Dog();
+        dog.attributes = new HashMap<>();
+        dog.attributes.put("key1", "value1");
+        dog.attributes.put("key2", "value2");
+        dog.attributes.put("key3", "value3");
+        marshal(dog);
+        System.out.println();
     }
     
     static JAXBContext jaxbContext;
@@ -84,14 +93,14 @@ public class jaxb_test {
         }
     }
 
-    static void marshal(Dog dog) throws JAXBException {
+    static void marshal(Object object) throws JAXBException {
         Marshaller marshaller = jaxbContext.createMarshaller();
         
         marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, "application/json");
         marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
         
-        marshaller.marshal(dog, System.out);
+        marshaller.marshal(object, System.out);
     }
     
     static Dog unmarshal(String jsonString) throws JAXBException {
