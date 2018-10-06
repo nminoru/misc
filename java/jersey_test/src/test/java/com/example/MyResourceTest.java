@@ -1,10 +1,19 @@
 package com.example;
 
+import java.util.List;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.jsonb.JsonBindingFeature;
+import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
 
 import org.junit.After;
 import org.junit.Before;
@@ -22,6 +31,10 @@ public class MyResourceTest {
         server = Main.startServer();
         // create the client
         Client c = ClientBuilder.newClient();
+
+        // c.register(JsonBindingFeature.class);
+        // c.register(JacksonFeature.class);
+        c.register(MoxyJsonFeature.class);
 
         // uncomment the following line if you want to enable
         // support for JSON in the client (you also have to uncomment
@@ -42,7 +55,27 @@ public class MyResourceTest {
      */
     @Test
     public void testGetIt() {
-        String responseMsg = target.path("myresource").request().get(String.class);
+        String responseMsg = target.path("/myresource").request().get(String.class);
+        
         assertEquals("Got it!", responseMsg);
     }
+
+    @Test
+    public void testGetJsonArray() {
+        Response response = target
+            .path("/myresource/jsonarray")
+            .request()
+            .get();
+
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+            System.err.println("status: " + response.getStatus());
+            System.err.println("response: " + response.readEntity(String.class));
+            throw new WebApplicationException();
+        }
+
+        List<MyResource.Type> results = response.readEntity(new GenericType<List<MyResource.Type>>(){});
+        for (MyResource.Type result : results) {
+            System.out.println(result.name + " : " + result.value);
+        }
+    }    
 }

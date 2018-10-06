@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.POST;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.POST;
 import javax.ws.rs.Produces;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.core.MediaType;
@@ -69,6 +70,19 @@ public class MyResource {
         public String[][] qux; // 多次元配列が JSON 化できることの
     }
 
+    public static class Type {
+        public String name;
+        public String value;
+        
+        public Type() {
+        }
+
+        public Type(String name, String value) {
+            this.name = name;
+            this.value = value;
+        }        
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
@@ -88,4 +102,17 @@ public class MyResource {
 
         return response;
     }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/jsonarray")
+    public List<Type> jsonarray() {
+        return new ArrayList<Type>() {
+            {
+                add(new Type("NAME1", "VALUE1"));
+                add(new Type("NAME2", "VALUE2"));
+                add(new Type("NAME3", "VALUE3"));
+            }
+        };
+    }    
 }
