@@ -3,7 +3,9 @@ package jp.nminoru.atlas_test;
 import java.util.Date;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown=true)
 public class AtlasEntity extends AtlasStruct {
     public String guid;

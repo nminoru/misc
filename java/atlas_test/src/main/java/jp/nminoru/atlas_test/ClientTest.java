@@ -10,12 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.apache.commons.io.IOUtils;
@@ -28,10 +27,9 @@ import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
 
 import static org.junit.Assert.*;
 
+
 public class ClientTest {
 
-    Jsonb jsonb;
-    
     public static void main(String[] args) throws IOException {
         ClientTest clientTest = new ClientTest();
 
@@ -208,7 +206,6 @@ public class ClientTest {
     }
 
     public ClientTest() {
-        jsonb = JsonbBuilder.create();
     }
 
     public WebTarget generateTarget() {
@@ -271,15 +268,12 @@ public class ClientTest {
 
     public EntityMutationResponse createOrUpdateEntity(AtlasEntityWithExtInfo request) {
         WebTarget target = generateTarget();
-
-        String res = jsonb.toJson(request);        
         
         Response response = target        
             .path("/v2/entity")
             .request(MediaType.APPLICATION_JSON)
-            // .post(Entity.entity(request, MediaType.APPLICATION_JSON_TYPE));
-            .post(Entity.entity(res, MediaType.APPLICATION_JSON_TYPE));
-
+            .post(Entity.entity(request, MediaType.APPLICATION_JSON_TYPE));
+        
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
             System.err.println("status: " + response.getStatus());
             System.err.println("response: " + response.readEntity(String.class));
@@ -449,13 +443,8 @@ public class ClientTest {
 
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL))
             return null;
-
-        String content = response.readEntity(String.class);
-        List<AtlasGlossary> result =
-            jsonb.fromJson(content,
-                           new ArrayList<AtlasGlossary>(){}.getClass().getGenericSuperclass());
         
-        return result;
+        return response.readEntity(new GenericType<List<AtlasGlossary>>(){});
     }
 
     public AtlasGlossary createGlossary(AtlasGlossary request) {
