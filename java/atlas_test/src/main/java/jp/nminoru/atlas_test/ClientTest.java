@@ -23,6 +23,7 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.glassfish.jersey.jackson.JacksonFeature;
+import org.glassfish.jersey.jsonb.JsonBindingFeature;
 import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
 
 import static org.junit.Assert.*;
@@ -45,51 +46,151 @@ public class ClientTest {
             System.out.println();
         }
             
-        //
-        AtlasSearchResult searchResult = clientTest.searchDSL();
-        if (searchResult != null && searchResult.entities != null) {
-            for (AtlasEntityHeader entity : searchResult.entities) {
-                String guid = entity.guid;
-                AtlasEntityWithExtInfo entityWithExtInfo = clientTest.getEntity(guid);
-                
-                // List<String> superTypes = clientTest.getSuperTypes(entity.entity.typeName);
-                // AtlasLineageInfo lineage = clientTest.getLineage(guid);                
-            }
-        }
-
-        //
-        AtlasEntityWithExtInfo request = new AtlasEntityWithExtInfo();
-        request.entity.typeName = "test_path";
-        request.entity.attributes.put("name",          "abc"     );
-        request.entity.attributes.put("qualifiedName", "abc@abc" );
-        request.entity.attributes.put("path",          "/abc.txt");
-
-        EntityMutationResponse response = clientTest.createEntity(request);
-        // EntityMutationResponse response = clientTest.createEntity(request);
+        // 過去のエントリを全削除
+        clientTest.deleteAllEntityOfType("test_proces");
+        clientTest.deleteAllEntityOfType("test_path");
         
-        assert response != null;
-        assert response.mutatedEntities != null;        
+        // put("name",          name);
+        // request.entity.attributes.put(, qualifiedName);
+        //request.entity.attributes.put("path",          path);
 
-        if (response.mutatedEntities != null) {
-            List<AtlasEntityHeader> entityHeaderList1;
-            List<AtlasEntityHeader> entityHeaderList2;
-            
-            entityHeaderList1 = (List<AtlasEntityHeader>)response.mutatedEntities.get("CREATE");
-            entityHeaderList2 = (List<AtlasEntityHeader>)response.mutatedEntities.get("UPDATE");
-            
-            if (entityHeaderList1 != null) {
-                for (AtlasEntityHeader entityHeader: entityHeaderList1) {
-                    ;
-                }
-            }
-            
-            if (entityHeaderList2 != null) {
-                for (AtlasEntityHeader entityHeader: entityHeaderList2) {
-                    ;
-                }
-            }            
-        }
+        // エンティティの定義
+        String guid1 =
+            clientTest.createOrUpdateEntity("test_path",
+                                            new HashMap<String, Object>() {
+                                                {
+                                                    put("name",          "abc");
+                                                    put("qualifiedName", "abc@0");
+                                                    put("path",           "/abc.txt");
+                                                }
+                                            });
+
+        String guid2 =
+            clientTest.createOrUpdateEntity("test_path",
+                                            new HashMap<String, Object>() {
+                                                {
+                                                    put("name",          "def");
+                                                    put("qualifiedName", "def@0");
+                                                    put("path",           "/def.txt");
+                                                }
+                                            });
+
+        String guid3 =
+            clientTest.createOrUpdateEntity("test_path",
+                                            new HashMap<String, Object>() {
+                                                {
+                                                    put("name",          "hij");
+                                                    put("qualifiedName", "hij@0");
+                                                    put("path",           "/hij.txt");
+                                                }
+                                            });
+
+        String guid4 =
+            clientTest.createOrUpdateEntity("test_path",
+                                            new HashMap<String, Object>() {
+                                                {
+                                                    put("name",          "klm");
+                                                    put("qualifiedName", "klm@0");
+                                                    put("path",           "/klm.txt");
+                                                }
+                                            });        
+
+        // プロセスの定義
+        clientTest.createOrUpdateEntity("test_process",
+                                        new HashMap<String, Object>() {
+                                            {
+                                                put("name",          "test1");
+                                                put("qualifiedName", "test1");
+                                                put("description",   "DESCRIPTION");
+                                                put("inputs",
+                                                    new ArrayList() {
+                                                        {
+                                                            // add(getDatasetWithQualifiedName("abc@0"));
+                                                            add(getDatasetWithGuid(guid1));
+                                                        }
+                                                    });
+
+                                                put("outputs",
+                                                    new ArrayList() {
+                                                        {
+                                                            // add(getDatasetWithQualifiedName("def@0"));
+                                                            add(getDatasetWithGuid(guid2));
+                                                        }
+                                                    });                                                    
+                                            }
+                                        });
+
+        clientTest.createOrUpdateEntity("test_process",
+                                        new HashMap<String, Object>() {
+                                            {
+                                                put("name",          "test2");
+                                                put("qualifiedName", "test2");
+                                                put("description",   "DESCRIPTION");
+                                                put("inputs",
+                                                    new ArrayList() {
+                                                        {
+                                                            // add(getDatasetWithQualifiedName("def@0"));
+                                                            add(getDatasetWithGuid(guid2));
+                                                        }
+                                                    });
+
+                                                put("outputs",
+                                                    new ArrayList() {
+                                                        {
+                                                            // add(getDatasetWithQualifiedName("hij@0"));
+                                                            add(getDatasetWithGuid(guid3));
+                                                        }
+                                                    });                                                    
+                                            }
+                                        });
+
+        clientTest.createOrUpdateEntity("test_process",
+                                        new HashMap<String, Object>() {
+                                            {
+                                                put("name",          "test1");
+                                                put("qualifiedName", "test1");
+                                                put("description",   "DESCRIPTION");
+                                                put("inputs",
+                                                    new ArrayList() {
+                                                        {
+                                                            // add(getDatasetWithQualifiedName("klm@0"));
+                                                            add(getDatasetWithGuid(guid4));
+                                                        }
+                                                    });
+
+                                                put("outputs",
+                                                    new ArrayList() {
+                                                        {
+                                                            // add(getDatasetWithQualifiedName("def@0"));
+                                                            add(getDatasetWithGuid(guid2));
+                                                        }
+                                                    });                                                    
+                                            }
+                                        });        
     }
+
+    static Map<String, Object> getDatasetWithQualifiedName(String qualifiedName) {
+        return new HashMap<String, Object>() {
+            {
+                put("typeName", "test_path");
+                put("uniqueAttributes",
+                    new HashMap<String, Object>() {
+                        {
+                            put("qualifiedName", qualifiedName);
+                        }
+                    });
+            }
+        };
+    }
+
+    static Map<String, Object> getDatasetWithGuid(String guid) {
+        return new HashMap<String, Object>() {
+            {
+                put("typeName", "test_path");
+                put("guid",     guid);
+            }
+        };
+    }    
 
     public void install() throws IOException {
         AtlasBaseTypeDef typeDef = getTypeDefByName("test_path");
@@ -123,13 +224,52 @@ public class ClientTest {
         
         client
             .register(feature)
-            // .register(MoxyJsonFeature.class);
-            .register(JacksonFeature.class);
+            
+            // JSON バインディングを選択する
+            // .register(JsonBindingFeature.class)
+            // .register(MoxyJsonFeature.class)
+            .register(JacksonFeature.class)
+            ;
 
         return client.target("http://127.0.0.1:21000/api/atlas");
     }
 
-    public EntityMutationResponse createEntity(AtlasEntityWithExtInfo request) {
+    public String createOrUpdateEntity(String typeName, Map<String, Object> attributes) {
+        AtlasEntityWithExtInfo request = new AtlasEntityWithExtInfo();
+        
+        request.entity.typeName = typeName;
+        request.entity.attributes = attributes;
+
+        EntityMutationResponse response = createOrUpdateEntity(request);
+        // EntityMutationResponse response = clientTest.createEntity(request);
+        
+        assert response != null;
+        assert response.mutatedEntities != null;        
+
+        if (response.mutatedEntities != null) {
+            List<AtlasEntityHeader> entityHeaderList1;
+            List<AtlasEntityHeader> entityHeaderList2;
+            
+            entityHeaderList1 = (List<AtlasEntityHeader>)response.mutatedEntities.get("CREATE");
+            entityHeaderList2 = (List<AtlasEntityHeader>)response.mutatedEntities.get("UPDATE");
+            
+            if (entityHeaderList1 != null) {
+                for (AtlasEntityHeader entityHeader: entityHeaderList1) {
+                    return entityHeader.guid;
+                }
+            }
+            
+            if (entityHeaderList2 != null) {
+                for (AtlasEntityHeader entityHeader: entityHeaderList2) {
+                    return entityHeader.guid;
+                }
+            }            
+        }
+
+        return null;
+    }
+
+    public EntityMutationResponse createOrUpdateEntity(AtlasEntityWithExtInfo request) {
         WebTarget target = generateTarget();
 
         String res = jsonb.toJson(request);        
@@ -141,13 +281,30 @@ public class ClientTest {
             .post(Entity.entity(res, MediaType.APPLICATION_JSON_TYPE));
 
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-            System.out.println("status: " + response.getStatus());
-            System.out.println("response: " + response.readEntity(String.class));
+            System.err.println("status: " + response.getStatus());
+            System.err.println("response: " + response.readEntity(String.class));
             return null;
         }
-
+        
         return response.readEntity(EntityMutationResponse.class);
     }
+
+    public void deleteAllEntityOfType(String typeName) {
+        AtlasSearchResult searchResult = searchDSL(typeName);
+        
+        if (searchResult != null && searchResult.entities != null) {
+            for (AtlasEntityHeader entity : searchResult.entities) {
+                String guid = entity.guid;
+
+                System.out.println(entity.guid + " " + entity.status + " " + entity.displayText);
+                                   
+                deleteEntity(guid);
+                //AtlasEntityWithExtInfo entityWithExtInfo = clientTest.getEntity(guid);
+                // List<String> superTypes = clientTest.getSuperTypes(entity.entity.typeName);
+                // AtlasLineageInfo lineage = clientTest.getLineage(guid);                
+            }
+        }
+    }    
 
     public EntityMutationResponse deleteEntity(String guid) {
         WebTarget target = generateTarget();
@@ -181,15 +338,8 @@ public class ClientTest {
 
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL))
             return null;
-
-        String content = response.readEntity(String.class);
         
-        System.out.println(content);
-        
-        AtlasTypesDef result =
-            jsonb.fromJson(content, AtlasTypesDef.class);
-
-        return result;
+        return response.readEntity(AtlasTypesDef.class);
     }
 
     public AtlasBaseTypeDef getTypeDefByName(String name) {
@@ -206,31 +356,16 @@ public class ClientTest {
         return response.readEntity(AtlasBaseTypeDef.class);
     }
 
-    public AtlasSearchResult searchDSL() {
+    public AtlasSearchResult searchDSL(String typeName) {
         WebTarget target = generateTarget();
 
         Response response = target
             .path("/v2/search/dsl")
-            .queryParam("typeName", "test_path")
+            .queryParam("query", "where __state = \"ACTIVE\"")
+            .queryParam("typeName", typeName)
             .request(MediaType.APPLICATION_JSON)
             .get();
         
-        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL))
-            return null;        
-
-        return response.readEntity(AtlasSearchResult.class); 
-    }
-
-    public AtlasSearchResult searchDSL2() {
-        WebTarget target = generateTarget();
-
-        Response response = target        
-            .path("/v2/search/dsl")
-            .queryParam("typeName", "test_path")
-            .queryParam("query", "WHERE title = FOO")
-            .request(MediaType.APPLICATION_JSON)
-            .get();
-
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL))
             return null;        
 
