@@ -45,7 +45,7 @@ public class ClientTest {
         }
             
         // 過去のエントリを全削除
-        clientTest.deleteAllEntityOfType("test_proces");
+        clientTest.deleteAllEntityOfType("test_process");
         clientTest.deleteAllEntityOfType("test_path");
         
         // put("name",          name);
