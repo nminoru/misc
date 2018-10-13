@@ -164,7 +164,10 @@ public class ClientTest {
                                                         }
                                                     });                                                    
                                             }
-                                        });        
+                                        });
+
+        // アトリビューション書き換え
+        clientTest.partialUpdateEntityAttrByGuid(guid1, "path", "/abc/abc.txt");
     }
 
     static Map<String, Object> getDatasetWithQualifiedName(String qualifiedName) {
@@ -281,6 +284,25 @@ public class ClientTest {
         }
         
         return response.readEntity(EntityMutationResponse.class);
+    }
+
+    public EntityMutationResponse partialUpdateEntityAttrByGuid(String guid, String attrName, String attrValue) {
+        WebTarget target = generateTarget();
+        
+        Response response = target        
+            .path("/v2/entity/guid/" + guid)
+            .queryParam("name", attrName)
+            .request(MediaType.APPLICATION_JSON)
+            .put(Entity.json("\"" + attrValue + "\""));
+        
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+            System.out.println("*** partialUpdateEntityAttrByGuid ***");
+            System.err.println("status: " + response.getStatus());
+            System.err.println("response: " + response.readEntity(String.class));
+            return null;
+        }
+        
+        return response.readEntity(EntityMutationResponse.class);        
     }
 
     public void deleteAllEntityOfType(String typeName) {
