@@ -91,9 +91,21 @@ public class ClientTest {
                                                     put("qualifiedName", "klm@0");
                                                     put("path",           "/klm.txt");
                                                 }
-                                            });        
+                                            });
+
+        String guid5 =
+            clientTest.createOrUpdateEntity("test_path",
+                                            new HashMap<String, Object>() {
+                                                {
+                                                    put("name",          "nop");
+                                                    put("qualifiedName", "nop@0");
+                                                    put("path",           "/np.txt");
+                                                }
+                                            });  
 
         // プロセスの定義
+
+        // 新規プロセスの作成
         clientTest.createOrUpdateEntity("test_process",
                                         new HashMap<String, Object>() {
                                             {
@@ -118,6 +130,7 @@ public class ClientTest {
                                             }
                                         });
 
+        // 別の新規プロセスの作成        
         clientTest.createOrUpdateEntity("test_process",
                                         new HashMap<String, Object>() {
                                             {
@@ -142,6 +155,7 @@ public class ClientTest {
                                             }
                                         });
 
+        // 既存のプロセスの更新
         clientTest.createOrUpdateEntity("test_process",
                                         new HashMap<String, Object>() {
                                             {
@@ -165,6 +179,29 @@ public class ClientTest {
                                                     });                                                    
                                             }
                                         });
+
+        // 入力枝しかない新規プロセスの作成
+        clientTest.createOrUpdateEntity("test_process",
+                                        new HashMap<String, Object>() {
+                                            {
+                                                put("name",          "test3");
+                                                put("qualifiedName", "test3");
+                                                put("description",   "DESCRIPTION");
+                                                put("inputs",
+                                                    new ArrayList() {
+                                                        {
+                                                            // add(getDatasetWithQualifiedName("nop@0"));
+                                                            add(getDatasetWithGuid(guid5));
+                                                        }
+                                                    });
+
+                                                put("outputs",
+                                                    new ArrayList() {
+                                                        {
+                                                        }
+                                                    });                                                    
+                                            }
+                                        });        
 
         // アトリビューション書き換え
         clientTest.partialUpdateEntityAttrByGuid(guid1, "path", "/abc/abc.txt");
