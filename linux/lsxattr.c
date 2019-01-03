@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
-#include <attr/xattr.h>
 #include <sys/stat.h>
+#include <sys/xattr.h>
 #include <fcntl.h>
 #include <alloca.h>
 #include <string.h>

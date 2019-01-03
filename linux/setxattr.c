@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <sys/types.h>
-#include <attr/xattr.h>
-
+#include <sys/xattr.h>
 
 int main(int argc, char **argv)
 {

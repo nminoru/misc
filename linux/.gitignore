@@ -1,2 +1,6 @@
 backtrace
 gprof_test
+lsxattr
+setxattr
+setxattr2
+
