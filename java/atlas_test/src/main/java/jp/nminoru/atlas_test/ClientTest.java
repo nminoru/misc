@@ -30,6 +30,8 @@ import static org.junit.Assert.*;
 
 public class ClientTest {
 
+    public static final String BASE_URI = "http://127.0.0.1:21000/api/atlas";
+
     public static void main(String[] args) throws IOException {
         ClientTest clientTest = new ClientTest();
 
@@ -113,7 +115,7 @@ public class ClientTest {
                                                 put("qualifiedName", "test1");
                                                 put("description",   "DESCRIPTION");
                                                 put("inputs",
-                                                    new ArrayList() {
+                                                    new ArrayList<Map<String, Object>>() {
                                                         {
                                                             // add(getDatasetWithQualifiedName("abc@0"));
                                                             add(getDatasetWithGuid(guid1));
@@ -121,7 +123,7 @@ public class ClientTest {
                                                     });
 
                                                 put("outputs",
-                                                    new ArrayList() {
+                                                    new ArrayList<Map<String, Object>>() {
                                                         {
                                                             // add(getDatasetWithQualifiedName("def@0"));
                                                             add(getDatasetWithGuid(guid2));
@@ -138,7 +140,7 @@ public class ClientTest {
                                                 put("qualifiedName", "test2");
                                                 put("description",   "DESCRIPTION");
                                                 put("inputs",
-                                                    new ArrayList() {
+                                                    new ArrayList<Map<String, Object>>() {
                                                         {
                                                             // add(getDatasetWithQualifiedName("def@0"));
                                                             add(getDatasetWithGuid(guid2));
@@ -146,7 +148,7 @@ public class ClientTest {
                                                     });
 
                                                 put("outputs",
-                                                    new ArrayList() {
+                                                    new ArrayList<Map<String, Object>>() {
                                                         {
                                                             // add(getDatasetWithQualifiedName("hij@0"));
                                                             add(getDatasetWithGuid(guid3));
@@ -163,7 +165,7 @@ public class ClientTest {
                                                 put("qualifiedName", "test1");
                                                 put("description",   "DESCRIPTION");
                                                 put("inputs",
-                                                    new ArrayList() {
+                                                    new ArrayList<Map<String, Object>>() {
                                                         {
                                                             // add(getDatasetWithQualifiedName("klm@0"));
                                                             add(getDatasetWithGuid(guid4));
@@ -171,7 +173,7 @@ public class ClientTest {
                                                     });
 
                                                 put("outputs",
-                                                    new ArrayList() {
+                                                    new ArrayList<Map<String, Object>>() {
                                                         {
                                                             // add(getDatasetWithQualifiedName("def@0"));
                                                             add(getDatasetWithGuid(guid2));
@@ -188,7 +190,7 @@ public class ClientTest {
                                                 put("qualifiedName", "test3");
                                                 put("description",   "DESCRIPTION");
                                                 put("inputs",
-                                                    new ArrayList() {
+                                                    new ArrayList<Map<String, Object>>() {
                                                         {
                                                             // add(getDatasetWithQualifiedName("nop@0"));
                                                             add(getDatasetWithGuid(guid5));
@@ -196,7 +198,7 @@ public class ClientTest {
                                                     });
 
                                                 put("outputs",
-                                                    new ArrayList() {
+                                                    new ArrayList<Map<String, Object>>() {
                                                         {
                                                         }
                                                     });                                                    
@@ -268,7 +270,7 @@ public class ClientTest {
             .register(JacksonFeature.class)
             ;
 
-        return client.target("http://127.0.0.1:21000/api/atlas");
+        return client.target(BASE_URI);
     }
 
     public String createOrUpdateEntity(String typeName, Map<String, Object> attributes) {

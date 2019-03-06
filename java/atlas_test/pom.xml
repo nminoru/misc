@@ -108,7 +108,8 @@
         <inherited>true</inherited>
         <configuration>
           <source>${java.version}</source>
-          <target>${java.version}</target>	  
+          <target>${java.version}</target>
+	  <compilerArgument>${compilerArgument}</compilerArgument>
         </configuration>
       </plugin>
       
