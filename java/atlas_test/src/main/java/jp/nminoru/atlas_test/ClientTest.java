@@ -101,9 +101,19 @@ public class ClientTest {
                                                 {
                                                     put("name",          "nop");
                                                     put("qualifiedName", "nop@0");
-                                                    put("path",           "/np.txt");
+                                                    put("path",           "/nop.txt");
                                                 }
-                                            });  
+                                            });
+
+        String guid6 =
+            clientTest.createOrUpdateEntity("test_path",
+                                            new HashMap<String, Object>() {
+                                                {
+                                                    put("name",          "qrs");
+                                                    put("qualifiedName", "qrs@0");
+                                                    put("path",           "/qrs.txt");
+                                                }
+                                            });          
 
         // プロセスの定義
 
@@ -203,8 +213,30 @@ public class ClientTest {
                                                         }
                                                     });                                                    
                                             }
-                                        });        
-
+                                        });
+        
+        // 出力枝しかない新規プロセスの作成
+        clientTest.createOrUpdateEntity("test_process",
+                                        new HashMap<String, Object>() {
+                                            {
+                                                put("name",          "test4");
+                                                put("qualifiedName", "test4");
+                                                put("description",   "DESCRIPTION");
+                                                put("inputs",
+                                                    new ArrayList<Map<String, Object>>() {
+                                                        {
+                                                        }
+                                                    });
+                                                put("outputs",
+                                                    new ArrayList<Map<String, Object>>() {
+                                                        {
+                                                            // add(getDatasetWithQualifiedName("qrs@0"));
+                                                            add(getDatasetWithGuid(guid6));
+                                                        }
+                                                    });
+                                            }
+                                        });
+        
         // アトリビューション書き換え
         clientTest.partialUpdateEntityAttrByGuid(guid1, "path", "/abc/abc.txt");
     }
