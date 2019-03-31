@@ -92,7 +92,7 @@ public class ClientTest {
         // Start container
         docker.startContainer(containerId);
 
-        inspect(containerId);        
+        inspect(containerId);
 
         System.out.println(logs.readFully());
 
@@ -114,6 +114,16 @@ public class ClientTest {
         
         // Kill container
         docker.killContainer(containerId);
+
+        // 2nd: Restart & stop 
+        docker.startContainer(containerId);
+        inspect(containerId);        
+        docker.killContainer(containerId);
+
+        // 3rd: Restart & stop 
+        docker.startContainer(containerId);
+        inspect(containerId);        
+        docker.killContainer(containerId);        
 
         System.out.println("Phase: remove container");
 
