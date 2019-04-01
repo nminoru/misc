@@ -13,9 +13,11 @@ import com.spotify.docker.client.exceptions.DockerException;
 import com.spotify.docker.client.messages.ContainerConfig;
 import com.spotify.docker.client.messages.ContainerCreation;
 import com.spotify.docker.client.messages.ContainerInfo;
+import com.spotify.docker.client.messages.ContainerStats;
 import com.spotify.docker.client.messages.ExecCreation;
 import com.spotify.docker.client.messages.HostConfig;
 import com.spotify.docker.client.messages.NetworkSettings;
+import com.spotify.docker.client.messages.NetworkStats;
 import com.spotify.docker.client.messages.PortBinding;
 
 
@@ -102,8 +104,10 @@ public class ClientTest {
         } catch (IOException e) {
         }
 
-        System.out.println(logs.readFully());        
+        System.out.println(logs.readFully());
 
+        inspect(containerId);
+        
         // Exec command inside running container with attached STDOUT and STDERR
         // final String[] command = {"sh", "-c", "ls"};
         // final ExecCreation execCreation = docker.execCreate(id, command, DockerClient.ExecCreateParam.attachStdout(),
@@ -115,16 +119,6 @@ public class ClientTest {
         
         // Kill container
         docker.killContainer(containerId);
-
-        // 2nd: Restart & stop 
-        docker.startContainer(containerId);
-        inspect(containerId);        
-        docker.killContainer(containerId);
-
-        // 3rd: Restart & stop 
-        docker.startContainer(containerId);
-        inspect(containerId);        
-        docker.killContainer(containerId);        
 
         System.out.println("Phase: remove container");
 
@@ -138,8 +132,10 @@ public class ClientTest {
     void inspect(String containerId) throws DockerException, InterruptedException {
         final ContainerInfo info = docker.inspectContainer(containerId);
 
-        System.out.println("[Name] " + info.name());
+        System.out.println("[Name]");
+        System.out.println("\t" + info.name());
 
+        System.out.println("[Networks]");
         NetworkSettings networkSettings = info.networkSettings();
 
         for (Map.Entry<String, List<PortBinding>> entry : networkSettings.ports().entrySet()) {
@@ -148,6 +144,30 @@ public class ClientTest {
                 System.out.println("\t\t" + portBinding.hostPort());
             }
         }
-        System.out.println();        
+        System.out.println();
+
+        final ContainerStats stats = docker.stats(containerId);
+
+        long rxBytes = 0;        
+        long txBytes = 0;
+        
+        if (stats.network() != null) {
+            NetworkStats networkStats = stats.network();
+            
+            rxBytes += networkStats.rxBytes();
+            txBytes += networkStats.txBytes();
+        }
+
+        if (stats.networks() != null) {
+            for (String key : stats.networks().keySet()) {
+                NetworkStats networkStats = stats.networks().get(key);
+                
+                rxBytes += networkStats.rxBytes();
+                txBytes += networkStats.txBytes();
+            }
+        }
+
+        System.out.println("\trxBytes: " + rxBytes);
+        System.out.println("\ttxBytes: " + txBytes);        
     }
 }
