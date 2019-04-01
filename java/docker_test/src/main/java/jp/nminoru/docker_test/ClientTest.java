@@ -33,7 +33,8 @@ public class ClientTest {
     final DockerClient docker;
 
     public ClientTest() throws DockerCertificateException, DockerException {
-        docker = DefaultDockerClient.fromEnv().build();
+        // docker = DefaultDockerClient.fromEnv().build();
+        docker = DefaultDockerClient.builder().uri("http://127.0.0.1:2376/").build();
     }
 
     public void test(String imageName) throws DockerException, InterruptedException {
@@ -74,7 +75,7 @@ public class ClientTest {
                 })
             .build();
 
-        final ContainerCreation creation = docker.createContainer(containerConfig);
+        final ContainerCreation creation = docker.createContainer(containerConfig, "hogehoge");
         final String containerId = creation.id();
         final LogStream logs = docker.logs(containerId,
                                            DockerClient.LogsParam.stdout(),
@@ -136,6 +137,8 @@ public class ClientTest {
 
     void inspect(String containerId) throws DockerException, InterruptedException {
         final ContainerInfo info = docker.inspectContainer(containerId);
+
+        System.out.println("[Name] " + info.name());
 
         NetworkSettings networkSettings = info.networkSettings();
 
