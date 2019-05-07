@@ -2,11 +2,12 @@ package com.example;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.logging.Level;
 import javax.servlet.Servlet;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.logging.LoggingFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.servlet.ServletContainer;
-import org.glassfish.jersey.uri.UriComponent;
 import org.glassfish.grizzly.servlet.ServletRegistration;
 import org.glassfish.grizzly.servlet.WebappContext;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -28,8 +29,9 @@ public class Main {
         URI uri = URI.create(BASE_URI);
             
         final ResourceConfig rc1 = new ResourceConfig()
-            .packages("com.example");
-
+            .packages("com.example")
+            .register(new LoggingFeature(new AccessLog(), Level.INFO, LoggingFeature.Verbosity.PAYLOAD_TEXT, 1000));
+        
         ServletContainer servletContainer1 = new ServletContainer(rc1);
 
         WebappContext context1 = new WebappContext("GrizzlyContext", "/path1");
@@ -39,7 +41,8 @@ public class Main {
         registration1.addMapping("/*");
 
         final ResourceConfig rc2 = new ResourceConfig()
-            .packages("com.example");        
+            .packages("com.example")
+            .register(new LoggingFeature(new AccessLog(), Level.INFO, LoggingFeature.Verbosity.PAYLOAD_TEXT, 1000));        
 
         ServletContainer servletContainer2 = new ServletContainer(rc2);        
 
