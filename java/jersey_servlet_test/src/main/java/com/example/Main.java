@@ -18,7 +18,7 @@ import org.glassfish.grizzly.http.server.HttpServer;
  */
 public class Main {
     // Base URI the Grizzly HTTP server will listen on
-    public static final String BASE_URI = "http://localhost:7777/myapp/";
+    public static final String BASE_URI = "http://localhost:7777/";
 
     /**
      * Starts Grizzly HTTP server exposing JAX-RS resources defined in this application.
@@ -27,21 +27,32 @@ public class Main {
     public static HttpServer createServer() {
         URI uri = URI.create(BASE_URI);
             
-        final ResourceConfig rc = new ResourceConfig()
+        final ResourceConfig rc1 = new ResourceConfig()
             .packages("com.example");
 
-        ServletContainer servletContainer = new ServletContainer(rc);
+        ServletContainer servletContainer1 = new ServletContainer(rc1);
 
-        String path = String.format("/%s", UriComponent.decodePath(uri.getPath(), true).get(1).toString());
+        WebappContext context1 = new WebappContext("GrizzlyContext", "/path1");
+        ServletRegistration registration1;
 
-        WebappContext context = new WebappContext("GrizzlyContext", path);
-        ServletRegistration registration;
+        registration1 = context1.addServlet("Jersey Servlet1", servletContainer1);
+        registration1.addMapping("/*");
 
-        registration = context.addServlet("Jersey Servlet", servletContainer);
-        registration.addMapping("/*");
+        final ResourceConfig rc2 = new ResourceConfig()
+            .packages("com.example");        
+
+        ServletContainer servletContainer2 = new ServletContainer(rc2);        
+
+        WebappContext context2 = new WebappContext("GrizzlyContext", "/path2");
+        ServletRegistration registration2;
+
+        registration2 = context2.addServlet("Jersey Servlet2", servletContainer2);
+        registration2.addMapping("/*");
 
         HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(uri, false);
-        context.deploy(httpServer);
+
+        context1.deploy(httpServer);
+        context2.deploy(httpServer);
         
         return httpServer;
     }
