@@ -37,15 +37,32 @@ services:
     protocol: http
     routes:
       - name: webdav
-        paths: null
-        strip_path: true
+        paths:
+           - /     
+        strip_path: false
         preserve_host: true
-        hosts:
-          - 'webdav.*'
+        hosts: null
         protocols:
-          - http
-          - https
-        methods: null  
+           - http
+           - https
+        methods: null        
+
+# services:
+#   - name: test
+#     host: localhost
+#     port: 8888
+#     protocol: http
+#     routes:
+#       - name: webdav
+#         paths: null
+#         strip_path: false
+#         preserve_host: true
+#         hosts:
+#           - 'webdav.*'
+#         protocols:
+#           - http
+#           - https
+#         methods: null
 
 # routes:
 # - name: another-route
