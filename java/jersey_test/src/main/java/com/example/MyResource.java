@@ -114,5 +114,19 @@ public class MyResource {
                 add(new Type("NAME3", "VALUE3"));
             }
         };
+    }
+
+    @GET
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Path("/content")
+    public String getContent1() {
+        return "text/plain";
+    }
+
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/content")
+    public String getContent2() {
+        return "application/json";
     }    
 }
