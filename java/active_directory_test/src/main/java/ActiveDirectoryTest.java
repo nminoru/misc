@@ -1,7 +1,8 @@
 /**
+ * Active Directory の接続テスト
  *
  * @see
- * - <a href="https://www.earthlink.co.jp/engineerblog/intra-mart-engineerblog/3336/">JavaでActiveDirectory検索を行う(AD認証) | 株式会社アースリンク</a> 
+ * - <a href="https://www.earthlink.co.jp/engineerblog/intra-mart-engineerblog/3336/">JavaでActiveDirectory検索を行う(AD認証) | 株式会社アースリンク</a>
  * - <a href="https://github.com/hierynomus/smbj/issues/304">Kerberos support? Issue #304 - hierynomus/smbj</a>
  */
 import java.io.IOException;
@@ -33,24 +34,38 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import com.hierynomus.smbj.auth.GSSAuthenticationContext;
+import com.hierynomus.msfscc.FileAttributes;
+import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
+import com.hierynomus.protocol.commons.EnumWithValue;
+import com.hierynomus.smbj.SMBClient;
+import com.hierynomus.smbj.auth.AuthenticationContext;
+import com.hierynomus.smbj.connection.Connection;
+import com.hierynomus.smbj.session.Session;
+import com.hierynomus.smbj.share.DiskShare;
 import com.sun.security.auth.callback.TextCallbackHandler;
 import com.sun.security.jgss.ExtendedGSSContext;
 import com.sun.security.jgss.ExtendedGSSCredential;
+import org.apache.commons.codec.binary.Hex;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.GSSName;
 import org.ietf.jgss.Oid;
 
-    
+
 public class ActiveDirectoryTest {
-    
-    static final String DomainName = "<domain>";
-    static final String UserName = "<user>";
+
+    // Active Diretory の設定
+    static final String DomainName = "<AD domain name>";
+    static final String UserName = "<username>";
     static final String Password = "<password>";
-    static final String LdapHostName = "<LDAP host name>";
-    static final String KerberosHostName = "<Kerberos host name>";
-    
+    static final String LdapHostName = "<LDAP hostname>";
+    static final String KerberosHostName = "<Kerberos hostname>";
+
+    // テスト用のSMBサーバー
+    static final String SmbHostName = "<SMB hostname>";
+    static final String ShareName = "<SMB share name>";
+
     public static void main(String[] args) throws Exception {
         ActiveDirectoryTest activeDirectoryTest = new ActiveDirectoryTest();
 
@@ -62,15 +77,15 @@ public class ActiveDirectoryTest {
 
     void connectLdap() {
         Hashtable<String, String> env = new Hashtable<>();
-        
+
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
         env.put(Context.PROVIDER_URL,            "ldap://" + LdapHostName);
         env.put(Context.SECURITY_PRINCIPAL,      UserName + "@" + DomainName);
         env.put(Context.SECURITY_CREDENTIALS,    Password);
-        
+
         DirContext dirContext = null;
-        
+
         try {
             dirContext = new InitialDirContext(env);
 
@@ -81,10 +96,10 @@ public class ActiveDirectoryTest {
             e.printStackTrace();
         } finally {
             try {
-                if (dirContext != null) 
+                if (dirContext != null)
                     dirContext.close();
             } catch (NamingException e) {
-                e.printStackTrace();                
+                e.printStackTrace();
             }
         }
     }
@@ -93,85 +108,87 @@ public class ActiveDirectoryTest {
     GSSCredential serviceCredentials;
 
     GSSCredential impersonate(Subject subject, final String someone) throws PrivilegedActionException {
-        
+
         GSSCredential creds = Subject.doAs(subject,
             new PrivilegedExceptionAction<GSSCredential>() {
-                
-                @Override                
+
+                @Override
                 public GSSCredential run() throws Exception {
                     GSSManager manager = GSSManager.getInstance();
-                    
+
                     if (serviceCredentials == null)
                         serviceCredentials = manager.createCredential(GSSCredential.INITIATE_ONLY);
-                    
+
                     GSSName other = manager.createName(someone, GSSName.NT_USER_NAME);
-                        
+
                     return ((ExtendedGSSCredential)serviceCredentials).impersonate(other);
                 }
             });
-        
+
         return creds;
     }
 
     void connectKerberos() throws GSSException, IOException, LoginException, PrivilegedActionException {
+        String realmName = DomainName.toUpperCase();
+
+        System.out.println("realmName: " + realmName);
 
         System.setProperty("java.security.krb5.kdc",   KerberosHostName);
-        System.setProperty("java.security.krb5.realm", DomainName.toUpperCase());
-        // System.setProperty("java.security.auth.login.config", "./jaas.conf");
-        // System.setProperty("javax.security.auth.useSubjectCredsOnly", "true");
+        System.setProperty("java.security.krb5.realm", realmName);
+        System.setProperty("java.security.auth.login.config", "./jaas.conf");
+        System.setProperty("javax.security.auth.useSubjectCredsOnly", "true");
         System.setProperty("java.security.krb5.debug", "true");
-        System.setProperty("sun.security.krb5.debug",  "true");        
-        
+        System.setProperty("sun.security.krb5.debug",  "true");
+
         HashMap<String, String> loginParams = new HashMap<>();
 
-        String principal = UserName + "@" + DomainName.toUpperCase();
-        
+        String principal = UserName + "@" + realmName;
+
         loginParams.put("principal", principal);
-        
-        LoginContext lc = new LoginContext("login", null,
+
+        LoginContext lc = new LoginContext("Client", null,
                                            new UserPasswordCallbackHandler(principal, Password),
                                            new CustomLoginConfiguration(loginParams));
-        
+
         lc.login();
 
         try {
             Subject subject = lc.getSubject();
             KerberosPrincipal krbPrincipal = subject.getPrincipals(KerberosPrincipal.class).iterator().next();
-        
+
             GSSManager manager = GSSManager.getInstance();
             GSSName name = manager.createName(krbPrincipal.toString(), GSSName.NT_USER_NAME);
             Set<Oid> mechs = new HashSet<>(Arrays.asList(manager.getMechsForName(name.getStringNameType())));
-        
+
             Oid mech;
             Oid spnegoOid = new Oid("1.3.6.1.5.5.2");
             Oid kerberos5Oid = new Oid("1.2.840.113554.1.2.2");
-        
-            if (mechs.contains(kerberos5Oid)) {
-                mech = kerberos5Oid;
-            } else if (mechs.contains(spnegoOid)) {
+
+            System.out.println("enable support for kerbros: " + mechs.contains(kerberos5Oid));
+            System.out.println("enable support for spnego: " + mechs.contains(spnegoOid));
+            
+            if (mechs.contains(spnegoOid)) {
                 mech = spnegoOid;
+            } else if (mechs.contains(kerberos5Oid)) {
+                mech = kerberos5Oid;
             } else {
                 throw new IllegalArgumentException("No mechanism found");
             }
 
-            GSSCredential creds = Subject.doAs(subject,
+            GSSCredential credential = Subject.doAs(subject,
                 new PrivilegedExceptionAction<GSSCredential>() {
                     @Override
                     public GSSCredential run() throws GSSException {
                         return manager.createCredential(name, GSSCredential.DEFAULT_LIFETIME, mech, GSSCredential.INITIATE_ONLY);
                     }
                 });
-            
-            GSSAuthenticationContext auth =
-                new GSSAuthenticationContext(krbPrincipal.getName(),
-                                             krbPrincipal.getRealm(),
-                                             subject,
-                                             creds);
 
-            // SMBClient client = new SMBClient();
-            // Connection connection = client.connect("<your SMB server>");
-            // Session session = connection.authenticate(auth);
-            // Share share = session.connectShare("<your share name>");
+            // TODO: credential から SPNEGO トークンを作ることができるはず。
+
+            System.out.println("Kerbros OK");
+
+            connectSmb(subject, krbPrincipal, credential);
+
         } finally {
             lc.logout();
         }
@@ -179,7 +196,7 @@ public class ActiveDirectoryTest {
 
     String generateToken(ExtendedGSSContext context) throws Exception {
         byte[] token = new byte[0];
-        
+
         token = context.initSecContext(token, 0, token.length);
 
         if (!context.isEstablished()) {
@@ -193,11 +210,59 @@ public class ActiveDirectoryTest {
             System.out.println("Context targName " + context.getTargName());
 
         }
-        
+
         String result = Base64.getEncoder().encodeToString(token);
         System.out.println("Token " + Base64.getEncoder().encodeToString(token));
-        
+
         return result;
+    }
+
+    void connectSmb(Subject subject, KerberosPrincipal krbPrincipal, GSSCredential credential) throws IOException {
+        System.out.println("krb.principal: " + krbPrincipal.getName());
+        System.out.println("krb.realm: " + krbPrincipal.getRealm());
+        
+        //
+        // Kerberos を使ったアクセス
+        //
+        AuthenticationContext ac =
+            new GSSAuthenticationContext(krbPrincipal.getName(),
+                                         krbPrincipal.getRealm(),
+                                         subject,
+                                         credential);
+        
+        //
+        // ユーザ・パスワードを与える場合は以下のようなコードになる
+        //
+        // AuthenticationContext ac =
+        //     new AuthenticationContext(userName, password.toCharArray(), domainName);
+        
+        SMBClient client = new SMBClient();
+        try (Connection connection = client.connect(SmbHostName)) {
+            Session session = connection.authenticate(ac);
+
+            try (DiskShare share = (DiskShare) session.connectShare(ShareName)) {
+                for (FileIdBothDirectoryInformation f : share.list("", "*")) {
+                    long fileAttributes = f.getFileAttributes();
+
+                    System.out.println("File : " + f.getFileName());
+                    System.out.println("\t" + f.getCreationTime());
+                    System.out.println("\t" + f.getLastAccessTime());
+                    System.out.println("\t" + f.getLastWriteTime());
+                    System.out.println("\t" + f.getChangeTime());
+                    System.out.println("\t" + f.getAllocationSize());
+                    System.out.println("\t" + fileAttributes);
+
+                    if (EnumWithValue.EnumUtils.isSet(fileAttributes, FileAttributes.FILE_ATTRIBUTE_DIRECTORY))
+                        System.out.println("\tDIRECTORY");
+
+                    if (EnumWithValue.EnumUtils.isSet(fileAttributes, FileAttributes.FILE_ATTRIBUTE_HIDDEN))
+                        System.out.println("\tHIDDEN");
+
+                    System.out.println("\t" + f.getEaSize());
+                    System.out.println("\t" +  new String(Hex.encodeHex(f.getFileId())));
+                }
+            }
+        }
     }
 
     static class UserPasswordCallbackHandler implements CallbackHandler {
@@ -224,13 +289,13 @@ public class ActiveDirectoryTest {
             }
         }
     }
-    
+
     static class CustomLoginConfiguration extends Configuration {
 
-        final Map<String, String> params = new HashMap<>();       
-        
+        final Map<String, String> params = new HashMap<>();
+
         public CustomLoginConfiguration(Map<String, String> params) {
-            this.params.putAll(params); 
+            this.params.putAll(params);
         }
 
         @Override
@@ -239,7 +304,7 @@ public class ActiveDirectoryTest {
                 new AppConfigurationEntry("com.sun.security.auth.module.Krb5LoginModule",
                                           AppConfigurationEntry.LoginModuleControlFlag.REQUIRED,
                                           params);
-            
+
             return new AppConfigurationEntry[]{configEntry};
         }
     }
