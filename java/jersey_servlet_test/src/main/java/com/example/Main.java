@@ -19,7 +19,7 @@ import org.glassfish.grizzly.http.server.HttpServer;
  */
 public class Main {
     // Base URI the Grizzly HTTP server will listen on
-    public static final String BASE_URI = "http://localhost:7777/";
+    public static final String BASE_URI = "http://0.0.0.0:7777/";
 
     /**
      * Starts Grizzly HTTP server exposing JAX-RS resources defined in this application.
