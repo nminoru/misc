@@ -15,11 +15,11 @@ import org.apache.commons.codec.binary.Hex;
 public class Main {
     
     public static void main(String[] args) throws IOException {
-        String serverName = getEnv("SMBJ_SERVER");
-        String domainName = getEnv("SMBJ_DOMAIN");
-        String userName   = getEnv("SMBJ_USERNAME");
-        String password   = getEnv("SMBJ_PASSWORD");
-        String shareName  = getEnv("SMBJ_SHARENAME");
+        String serverName = getEnv("SMB_SERVER");
+        String domainName = getEnv("SMB_DOMAIN");
+        String userName   = getEnv("SMB_USERNAME");
+        String password   = getEnv("SMB_PASSWORD");
+        String shareName  = getEnv("SMB_SHARENAME");
 
         SMBClient client = new SMBClient();
         
