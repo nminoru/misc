@@ -35,7 +35,7 @@ public class Test {
 
         System.out.println("sub: " + parsedJws.getBody().getSubject());
         
-        // 公開鍵を BASE64 文字列に変更し、際
+        // 公開鍵を BASE64 文字列に変更し、再 PublicKey 化する。
         String publicKeyEncoded = Base64.getEncoder().encodeToString(publicKey.getEncoded());
         System.out.println("public-key: " + publicKeyEncoded);
 
