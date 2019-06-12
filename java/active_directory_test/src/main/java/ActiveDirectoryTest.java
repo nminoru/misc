@@ -43,6 +43,7 @@ import com.hierynomus.smbj.connection.Connection;
 import com.hierynomus.smbj.session.Session;
 import com.hierynomus.smbj.share.DiskShare;
 import com.sun.security.auth.callback.TextCallbackHandler;
+import com.sun.security.auth.module.Krb5LoginModule;
 import com.sun.security.jgss.ExtendedGSSContext;
 import com.sun.security.jgss.ExtendedGSSCredential;
 import org.apache.commons.codec.binary.Hex;
@@ -83,7 +84,11 @@ public class ActiveDirectoryTest {
         env.put(Context.PROVIDER_URL,            "ldap://" + LdapHostName);
         env.put(Context.SECURITY_PRINCIPAL,      UserName + "@" + DomainName);
         env.put(Context.SECURITY_CREDENTIALS,    Password);
-
+        
+        // env.put(Context.SECURITY_PROTOCOL,       "ssl");
+        // env.put(Context.REFERRAL,                "follow");
+        env.put(Context.REFERRAL,                "ignore");
+        
         DirContext dirContext = null;
 
         try {
