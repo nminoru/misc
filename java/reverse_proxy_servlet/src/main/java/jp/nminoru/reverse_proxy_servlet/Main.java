@@ -1,4 +1,4 @@
-package jp.nminoru.jersey_servlet_proxy;
+package jp.nminoru.reverse_proxy_servlet;
 
 import java.io.IOException;
 import java.net.URI;
@@ -12,7 +12,7 @@ import org.glassfish.grizzly.servlet.ServletRegistration;
 import org.glassfish.grizzly.servlet.WebappContext;
 import org.glassfish.grizzly.http.server.HttpServer;
 
-import jp.nminoru.jersey_servlet_proxy.ProxyServlet;
+import jp.nminoru.reverse_proxy_servlet.ProxyServlet;
 
 
 public class Main {

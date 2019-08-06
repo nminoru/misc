@@ -1,4 +1,4 @@
-package jp.nminoru.jersey_servlet_proxy;
+package jp.nminoru.reverse_proxy_servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,20 +46,29 @@ import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.apache.http.util.EntityUtils;
 import lombok.extern.slf4j.Slf4j;
 
-import jp.nminoru.jersey_servlet_proxy.HttpConnection;
+import jp.nminoru.reverse_proxy_servlet.WebSocketConnection;
 
 
 @Slf4j
 public class ProxyServlet extends HttpServlet {
 
-    static final Pattern pattern = Pattern.compile("^(\\S+): (.+)$");
+    static final Pattern HeaderPattern = Pattern.compile("^(\\S+):(.+)$");
 
-    final static Set<String> IgnoreHeaderSet = Arrays.asList(HttpHeaders.CONNECTION, HttpHeaders.PROXY_AUTHENTICATE, HttpHeaders.PROXY_AUTHORIZATION, HttpHeaders.TE, HttpHeaders.TRAILER, HttpHeaders.TRANSFER_ENCODING, HttpHeaders.UPGRADE).stream().map(name -> name.toLowerCase()).collect(Collectors.toCollection(HashSet::new));
+    final static Set<String> HopByHopHeaderSet =
+        Arrays.asList(HttpHeaders.CONNECTION,
+                      "Keep-Alive",
+                      HttpHeaders.PROXY_AUTHENTICATE,
+                      HttpHeaders.PROXY_AUTHORIZATION,
+                      HttpHeaders.TE,
+                      HttpHeaders.TRAILER,
+                      HttpHeaders.TRANSFER_ENCODING,
+                      HttpHeaders.UPGRADE)
+        .stream().map(name -> name.toLowerCase()).collect(Collectors.toCollection(HashSet::new));
 
     private String hostHeader;
 
     public static class ProxyHttpUpgradeHandler implements HttpUpgradeHandler {
-        private HttpConnection      httpConnection;
+        private WebSocketConnection webSocketConnection;
         private String              host;
         private int                 port;
         private byte[]              request;
@@ -67,17 +76,17 @@ public class ProxyServlet extends HttpServlet {
         public ProxyHttpUpgradeHandler() {
         }
 
-        public void setHttpConnection(HttpConnection httpConnection) {
-            this.httpConnection = httpConnection;
+        public void setWebSocketConnection(WebSocketConnection webSocketConnection) {
+            this.webSocketConnection = webSocketConnection;
         }
 
         @Override
         public void init(WebConnection wc) {
-            log.info("ProxyHttpUpgradeHandler#init");
+            log.trace("ProxyHttpUpgradeHandler#init");
 
             try {
-                httpConnection.setBothStreams(wc.getInputStream(), wc.getOutputStream());
-                httpConnection.execute();
+                webSocketConnection.setBothStreams(wc.getInputStream(), wc.getOutputStream());
+                webSocketConnection.execute();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -85,10 +94,10 @@ public class ProxyServlet extends HttpServlet {
 
         @Override
         public void destroy() {
-            log.info("ProxyHttpUpgradeHandler#destroy");
+            log.trace("ProxyHttpUpgradeHandler#destroy");
 
-            if (httpConnection != null)
-                httpConnection.close();
+            if (webSocketConnection != null)
+                webSocketConnection.close();
         }
     }
 
@@ -106,7 +115,7 @@ public class ProxyServlet extends HttpServlet {
 
         hostHeader = servletRequest.getHeader(HttpHeaders.HOST);
 
-        log.info("service: {} {} {}", method, requestUri, hostHeader);
+        log.trace("service: {} {} {}", method, requestUri, hostHeader);
 
         try {
             if (isUpgrade(method, servletRequest)) {
@@ -161,14 +170,22 @@ public class ProxyServlet extends HttpServlet {
     }
 
     private boolean isUpgrade(String method, HttpServletRequest servletRequest) {
-        String connectionHeader = servletRequest.getHeader(HttpHeaders.CONNECTION);
-        String upgradeHeader = servletRequest.getHeader(HttpHeaders.UPGRADE);
+        if ("GET".equals(method)) {
+            String connectionHeader = servletRequest.getHeader(HttpHeaders.CONNECTION);
 
-        if ("GET".equals(method) && "WebSocket".equalsIgnoreCase(upgradeHeader)) {
             if (connectionHeader != null) {
-                for (String part : connectionHeader.split(",")) {
-                    if ("Upgrade".equalsIgnoreCase(part.trim()))
-                        return true;
+                for (String connectionPart : connectionHeader.split(",")) {
+                    if ("Upgrade".equalsIgnoreCase(connectionPart.trim())) {
+                        String upgradeHeader = servletRequest.getHeader(HttpHeaders.UPGRADE);
+
+                        if (upgradeHeader != null) {
+                            for (String upgradePart : upgradeHeader.split(",")) {
+                                if ("WebSocket".equalsIgnoreCase(upgradePart.trim())) {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -177,14 +194,15 @@ public class ProxyServlet extends HttpServlet {
     }
 
     private void serviceWebSocket(HttpServletRequest servletRequest, HttpServletResponse servletResponse, String host, int port, String path) throws ServletException, IOException {
-        log.info("ProxyServlet#serviceWebSocket {}", path);
+        log.trace("ProxyServlet#serviceWebSocket {}", path);
 
-        HttpConnection httpConnection = new HttpConnection(host, port);
-        httpConnection.sendRequest(getRequestHeader(servletRequest, path));
-        setResponseHeader(servletResponse, httpConnection.receiveResponse());
+        WebSocketConnection webSocketConnection = new WebSocketConnection(host, port);
+
+        webSocketConnection.sendRequest(getRequestHeader(servletRequest, path));
+        setResponseHeader(servletResponse, webSocketConnection.receiveResponse());
 
         ProxyHttpUpgradeHandler handler = servletRequest.upgrade(ProxyHttpUpgradeHandler.class);
-        handler.setHttpConnection(httpConnection);
+        handler.setWebSocketConnection(webSocketConnection);
     }
 
     public byte[] getRequestHeader(HttpServletRequest servletRequest, String path) {
@@ -200,7 +218,7 @@ public class ProxyServlet extends HttpServlet {
             if (headerName.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH))
                 continue;
 
-            if (ProxyServlet.isIgnoreHeader(headerName))
+            if (ProxyServlet.isHopByHopHeader(headerName))
                 continue;
 
             Enumeration<String> it2 = servletRequest.getHeaders(headerName);
@@ -223,22 +241,21 @@ public class ProxyServlet extends HttpServlet {
     }
 
     public void setResponseHeader(HttpServletResponse servletResponse, byte[] bytes) {
-        log.info("ProxyServlet#setResponseHeader");        
         String response = new String(bytes, StandardCharsets.UTF_8);
 
         String[] lines = response.split("\\r\\n");
 
         if (lines.length > 0) {
             String[] parts = lines[0].split("\\s+");
-            
+
             if (parts.length >= 2)
                 servletResponse.setStatus(Integer.parseInt(parts[1]));
 
             for (int i = 1 ; i < lines.length ; i++) {
-                Matcher m = pattern.matcher(lines[i]);
+                Matcher m = HeaderPattern.matcher(lines[i]);
 
                 if (m.matches() && m.groupCount() == 2)
-                    servletResponse.addHeader(m.group(1), m.group(2));
+                    servletResponse.addHeader(m.group(1).trim(), m.group(2).trim());
             }
         }
     }
@@ -271,7 +288,7 @@ public class ProxyServlet extends HttpServlet {
         if (headerName.equalsIgnoreCase(HttpHeaders.CONTENT_LENGTH))
             return;
 
-        if (isIgnoreHeader(headerName))
+        if (isHopByHopHeader(headerName))
             return;
 
         Enumeration<String> it = servletRequest.getHeaders(headerName);
@@ -292,7 +309,7 @@ public class ProxyServlet extends HttpServlet {
     private void copyResponseHeader(HttpServletRequest servletRequest, HttpServletResponse servletResponse, Header header) {
         String headerName = header.getName();
 
-        if (isIgnoreHeader(headerName))
+        if (isHopByHopHeader(headerName))
             return;
 
         String headerValue = header.getValue();
@@ -306,7 +323,7 @@ public class ProxyServlet extends HttpServlet {
             entity.writeTo(servletResponse.getOutputStream());
     }
 
-    public static boolean isIgnoreHeader(String headerName) {
-        return IgnoreHeaderSet.contains(headerName.toLowerCase());
+    public static boolean isHopByHopHeader(String headerName) {
+        return HopByHopHeaderSet.contains(headerName.toLowerCase());
     }
 }

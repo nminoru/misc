@@ -1,4 +1,4 @@
-package jp.nminoru.jersey_servlet_proxy;
+package jp.nminoru.reverse_proxy_servlet;
 
 import java.io.Closeable;
 import java.io.EOFException;
@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-public class HttpConnection implements Closeable {
+public class WebSocketConnection implements Closeable {
     private final Socket       socket;
     private final InputStream  serverInputStream;
     private final OutputStream serverOutputStream;
@@ -23,8 +23,8 @@ public class HttpConnection implements Closeable {
 
     private SendThread    sendThread;
     private ReceiveThread receiveThread;
-    
-    public HttpConnection(String host, int port) throws IOException {
+
+    public WebSocketConnection(String host, int port) throws IOException {
         this.socket = new Socket(host, port);
         this.serverInputStream = socket.getInputStream();
         this.serverOutputStream = socket.getOutputStream();
@@ -36,14 +36,14 @@ public class HttpConnection implements Closeable {
     }
 
     public void sendRequest(byte[] request) throws IOException {
-        log.info("HttpConnection#sendRequest");
-        
+        log.trace("HttpConnection#sendRequest");
+
         serverOutputStream.write(request, 0, request.length);
         serverOutputStream.flush();
     }
 
     public byte[] receiveResponse() throws IOException {
-        log.info("HttpConnection#receiveResponse");
+        log.trace("HttpConnection#receiveResponse");
 
         ByteBuffer byteBuffer = ByteBuffer.allocate(1024 * 1024);
 
@@ -60,16 +60,16 @@ public class HttpConnection implements Closeable {
 
                 if (count >= 4)
                     if (byteBuffer.get(count - 4) == 13 &&
-                        byteBuffer.get(count - 3) == 10 && 
-                        byteBuffer.get(count - 2) == 13 && 
+                        byteBuffer.get(count - 3) == 10 &&
+                        byteBuffer.get(count - 2) == 13 &&
                         byteBuffer.get(count - 1) == 10)
                         break;
             }
         }
-        
+
         return byteBuffer.slice().array();
-    }    
-        
+    }
+
     public void execute() {
         SendThread sendThread = new SendThread();
         ReceiveThread receiveThread = new ReceiveThread();
@@ -80,11 +80,11 @@ public class HttpConnection implements Closeable {
 
     class SendThread extends Thread {
         final byte[] bytes = new byte[1024];
-        
+
         @Override
         public void run() {
             int bytes_read;
-            
+
             try {
                 while ((bytes_read = clientInputStream.read(bytes)) != -1) {
                     if (bytes_read > 0) {
@@ -107,14 +107,14 @@ public class HttpConnection implements Closeable {
             }
         }
     }
-        
+
     class ReceiveThread extends Thread {
         final byte[] bytes = new byte[1024];
-        
-        @Override        
+
+        @Override
         public void run() {
             int bytes_read;
-            
+
             try {
                 while ((bytes_read = serverInputStream.read(bytes)) != -1) {
                     if (bytes_read > 0) {
@@ -123,9 +123,9 @@ public class HttpConnection implements Closeable {
                     }
                 }
             } catch (EOFException|SocketException e) {
-                // do nothing                
+                // do nothing
             } catch (IOException e) {
-                log.error("unknown error", e);                
+                log.error("unknown error", e);
                 throw new RuntimeException(e);
             } finally {
                 try {
@@ -135,7 +135,7 @@ public class HttpConnection implements Closeable {
                     log.error("unknown error", e);
                 }
             }
-        }        
+        }
     }
 
     public void close() {

@@ -3,11 +3,11 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.example</groupId>
-  <artifactId>jersey_servlet_proxy</artifactId>
+  <groupId>reverse_proxy_servlet</groupId>
+  <artifactId>reverse_proxy_servlet</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>jersey_servlet_proxy</name>
+  <name>reverse_proxy_servlet</name>
 
   <properties>
     <java.version>1.8</java.version>
@@ -142,7 +142,7 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>jp.nminoru.jersey_servlet_proxy.Main</mainClass>
+          <mainClass>jp.nminoru.reverse_proxy_servlet.Main</mainClass>
         </configuration>
       </plugin>
     </plugins>
