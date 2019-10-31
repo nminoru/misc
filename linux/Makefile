@@ -1,4 +1,4 @@
-TARGETS = backtrace gprof_test lsxattr setxattr setxattr2 access
+TARGETS = backtrace gprof_test lsxattr setxattr setxattr2 access append_write
 
 all: $(TARGETS)
 
@@ -8,7 +8,7 @@ backtrace: backtrace.c backtrace_main.c
 gprof_test: gprof_test.c
 	gcc -g -pg -rdynamic -lpthread -D_GNU_SOURCE $< -o $@
 
-lsxattr setxattr setxattr2 access: %: %.c
+lsxattr setxattr setxattr2 access append_write: %: %.c
 	$(CC) $(CFLAGS) $< -o $@
 
 clean:
