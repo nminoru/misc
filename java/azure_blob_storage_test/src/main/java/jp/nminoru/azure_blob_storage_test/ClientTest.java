@@ -75,7 +75,7 @@ public class ClientTest {
         }
 
         CloudBlobDirectory directory;
-        CloudBlockBlob     blob;
+
 
         // ディレクトリの削除
         for (ListBlobItem blobItem : container.listBlobs("foo/", true)) {
@@ -100,27 +100,30 @@ public class ClientTest {
         HashMap<String, String> metadata = new HashMap<String, String>() {{put("hdi_isfolder", "true");}};
 
         // ディレクトの作成
-        blob = container.getBlockBlobReference("foo/bar/");
-        blob.setMetadata(metadata); // 必須ではない
-        blob.uploadFromByteArray(new byte[0], 0, 0);
+        CloudBlockBlob blob1;        
+        blob1 = container.getBlockBlobReference("foo/bar/");
+        blob1.setMetadata(metadata); // 必須ではない
+        blob1.uploadFromByteArray(new byte[0], 0, 0);
 
         // ファイルの作成
-        blob = container.getBlockBlobReference("foo/test.txt");
+        CloudBlockBlob blob2;                
+        blob2 = container.getBlockBlobReference("foo/test.txt");
         try (InputStream inputStream = ClientTest.class.getResourceAsStream("test.txt")) {
-            blob.upload(inputStream, -1);
+            blob2.upload(inputStream, -1);
         }
 
         // ファイルのダウンロード
-        try (InputStream inputStream1 = blob.openInputStream();
+        try (InputStream inputStream1 = blob2.openInputStream();
              InputStream inputStream2 = ClientTest.class.getResourceAsStream("test.txt")) {
             boolean result = IOUtils.contentEquals(inputStream1, inputStream2);
             System.out.println("result = " + result);
         }
 
         // ファイルの作成
-        blob = container.getBlockBlobReference("foo/bar/test.txt");
+        CloudBlockBlob blob3;                        
+        blob3 = container.getBlockBlobReference("foo/bar/test.txt");
         try (InputStream inputStream = ClientTest.class.getResourceAsStream("test.txt")) {
-            blob.upload(inputStream, -1);
+            blob3.upload(inputStream, -1);
         }
 
         System.out.println("=== STEP 2 ===");
@@ -134,17 +137,24 @@ public class ClientTest {
         System.out.println("=== STEP 4 ===");
         getCloudBlob(container.getBlobReferenceFromServer("foo/bar/test.txt"));
 
+        // ファイルのコピー        
         System.out.println("=== STEP 5 ===");
-        copyCloudBlob(blob, container.getBlockBlobReference("foo/test2.txt"));
+        copyCloudBlob(blob3, container.getBlockBlobReference("foo/test2.txt"));
 
-        System.out.println("=== FINAL ===");
-        listFolder(container);
+        // ディレクトリのコピー
+        System.out.println("=== STEP 6 ===");
+        copyCloudBlob(blob1, container.getBlockBlobReference("foo/bar3/"));
+        listFolder(container); 
     }
 
     private void listFolder(CloudBlobContainer container) {
+        System.out.println("listFolder");
+        _listFolder(container, "");
+    }
 
+    private void _listFolder(CloudBlobContainer container, String name) {        
         // ディレクトリのリスティング
-        for (ListBlobItem blobItem : container.listBlobs("foo/", false, details, options, null)) {
+        for (ListBlobItem blobItem : container.listBlobs(name, false, details, options, null)) {
             System.out.println(blobItem.getUri());
 
             if (blobItem instanceof CloudBlob) {
@@ -159,7 +169,10 @@ public class ClientTest {
                 System.out.println("\t" + properties.getCreatedTime());
                 System.out.println("\t" + properties.getLastModified());
             } else if (blobItem instanceof CloudBlobDirectory) {
-                // BlobProperties properties = blobItem.getProperties();
+                // BlobProperties properties = blobItem.getProperties()
+                CloudBlobDirectory cloudBlobDirectory = (CloudBlobDirectory)blobItem;
+
+                _listFolder(container, cloudBlobDirectory.getPrefix());
             }
         }
     }
