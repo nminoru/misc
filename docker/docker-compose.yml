@@ -4,6 +4,22 @@ services:
   myjupyter:
     image: myjupyter
     build:
-      context: .    
-      dockerfile: Dockerfile-jupyternotebook    
+      context: .
+      dockerfile: Dockerfile-jupyternotebook
 
+  localdns:
+    image: localdns
+    build:
+      context: .
+      dockerfile: Dockerfile-localdns
+    cap_add:
+      - NET_ADMIN
+    domainname: example.com
+    hostname: host
+    extra_hosts:
+      - "*.host.example.com:127.0.0.1"
+    tmpfs:
+      - /run
+      - /run/lock
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
