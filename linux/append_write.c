@@ -6,25 +6,50 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-int main(int argc, char **argv)
+static void print_offset(int fd);
+
+int
+main(int argc, char **argv)
 {
-  if (argc < 1) {
-    printf("usage: <filename>");
-    exit(EXIT_FAILURE);    
-  }
+    if (argc < 2) {
+       printf("usage: <filename>");
+       exit(EXIT_FAILURE);    
+    }
     
-  const char *filename = argv[1];
-  char buffer[] = "ABCEDFGHIZJKLM";
+    const char *filename = argv[1];
+    char buffer[] = "ABCEDFGHIZJKLM\n";
   
-  int fd = open(filename, O_APPEND);
-  if (fd < 0) {
-    perror("open with O_APPEND");
-    exit(EXIT_FAILURE);
-  }
+    int fd = open(filename, O_RDWR | O_APPEND);
+    if (fd < 0) {
+        perror("open with O_APPEND");
+        exit(EXIT_FAILURE);
+    }
 
-  write(fd, buffer, strlen(buffer) + 1);
+    print_offset(fd);
+    
+    ssize_t size = write(fd, buffer, strlen(buffer) + 1);
+    if (size < 0) {
+        perror("write with O_APPEND");
+        exit(EXIT_FAILURE);      
+    }
 
-  close(fd);
+    printf("write %d\n", (int)size);
+
+    print_offset(fd);    
+
+    close(fd);
 	       
-  return 0;
+    return 0;
+}
+
+static void
+print_offset(int fd)
+{
+    off_t off = lseek(fd, 0, SEEK_CUR);
+    if (off < 0) {
+        perror("lseek with O_APPEND");
+        exit(EXIT_FAILURE);      
+    }
+
+    printf("lseek %d\n", (int)off);
 }
