@@ -1,8 +1,8 @@
-TARGETS = bigcache-test sscanf-test json-test
+TARGETS = bigcache-test json-test setfile-test sscanf-test time-test
 
 all: $(TARGETS)
 
-lsxattr setxattr setxattr2 access append_write: %: %.go
+bigcache-test json-test setfile-test sscanf-test time-test: %: %.go
 	go build $<
 
 clean:

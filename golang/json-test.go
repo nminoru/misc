@@ -14,6 +14,7 @@ type Book struct {
 type BookShelf struct {
 	Count int `json:"count"`
 	Books []Book `json:"books"`
+    Time  int64
 }
 
 func main() {
@@ -33,5 +34,7 @@ func main() {
         fmt.Println("\t" + book.GUID);
         fmt.Println("\t" + book.FileName);
     }
+    
+    fmt.Println(bookShelf.Time)
 }
 
