@@ -1,8 +1,8 @@
-TARGETS = bigcache-test json-test setfile-test sscanf-test time-test
+TARGETS = bigcache-test json-test setfile-test sscanf-test string-test time-test
 
 all: $(TARGETS)
 
-bigcache-test json-test setfile-test sscanf-test time-test: %: %.go
+bigcache-test json-test setfile-test sscanf-test string-test time-test: %: %.go
 	go build $<
 
 clean:
