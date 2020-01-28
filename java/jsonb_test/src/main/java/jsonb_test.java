@@ -6,13 +6,23 @@ import javax.json.bind.JsonbBuilder;
 import javax.json.bind.Jsonb;
 
 public class jsonb_test {
-    Jsonb jsonb = JsonbBuilder.create();    
+    Jsonb jsonb = JsonbBuilder.create();
 
     public static class Dog {
         public String name;
         public int age;
         public boolean bitable;
         public List<List<String>> multidimarr;
+    }
+
+    public static class Cat {
+        public String name;
+        public Map<String, Object> obj;
+    }
+
+    public static class Foo {
+        public List<Bar> bars;
+        public List<Baz> bazs;
     }
 
     public static class Bar {
@@ -34,13 +44,8 @@ public class jsonb_test {
 
         public Baz(String name) {
             this.name = name;
-        }        
-    }    
-
-    public static class Foo {
-        public List<Bar> bars;
-        public List<Baz> bazs;
-    }    
+        }
+    }
 
     public static void main(String[] args) {
         jsonb_test test = new jsonb_test();
@@ -50,11 +55,12 @@ public class jsonb_test {
         test.testPojo3();
         test.testPojo4();
         test.testPojo5();
+        test.testPojo6();
     }
 
     /**
      * 配列の配列を含む Java オブジェクトを JSON 文字列へマーシャリング
-     */    
+     */
     void testPojo1() {
         Dog dog = new Dog();
         dog.name = "Falco";
@@ -63,7 +69,7 @@ public class jsonb_test {
 
         List<String> array = new ArrayList<>();
         array.add("123");
-        array.add("456"); 
+        array.add("456");
         dog.multidimarr = new ArrayList<>();
         dog.multidimarr.add(array);
         dog.multidimarr.add(array);
@@ -82,7 +88,7 @@ public class jsonb_test {
     void testPojo2() {
         Dog dog = jsonb.fromJson("{\"name\":\"hoge\", \"abc\":\"hoge\"}", Dog.class);
         String result = jsonb.toJson(dog);
-        
+
         System.out.println("test2: " + result);
     }
 
@@ -126,30 +132,39 @@ public class jsonb_test {
         String result = jsonb.toJson(foo);
 
         System.out.println("test5: " + result);
-    }    
+    }
+
+    void testPojo6() {
+        String request = "{\"name\":\"NAME\",\"obj\":{\"abc\":\"ABC\", \"def\":\"DEF\", \"ghi\":{\"F1\":1, \"F2\":2, \"F3\":3},\"array\":[0,1,2]}}";
+        Cat    cat     = jsonb.fromJson(request, Cat.class);
+        String result  = jsonb.toJson(cat);
+
+        System.out.println("test6: " + request);
+        System.out.println("test6: " + result);
+    }
 
     void printMap(int level, Map<String, Object> jsonMap) {
         for (String key : jsonMap.keySet()) {
             Object value = jsonMap.get(key);
-            
+
             if (value instanceof Map) {
                 for (int i = 0 ; i < level ; i++)
                     System.out.print("    ");
-                
+
                 System.out.println(key + ": {");
-                
+
                 printMap(level + 1, (Map<String, Object>)value);
 
                 for (int i = 0 ; i < level ; i++)
-                    System.out.print("    ");                
+                    System.out.print("    ");
                 System.out.println("}");
             } else {
                 for (int i = 0 ; i < level ; i++)
                     System.out.print("    ");
-                
+
                 System.out.println(key + ": " + value.toString());
             }
-        }        
+        }
     }
 }
 
