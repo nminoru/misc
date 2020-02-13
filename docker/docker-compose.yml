@@ -7,17 +7,26 @@ services:
       context: .
       dockerfile: Dockerfile-jupyternotebook
 
-  localdns:
-    image: localdns
+  localdns-dnsmasq:
+    image: localdns-dnsmasq
     build:
-      context: .
-      dockerfile: Dockerfile-localdns
+      context: localdns-dnsmasq
     cap_add:
       - NET_ADMIN
     domainname: example.com
     hostname: host
     extra_hosts:
       - "*.host.example.com:127.0.0.1"
+    tmpfs:
+      - /run
+      - /run/lock
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+  localdns-bind:
+    image: localdns-bind
+    build:
+      context: localdns-bind
     tmpfs:
       - /run
       - /run/lock

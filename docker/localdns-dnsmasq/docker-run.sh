@@ -9,5 +9,5 @@ sudo docker run -ti \
      --tmpfs /run \
      --tmpfs /run/lock \
      -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
-     --name localdns \
-     localdns
+     --name localdns-dnsmasq \
+     localdns-dnsmasq

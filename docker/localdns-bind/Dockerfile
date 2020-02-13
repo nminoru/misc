@@ -13,14 +13,15 @@ RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
     rm -f /lib/systemd/system/basic.target.wants/*;\
     rm -f /lib/systemd/system/anaconda.target.wants/*;
 
-RUN yum install -y rsyslog dnsmasq bind-utils less
+RUN echo -e "root:root" | chpasswd
 
-RUN echo address=/.host.example.com/127.0.0.1 >> /etc/dnsmasq.conf
-RUN echo resolv-file=/etc/dnsmasq.resolv.conf >> /etc/dnsmasq.conf
-RUN echo "nameserver 8.8.8.8" > /etc/dnsmasq.resolv.conf
+RUN yum install -y rsyslog bind bind-utils less
+
+COPY named.conf       /etc/named.conf
+COPY example.com.defs /var/named/data/example.com.defs
 
 RUN systemctl enable rsyslog.service
-RUN systemctl enable dnsmasq.service
+RUN systemctl enable named.service
 
 VOLUME [ "/sys/fs/cgroup"]
 

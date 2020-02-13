@@ -1,0 +1,12 @@
+$TTL  3600
+@		IN	SOA	host.example.com. root.example.com. (
+			2020021301 ; serial
+			      3600 ; refresh
+			       900 ; retry
+			   3600000 ; expire
+			      3600 ; default_ttl
+			)
+
+              	IN	NS	host.example.com.
+host            IN	A	127.0.0.1
+*.host          IN      A	127.0.0.1
