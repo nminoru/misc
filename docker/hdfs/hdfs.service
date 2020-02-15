@@ -1,0 +1,15 @@
+[Unit]
+Description=Apache HDFS
+After=syslog.target network.target sshd.target
+
+[Service]
+Environment="JAVA_HOME=/usr/lib/jvm/java-1.8.0/"
+Type=simple
+ExecStart=/opt/hadoop/hadoop-3.2.1/sbin/start-dfs.sh
+ExecStop=/opt/hadoop/hadoop-3.2.1/sbin/stop-dfs.sh
+# Restart=always
+Restart=no
+User=hdfs
+
+[Install]
+WantedBy=multi-user.target
