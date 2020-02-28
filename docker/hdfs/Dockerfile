@@ -1,3 +1,24 @@
+FROM alpine AS builder
+
+COPY ./hadoop-3.2.1.tar.gz /tmp/hadoop-3.2.1.tar.gz
+
+WORKDIR /tmp
+
+RUN mkdir -p /tmp/base1 /tmp/base2
+
+RUN cd /tmp/base1 && \
+    tar xvf /tmp/hadoop-3.2.1.tar.gz
+
+RUN cd /tmp/base2 && \
+    tar xvf /tmp/hadoop-3.2.1.tar.gz
+    
+RUN rm -rf /tmp/base1/hadoop-3.2.1/share/doc
+RUN rm -rf /tmp/base1/hadoop-3.2.1/share/hadoop/common
+RUN rm -rf /tmp/base1/hadoop-3.2.1/share/hadoop/client
+RUN rm -rf /tmp/base1/hadoop-3.2.1/share/hadoop/tools
+RUN rm -rf /tmp/base1/hadoop-3.2.1/share/hadoop/mapreduce
+RUN rm -rf /tmp/base1/hadoop-3.2.1/share/hadoop/yarn
+
 FROM centos:7
 
 MAINTAINER nminoru1975@gmail.com
@@ -15,12 +36,21 @@ RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
 
 COPY ./core-site.xml       /tmp/core-site.xml
 COPY ./hdfs-site.xml       /tmp/hdfs-site.xml 
-COPY ./build.sh            /tmp/build.sh
+COPY ./build1.sh           /tmp/build1.sh
+COPY ./build2.sh           /tmp/build2.sh
 COPY ./user_hdfs.sh        /tmp/user_hdfs.sh
 COPY ./hdfs.service        /tmp/hdfs.service
-COPY ./hadoop-3.2.1.tar.gz /tmp/hadoop-3.2.1.tar.gz
 
-RUN  /tmp/build.sh
+RUN  /tmp/build1.sh
+
+COPY --from=builder --chown=hdfs:hdfs /tmp/base1/hadoop-3.2.1                        /opt/hadoop/hadoop-3.2.1
+COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.2.1/share/hadoop/common    /opt/hadoop/hadoop-3.2.1/share/hadoop/common
+COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.2.1/share/hadoop/client    /opt/hadoop/hadoop-3.2.1/share/hadoop/client
+COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.2.1/share/hadoop/tools     /opt/hadoop/hadoop-3.2.1/share/hadoop/tools
+COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.2.1/share/hadoop/mapreduce /opt/hadoop/hadoop-3.2.1/share/hadoop/mapreduce
+COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.2.1/share/hadoop/yarn      /opt/hadoop/hadoop-3.2.1/share/hadoop/yarn
+
+RUN  /tmp/build2.sh
 
 USER hdfs
 
