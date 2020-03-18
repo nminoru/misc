@@ -30,46 +30,53 @@
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-grizzly2-http</artifactId>
-        <version>${jersey.version}</version>      
+        <version>${jersey.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.glassfish.jersey.inject</groupId>
       <artifactId>jersey-hk2</artifactId>
-        <version>${jersey.version}</version>      
+        <version>${jersey.version}</version>
     </dependency>
 
     <!-- start of JSON supports -->
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
-      <artifactId>jersey-media-moxy</artifactId>      
-      <version>${jersey.version}</version>      
+      <artifactId>jersey-media-moxy</artifactId>
+      <version>${jersey.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-json-jackson</artifactId>
-      <version>${jersey.version}</version>      
+      <version>${jersey.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-json-binding</artifactId>
-      <version>${jersey.version}</version>      
+      <version>${jersey.version}</version>
     </dependency>
     <!-- end of JSON supports -->
-    
+
     <dependency>
       <groupId>org.glassfish.jersey.media</groupId>
       <artifactId>jersey-media-multipart</artifactId>
-      <version>${jersey.version}</version>      
+      <version>${jersey.version}</version>
     </dependency>
 
-    <!-- JUnit -->    
+    <!-- Apache HttpClient -->
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.5.10</version>
+    </dependency>
+
+    <!-- JUnit -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>      
+      <version>4.12</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -89,7 +96,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>1.6.0</version>	
+        <version>1.6.0</version>
         <executions>
           <execution>
             <goals>
