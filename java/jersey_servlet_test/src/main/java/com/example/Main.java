@@ -27,11 +27,11 @@ public class Main {
      */
     public static HttpServer createServer() {
         URI uri = URI.create(BASE_URI);
-            
+
         final ResourceConfig rc1 = new ResourceConfig()
             .packages("com.example")
             .register(new LoggingFeature(new AccessLog(), Level.INFO, LoggingFeature.Verbosity.PAYLOAD_TEXT, 1000));
-        
+
         ServletContainer servletContainer1 = new ServletContainer(rc1);
 
         WebappContext context1 = new WebappContext("GrizzlyContext", "/path1");
@@ -42,9 +42,9 @@ public class Main {
 
         final ResourceConfig rc2 = new ResourceConfig()
             .packages("com.example")
-            .register(new LoggingFeature(new AccessLog(), Level.INFO, LoggingFeature.Verbosity.PAYLOAD_TEXT, 1000));        
+            .register(new LoggingFeature(new AccessLog(), Level.INFO, LoggingFeature.Verbosity.PAYLOAD_TEXT, 1000));
 
-        ServletContainer servletContainer2 = new ServletContainer(rc2);        
+        ServletContainer servletContainer2 = new ServletContainer(rc2);
 
         WebappContext context2 = new WebappContext("GrizzlyContext", "/path2");
         ServletRegistration registration2;
@@ -56,7 +56,7 @@ public class Main {
 
         context1.deploy(httpServer);
         context2.deploy(httpServer);
-        
+
         return httpServer;
     }
 
@@ -69,11 +69,11 @@ public class Main {
         final HttpServer server = createServer();
 
         server.start();
-        
+
         System.out.println(String.format("Jersey app started with WADL available at "
                 + "%sapplication.wadl\nHit enter to stop it...", BASE_URI));
         System.in.read();
-        
+
         server.shutdownNow();
     }
 }

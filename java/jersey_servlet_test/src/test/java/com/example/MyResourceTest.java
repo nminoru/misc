@@ -1,12 +1,8 @@
 package com.example;
 
-import java.io.File;
+import java.io.InputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
@@ -22,7 +18,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URIBuilder;
-import org.apache.http.entity.FileEntity;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -79,17 +75,6 @@ public class MyResourceTest {
     }
 
     void _testLargeUpload(long fileSize) throws Exception {
-        File tempFile = File.createTempFile("dummy-file", "dump");
-
-        try (RandomAccessFile fileWriter = new RandomAccessFile(tempFile, "rw")) {
-            long pos = fileSize;
-
-            if (pos > 0) {
-                fileWriter.seek(pos - 1);
-                fileWriter.writeChar(0);
-            }
-        }
-
         try (CloseableHttpClient httpClient = HttpClientBuilder.create().build()) {
             URI uri = URI.create(Main.BASE_URI + "/path1/myresource/large_upload_w_query?path=file");
 
@@ -98,9 +83,9 @@ public class MyResourceTest {
             request.setHeader("Content-Type", "application/octet-stream");
 
             // Request body
-            FileEntity fileEntity = new FileEntity(tempFile);
-            fileEntity.setChunked(true);
-            request.setEntity(fileEntity);
+            InputStreamEntity inputStreamEntity = new InputStreamEntity(new DummyFileInputStream(fileSize));
+            inputStreamEntity.setChunked(true);
+            request.setEntity(inputStreamEntity);
 
             HttpResponse response = httpClient.execute(request);
             System.out.println("satus-code: " + response.getStatusLine().getStatusCode());
@@ -110,7 +95,94 @@ public class MyResourceTest {
             e.printStackTrace(System.err);
             throw e;
         }
+    }
 
-        tempFile.delete();
+    static class DummyFileInputStream extends InputStream {
+        private final long size;
+        private long pos;
+        private long reportedPos;
+
+        DummyFileInputStream(long size) {
+            super();
+
+            this.pos  = 0;
+            this.size = size;
+        }
+
+        @Override
+        public int read() throws IOException {
+            if (pos < size) {
+                int v = '0' + (int)(pos % 10);
+                pos++;
+
+                report();
+
+                return (int)(byte)v;
+            }
+
+            return -1;
+        }
+
+        @Override
+        public int read(byte[] bytes) throws IOException {
+            return read(bytes, 0, bytes.length);
+        }
+
+        @Override
+        public int read(byte[] bytes, int off, int len) throws IOException {
+            int ret = 0;
+
+            for (int i = off ; i < len ; i++) {
+                int v = read();
+
+                if (v < 0) {
+                    if (ret == 0)
+                        return -1;
+
+                    break;
+                }
+
+                bytes[i] = (byte)v;
+
+                ret++;
+            }
+
+            report();
+
+            return ret;
+        }
+
+        @Override
+        public long skip(long n) throws IOException {
+            long oldPos = pos;
+
+            pos += n;
+            if (size <= pos)
+                pos = size;
+
+            return pos - oldPos;
+        }
+
+        @Override
+        public int available() throws IOException {
+            long a = size - pos;
+
+            if (a < (long)4096)
+                return (int)a;
+
+            return 4096;
+        }
+
+        @Override
+        public void close() throws IOException {
+            pos = 0;
+        }
+
+        void report() {
+            while (reportedPos + 16L * 1024L * 1024L < pos) {
+                System.out.println("send: " + pos);
+                reportedPos += 16L * 1024L * 1024L;
+            }
+        }
     }
 }

@@ -62,7 +62,7 @@
       <artifactId>jersey-hk2</artifactId>
         <version>${jersey.version}</version>
     </dependency>
-
+    
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
