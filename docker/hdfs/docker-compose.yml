@@ -1,0 +1,26 @@
+version: "3.7"
+
+services:
+  hdfs:
+    build:
+      context: .
+      dockerfile: Dockerfile-hdfs
+    networks:
+      - network1
+    ports:
+      - 8020:8020
+      - 9000:9000
+      - 50010:50010
+      - 50020:50020
+      - 50070:50070
+      - 50075:50075
+      - 50090:50090
+    tmpfs:
+      - /run
+      - /run/lock
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+networks:
+  network1:
+    name: mynetwork

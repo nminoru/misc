@@ -9,6 +9,7 @@ echo "export LANG=ja_JP.UTF-8" >> /root/.bash_profile
 
 echo -e "root:root" | chpasswd
 
+useradd hadoop
 useradd hdfs
 
 yum install -y yum-plugin-priorities

@@ -11,7 +11,7 @@ RUN cd /tmp/base1 && \
 
 RUN cd /tmp/base2 && \
     tar xvf /tmp/hadoop-3.2.1.tar.gz
-    
+
 RUN rm -rf /tmp/base1/hadoop-3.2.1/share/doc
 RUN rm -rf /tmp/base1/hadoop-3.2.1/share/hadoop/common
 RUN rm -rf /tmp/base1/hadoop-3.2.1/share/hadoop/client
@@ -35,7 +35,7 @@ RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
     rm -f /lib/systemd/system/anaconda.target.wants/*;
 
 COPY ./core-site.xml       /tmp/core-site.xml
-COPY ./hdfs-site.xml       /tmp/hdfs-site.xml 
+COPY ./hdfs-site.xml       /tmp/hdfs-site.xml
 COPY ./build1.sh           /tmp/build1.sh
 COPY ./build2.sh           /tmp/build2.sh
 COPY ./user_hdfs.sh        /tmp/user_hdfs.sh
@@ -59,7 +59,7 @@ RUN  /tmp/user_hdfs.sh
 USER root
 
 # HDFS
-EXPOSE 50010 50020 50070 50075 50090 8020 9000
+EXPOSE 88 749 50010 50020 50070 50075 50090 8020 9000
 
 VOLUME [ "/sys/fs/cgroup"]
 
