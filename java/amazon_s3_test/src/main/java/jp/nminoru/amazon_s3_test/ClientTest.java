@@ -53,6 +53,9 @@ public class ClientTest {
         if (s3.doesBucketExistV2(BucketName)) {
             System.out.println("### have a bucket ###");
 
+            System.out.println("### listFolder ###");
+            listFolder(s3, BucketName);
+
             //
             System.out.println("### createFolder ###");
             createFolder(s3, BucketName);
@@ -100,22 +103,31 @@ public class ClientTest {
     }
 
     static void listFolder(AmazonS3 s3, String bucketName) {
+        String continuationToken = null;
+        ListObjectsV2Result result;
+
         ListObjectsV2Request request = new ListObjectsV2Request()
             .withBucketName(bucketName)
             // .withPrefix("")
             .withDelimiter("/")
+            // .withMaxKeys(5)
             ;
 
-        ListObjectsV2Result result = s3.listObjectsV2(request);
+        do {
+            result = s3.listObjectsV2(request);
 
-        for (String prefix : result.getCommonPrefixes()) {
-            System.out.println("prefix: " + prefix);
-        }
+            for (String prefix : result.getCommonPrefixes()) {
+                System.out.println("prefix: " + prefix);
+            }
 
-        for (S3ObjectSummary summary : result.getObjectSummaries()) {
-            System.out.println("key:  " + summary.getKey());
-            System.out.println("size: " + summary.getSize());
-        }
+            for (S3ObjectSummary summary : result.getObjectSummaries()) {
+                System.out.println("key:  " + summary.getKey());
+                System.out.println("size: " + summary.getSize());
+            }
+
+            continuationToken = result.getNextContinuationToken();
+            request.setContinuationToken(continuationToken);
+        } while (result.isTruncated());
     }
 
     static void deleteFolder(AmazonS3 s3, String bucketName) {
