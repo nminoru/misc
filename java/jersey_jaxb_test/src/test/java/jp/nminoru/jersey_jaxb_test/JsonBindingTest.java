@@ -1,5 +1,4 @@
 package jp.nminoru.jersey_jaxb_test;
-
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -18,6 +17,7 @@ public class JsonBindingTest extends MyResourceTest {
 
     @Before
     public void setUp() throws Exception {
+        System.out.println("--- JsonBindingTest: STEP 1 -----------");
         super.setUp(JsonBindingFeature.class);
     }
 
@@ -28,7 +28,6 @@ public class JsonBindingTest extends MyResourceTest {
 
     @Test
     public void test() throws Exception {
-        // String request = "{\"enumType0\":\"abc\", \"enumType1\":\"abc\", \"version0\":2, \"version1\":2, \"options0\":{\"key1\":\"value1\"}, \"options1\":{\"key1\":\"value1\"}}";
         String request = "{\"enumType0\":\"abc\",\"version0\":2,\"version1\":2, \"options0\":{\"key1\":\"value1\"}, \"options1\":{\"key1\":\"value1\"}}";
 
         Response response = target
@@ -40,6 +39,8 @@ public class JsonBindingTest extends MyResourceTest {
             System.err.println(response.readEntity(String.class));
             assertTrue(false);
         }
+
+        System.out.println("--- JsonBindingTest: STEP 2 -----------");
 
         Foo result = response.readEntity(Foo.class);
 
@@ -53,6 +54,8 @@ public class JsonBindingTest extends MyResourceTest {
         assertNotNull(result.options0);
         assertEquals("value1",       result.options0.get("key1"));
         assertNotNull(result.options1);
-        assertEquals("value1",       result.options1.key1);
+        assertEquals("value1",       result.options1._key1);
+        
+        System.out.println("--- JsonBindingTest: STEP 3 -----------");        
     }
 }

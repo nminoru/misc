@@ -18,6 +18,7 @@ public class JacksonTest extends MyResourceTest {
 
     @Before
     public void setUp() throws Exception {
+        System.out.println("--- JacksonTest: STEP 1 -----------");
         super.setUp(JacksonFeature.class);
     }
 
@@ -28,7 +29,6 @@ public class JacksonTest extends MyResourceTest {
 
     @Test
     public void test() throws Exception {
-        // String request = "{\"enumType0\":\"abc\",\"enumType1\":\"abc\",\"version0\":2,\"version1\":2, \"options0\":{\"key1\":\"value1\"}, \"options1\":{\"key1\":\"value1\"}}";
         String request = "{\"enumType0\":\"abc\",\"version0\":2,\"version1\":2, \"options0\":{\"key1\":\"value1\"}, \"options1\":{\"key1\":\"value1\"}}";
 
         Response response = target
@@ -40,6 +40,8 @@ public class JacksonTest extends MyResourceTest {
             System.err.println(response.readEntity(String.class));
             assertTrue(false);
         }
+
+        System.out.println("--- JacksonTest: STEP 2 -----------");
 
         Foo result = response.readEntity(Foo.class);
 
@@ -59,6 +61,8 @@ public class JacksonTest extends MyResourceTest {
         assertEquals("value1",       result.options0.get("key1"));
 
         assertNotNull(result.options1);
-        assertEquals("value1",       result.options1.key1);
+        assertEquals("value1",       result.options1._key1);
+
+        System.out.println("--- JacksonTest: STEP 3 -----------");        
     }
 }

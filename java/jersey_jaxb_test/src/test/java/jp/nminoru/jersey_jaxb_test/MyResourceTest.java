@@ -14,7 +14,7 @@ public class MyResourceTest {
     protected WebTarget  target;
 
     protected void setUp(Class feature) throws Exception {
-        server = Main.startServer();
+        server = Main.startServer(feature);
 
         Client client = ClientBuilder.newBuilder()
             .register(feature)

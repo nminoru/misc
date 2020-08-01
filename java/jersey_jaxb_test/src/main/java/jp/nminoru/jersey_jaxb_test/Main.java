@@ -14,9 +14,10 @@ public class Main {
 
     public static final String BASE_URI = "http://localhost:8888/";
 
-    public static HttpServer startServer() {
+    public static HttpServer startServer(Class feature) {
         final ResourceConfig rc = new ResourceConfig()
-            .packages("jp.nminoru.jersey_jaxb_test");
+            .packages("jp.nminoru.jersey_jaxb_test")
+            .register(feature);
 
             // 下のうち1つを選択する
             // .register(MoxyJsonFeature.class)
@@ -27,7 +28,7 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        final HttpServer server = startServer();
+        final HttpServer server = startServer(MoxyJsonFeature.class);
         System.out.println(String.format("Jersey app started with WADL available at "
                 + "%sapplication.wadl\nHit enter to stop it...", BASE_URI));
         System.in.read();

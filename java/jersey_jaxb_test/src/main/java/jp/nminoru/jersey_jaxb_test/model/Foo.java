@@ -13,7 +13,7 @@ import jp.nminoru.jersey_jaxb_test.model.OptionsAdaptor;
 
 
 public class Foo {
-    
+
     @XmlTransient
     public EnumType0 enumType0;
 
@@ -26,7 +26,7 @@ public class Foo {
     public Integer  version1;
     public Map<String, Object> options0;
 
-    @XmlJavaTypeAdapter(OptionsAdaptor.class)
+    @XmlTransient
     public Options  options1;
 
     public Foo() {
@@ -63,5 +63,24 @@ public class Foo {
     @XmlTransient
     public int getVersion0() {
         return version0 != null ? version0.intValue() : 1;
+    }
+
+    @XmlElement(name = "options1")
+    public Map<String, Object> getOptions1() {
+        System.out.println("*** Foo.getOptions1 ***: " + options1._key1);
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("key1", options1._key1);
+
+        return map;
+    }
+
+    @XmlElement(name = "options1")
+    public void setOptions1(Map<String, Object> map) {
+        System.out.println("*** Foo.setOptions1 ***: " + map.get("key1"));
+
+        options1 = new Options();
+        options1._key1 = map.get("key1");
     }
 }

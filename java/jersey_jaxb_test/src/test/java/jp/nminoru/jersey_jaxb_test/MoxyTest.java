@@ -18,6 +18,7 @@ public class MoxyTest extends MyResourceTest {
 
     @Before
     public void setUp() throws Exception {
+        System.out.println("--- MoxyTest: STEP 1 -----------");
         super.setUp(MoxyJsonFeature.class);
     }
 
@@ -28,7 +29,6 @@ public class MoxyTest extends MyResourceTest {
 
     @Test
     public void test() throws Exception {
-        // String request = "{\"enumType1\":\"abc\",\"version0\":2,\"version1\":2, \"options0\":{\"key1\":\"value1\"}, \"options1\":{\"key1\":\"value1\"}}";
         String request = "{\"enumType0\":\"abc\",\"version0\":2,\"version1\":2, \"options0\":{\"key1\":\"value1\"}, \"options1\":{\"key1\":\"value1\"}}";
 
         Response response = target
@@ -41,6 +41,8 @@ public class MoxyTest extends MyResourceTest {
             assertTrue(false);
         }
 
+        System.out.println("--- MoxyTest: STEP 2 -----------");
+
         Foo result = response.readEntity(Foo.class);
 
         assertNotNull(result);
@@ -52,10 +54,12 @@ public class MoxyTest extends MyResourceTest {
         assertEquals(new Integer(2),        result.version1);
 
         // Moxy では対応は対応できない
-
         // assertNotNull(result.options0);
         // assertEquals("value1",       result.options0.get("key1"));
-        // assertNotNull(result.options1);
-        // assertEquals("value1",       result.options1.key1);
+
+        assertNotNull(result.options1);
+        assertEquals("value1",       result.options1._key1);
+
+        System.out.println("--- MoxyTest: STEP 3 -----------");        
     }
 }

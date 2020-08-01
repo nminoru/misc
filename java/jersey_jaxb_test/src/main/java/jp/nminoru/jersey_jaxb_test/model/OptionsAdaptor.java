@@ -13,7 +13,7 @@ public class OptionsAdaptor extends XmlAdapter<Map<String, Object>, Options> {
 
         if (v != null) {
             Map<String, Object> map = new HashMap<>();
-            map.put("key1", v.key1);
+            map.put("key1", v._key1);
             return map;
         }
 
@@ -27,7 +27,7 @@ public class OptionsAdaptor extends XmlAdapter<Map<String, Object>, Options> {
         Options options = new Options();
 
         if (v != null)
-            options.key1 = v.get("key1");
+            options._key1 = v.get("key1");
 
         return options;
     }
