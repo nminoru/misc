@@ -27,7 +27,7 @@ public class JacksonTest extends MyResourceTest {
 
     @Test
     public void test() throws Exception {
-        String request = "{\"enumType\":\"abc\",\"version0\":2,\"version1\":2, \"options0\":{\"key1\":\"value1\"}}";
+        String request = "{\"enumType\":\"abc\",\"version0\":2,\"version1\":2, \"options0\":{\"key1\":\"value1\"}, \"options1\":{\"key1\":\"value1\"}}";
 
         Response response = target
             .path("/myresource/foo")
@@ -53,5 +53,8 @@ public class JacksonTest extends MyResourceTest {
 
         assertNotNull(result.options0);
         assertEquals("value1",       result.options0.get("key1"));
+
+        assertNotNull(result.options1);
+        assertEquals("value1",       result.options1.key1);
     }
 }
