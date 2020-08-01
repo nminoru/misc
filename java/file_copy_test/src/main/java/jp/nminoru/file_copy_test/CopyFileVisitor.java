@@ -92,7 +92,7 @@ public class CopyFileVisitor implements FileVisitor<Path> {
         File destFile = destPath.toFile();
         
         if (destFile.exists() && !destFile.isFile())
-            FileUtils.forceDelete(destFile);o
+            FileUtils.forceDelete(destFile);
         
         FileUtils.copyFile(srcFile, destFile);
     }

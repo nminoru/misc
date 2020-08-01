@@ -3,26 +3,26 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <properties>
-    <jersey.version>2.27</jersey.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>1.8</java.version>    
-  </properties>
-
-  <groupId>docker_test</groupId>
+  <groupId>jp.nminoru</groupId>
   <artifactId>docker_test</artifactId>
   <packaging>jar</packaging>
   <version>0.0.1</version>
   <name>docker_test</name>
 
+  <properties>
+    <jersey.version>2.31</jersey.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>1.8</java.version>
+  </properties>
+
   <dependencies>
-    
+
     <dependency>
       <groupId>com.spotify</groupId>
       <artifactId>docker-client</artifactId>
       <version>8.15.1</version>
     </dependency>
-    
+
     <!-- JUnit -->
     <dependency>
       <groupId>junit</groupId>
@@ -45,7 +45,7 @@
 	  <compilerArgument>${compilerArgument}</compilerArgument>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -100,7 +100,7 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>      
+      </plugin>
 
     </plugins>
   </build>

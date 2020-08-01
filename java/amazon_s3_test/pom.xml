@@ -3,16 +3,16 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>1.8</java.version>
-  </properties>
-
-  <groupId>amazon_s3_test</groupId>
+  <groupId>jp.nminoru</groupId>
   <artifactId>amazon_s3_test</artifactId>
   <packaging>jar</packaging>
   <version>0.0.1</version>
   <name>amazon_s3_test</name>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>1.8</java.version>
+  </properties>
 
   <dependencies>
 
@@ -21,7 +21,7 @@
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>2.6</version>
-    </dependency>    
+    </dependency>
 
     <!-- Amazon S3 -->
     <dependency>
@@ -29,7 +29,7 @@
       <artifactId>aws-java-sdk-s3</artifactId>
       <version>1.11.789</version>
     </dependency>
-    
+
     <!-- JUnit -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>

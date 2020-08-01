@@ -3,7 +3,7 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>nminoru</groupId>
+  <groupId>jp.nminoru</groupId>
   <name>jsonb_test</name>
   <artifactId>jsonb_test</artifactId>
   <packaging>jar</packaging>
@@ -19,14 +19,14 @@
     <dependency>
       <groupId>javax.json</groupId>
       <artifactId>javax.json-api</artifactId>
-      <version>1.1</version>
+      <version>1.1.4</version>
     </dependency>
 
     <!-- JSON-P RI -->
     <dependency>
       <groupId>org.glassfish</groupId>
       <artifactId>javax.json</artifactId>
-      <version>1.1</version>
+      <version>1.1.4</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -44,12 +44,12 @@
       <version>1.0.1</version>
       <scope>runtime</scope>
     </dependency>
-    
+
     <!-- JUnit -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
+      <version>4.13</version>
       <scope>test</scope>
     </dependency>
 
@@ -59,7 +59,7 @@
       <version>3.3.0</version>
       <scope>test</scope>
     </dependency>
-      
+
   </dependencies>
 
   <build>
@@ -67,7 +67,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>	
+        <version>3.8.0</version>
         <inherited>true</inherited>
         <configuration>
           <source>1.8</source>
@@ -78,7 +78,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>1.6.0</version>	
+        <version>1.6.0</version>
         <executions>
           <execution>
             <goals>

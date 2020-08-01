@@ -3,16 +3,16 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <properties>
-    <jersey.version>2.27</jersey.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-
-  <groupId>gitlab_client_test</groupId>
+  <groupId>jp.nminoru</groupId>
   <artifactId>gitlab_client_test</artifactId>
   <packaging>jar</packaging>
   <version>0.0.1</version>
   <name>gitlab_client_test</name>
+
+  <properties>
+    <jersey.version>2.31</jersey.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
   
   <dependencyManagement>
     <dependencies>
@@ -84,7 +84,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
+      <version>4.13</version>
     </dependency>
   </dependencies>
 

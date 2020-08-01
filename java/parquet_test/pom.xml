@@ -4,16 +4,16 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>jp.nminoru</groupId>
-  <artifactId>ParquetTest</artifactId>
+  <artifactId>parquet_test</artifactId>
   <packaging>jar</packaging>
   <version>1.0</version>
-  <name>ParquetTest</name>
+  <name>parquet_test</name>
 
   <properties>
     <java.version>1.8</java.version>
-    <hadoop.version>2.7.5</hadoop.version>
-    <parquet.version>1.8.2</parquet.version>
-    <slf4j.version>1.7.25</slf4j.version>
+    <hadoop.version>3.3.0</hadoop.version>
+    <parquet.version>1.11.0</parquet.version>
+    <slf4j.version>1.7.30</slf4j.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
@@ -21,7 +21,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.6</version>
+      <version>2.7</version>
     </dependency>
 
     <dependency>
@@ -55,7 +55,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>	
+        <version>3.8.0</version>
         <inherited>true</inherited>
         <configuration>
           <source>${java.version}</source>
@@ -65,7 +65,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>1.6.0</version>	
+        <version>1.6.0</version>
         <executions>
           <execution>
             <goals>

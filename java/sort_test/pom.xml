@@ -3,24 +3,24 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-
-  <groupId>sort_test</groupId>
+  <groupId>jp.nminoru</groupId>
   <artifactId>sort_test</artifactId>
   <packaging>jar</packaging>
   <version>0.0.1</version>
   <name>sort_test</name>
-  
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
   <dependencies>
-    
+
     <!-- JUnit -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>      
+      <version>4.13</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
@@ -30,7 +30,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>	
+        <version>3.8.0</version>
         <inherited>true</inherited>
         <configuration>
           <source>1.8</source>
@@ -41,7 +41,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>1.6.0</version>	
+        <version>1.6.0</version>
         <executions>
           <execution>
             <goals>

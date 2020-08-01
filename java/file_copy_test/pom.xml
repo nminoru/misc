@@ -3,17 +3,17 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <properties>
-    <jersey.version>2.27</jersey.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <java.version>1.8</java.version>    
-  </properties>
-
-  <groupId>file_copy_test</groupId>
+  <groupId>jp.nminoru</groupId>
   <artifactId>file_copy_test</artifactId>
   <packaging>jar</packaging>
   <version>0.0.1</version>
   <name>file_copy_test</name>
+
+  <properties>
+    <jersey.version>2.31</jersey.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <java.version>1.8</java.version>
+  </properties>
 
   <dependencies>
 
@@ -21,8 +21,8 @@
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
       <version>2.6</version>
-    </dependency>    
-    
+    </dependency>
+
     <!-- JUnit -->
     <dependency>
       <groupId>junit</groupId>
@@ -45,7 +45,7 @@
 	  <compilerArgument>${compilerArgument}</compilerArgument>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
@@ -100,7 +100,7 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>      
+      </plugin>
 
     </plugins>
   </build>

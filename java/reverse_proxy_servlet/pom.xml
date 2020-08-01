@@ -3,7 +3,7 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>reverse_proxy_servlet</groupId>
+  <groupId>jp.nminoru</groupId>
   <artifactId>reverse_proxy_servlet</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
@@ -12,12 +12,12 @@
   <properties>
     <java.version>1.8</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    
+
     <servlet2.version>2.4</servlet2.version>
     <servlet3.version>3.0.1</servlet3.version>
-    <servlet4.version>4.0.0</servlet4.version>    
+    <servlet4.version>4.0.1</servlet4.version>
     <jersey.version>2.29</jersey.version>
-    <tyrus.version>1.15</tyrus.version>    
+    <tyrus.version>1.15</tyrus.version>
   </properties>
 
   <dependencyManagement>
@@ -31,7 +31,7 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
-  
+
   <dependencies>
 
     <dependency>
@@ -44,8 +44,8 @@
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
       <version>${servlet4.version}</version>
-    </dependency>  
-    
+    </dependency>
+
     <dependency>
       <groupId>org.glassfish.jersey.containers</groupId>
       <artifactId>jersey-container-grizzly2-http</artifactId>
@@ -57,18 +57,18 @@
       <artifactId>jersey-container-servlet</artifactId>
       <version>${jersey.version}</version>
     </dependency>
-	
+
     <dependency>
       <groupId>org.glassfish.jersey.inject</groupId>
       <artifactId>jersey-hk2</artifactId>
-        <version>${jersey.version}</version>      
+        <version>${jersey.version}</version>
     </dependency>
 
     <!-- Apache HttpClient -->
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
-      <version>4.5.8</version>
+      <version>4.5.12</version>
     </dependency>
 
     <!-- WebSocket -->
@@ -87,14 +87,14 @@
     <dependency>
       <groupId>org.glassfish.tyrus</groupId>
       <artifactId>tyrus-container-grizzly-client</artifactId>
-      <version>${tyrus.version}</version>      
+      <version>${tyrus.version}</version>
     </dependency>
-    
+
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.25</version>
+      <version>1.7.30</version>
     </dependency>
 
     <dependency>
@@ -106,14 +106,14 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.2</version>
+      <version>1.18.12</version>
     </dependency>
 
-    <!-- JUnit -->    
+    <!-- JUnit -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>      
+      <version>4.13</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -133,7 +133,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>1.6.0</version>	
+        <version>1.6.0</version>
         <executions>
           <execution>
             <goals>

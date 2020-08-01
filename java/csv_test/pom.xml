@@ -3,12 +3,12 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>nminoru</groupId>
+  <groupId>jp.nminoru</groupId>
   <name>csv_test</name>
   <artifactId>csv_test</artifactId>
   <packaging>jar</packaging>
   <version>0.0.1</version>
-  
+
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -21,7 +21,7 @@
       <version>1.5</version>
     </dependency>
 
-    <!-- JUnit -->    
+    <!-- JUnit -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -54,7 +54,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>1.6.0</version>	
+        <version>1.6.0</version>
         <executions>
           <execution>
             <goals>

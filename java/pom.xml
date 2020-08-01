@@ -1,0 +1,41 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>jp.nminoru</groupId>
+  <artifactId>modules</artifactId>
+  <packaging>pom</packaging>
+  <version>0.0.1</version>
+  <name>modules</name>
+
+  <modules>
+    <module>active_directory_test</module>
+    <module>amazon_s3_test</module>
+    <module>atlas_test</module>
+    <module>azure_blob_storage_test</module>
+    <module>bcrypt_test</module>
+    <module>csv_test</module>
+    <module>docker_test</module>
+    <module>gitlab_client_test</module>
+    <module>hdfs_test</module>
+    <module>http_measure_speed</module>
+    <module>jackson_test</module>
+    <module>jaxb_test</module>
+    <module>jcifs_ng_test</module>
+    <module>jersey_jaxb_test</module>
+    <module>jersey_servlet_test</module>
+    <module>jersey_test</module>
+    <module>jjwt_test</module>
+    <module>jsonb_test</module>
+    <module>parquet_test</module>
+    <module>postgresql_jdbc_test</module>
+    <module>request_forward_test</module>
+    <module>reverse_proxy_servlet</module>
+    <module>sardine_test</module>
+    <module>smbj_test</module>
+    <module>sort_test</module>
+    <module>websocket_test</module>
+  </modules>
+
+</project>
