@@ -9,7 +9,8 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
-import jp.nminoru.jersey_jaxb_test.model.EnumType;
+import jp.nminoru.jersey_jaxb_test.model.EnumType0;
+import jp.nminoru.jersey_jaxb_test.model.EnumType1;
 import jp.nminoru.jersey_jaxb_test.model.Foo;
 
 
@@ -27,7 +28,8 @@ public class JacksonTest extends MyResourceTest {
 
     @Test
     public void test() throws Exception {
-        String request = "{\"enumType\":\"abc\",\"version0\":2,\"version1\":2, \"options0\":{\"key1\":\"value1\"}, \"options1\":{\"key1\":\"value1\"}}";
+        // String request = "{\"enumType0\":\"abc\",\"enumType1\":\"abc\",\"version0\":2,\"version1\":2, \"options0\":{\"key1\":\"value1\"}, \"options1\":{\"key1\":\"value1\"}}";
+        String request = "{\"enumType0\":\"abc\",\"version0\":2,\"version1\":2, \"options0\":{\"key1\":\"value1\"}, \"options1\":{\"key1\":\"value1\"}}";
 
         Response response = target
             .path("/myresource/foo")
@@ -42,8 +44,10 @@ public class JacksonTest extends MyResourceTest {
         Foo result = response.readEntity(Foo.class);
 
         assertNotNull(result);
-
-        assertEquals(EnumType.ABC, result.enumType);
+        assertEquals(EnumType0.ABC,         result.enumType0);
+        assertEquals(EnumType1.unspecified, result.enumType1);
+        assertEquals(1,                     result.int0);
+        assertEquals(new Integer(1),        result.int1);
 
         // request.version0 は null になっている
         assertNull(result.version0);

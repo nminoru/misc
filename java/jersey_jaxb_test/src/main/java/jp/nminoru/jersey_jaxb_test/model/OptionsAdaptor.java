@@ -5,23 +5,11 @@ import java.util.Map;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 
-public class OptionsAdaptor extends XmlAdapter<Options, Map<String, Object>> {
+public class OptionsAdaptor extends XmlAdapter<Map<String, Object>, Options> {
 
     @Override
-    public Options marshal(Map<String, Object> v) {
+    public Map<String, Object> marshal(Options v) {
         System.out.println("# OptionsAdaptor.marshal = " + v);
-
-        Options options = new Options();
-        
-        if (v != null)
-            options.key1 = v.get("key1");
-
-        return options;
-    }
-
-    @Override
-    public Map<String, Object> unmarshal(Options v) {
-        System.out.println("# OptionsAdaptor.unmarshal = " + v);
 
         if (v != null) {
             Map<String, Object> map = new HashMap<>();
@@ -30,5 +18,17 @@ public class OptionsAdaptor extends XmlAdapter<Options, Map<String, Object>> {
         }
 
         return null;
-    }    
+    }
+
+    @Override
+    public Options unmarshal(Map<String, Object> v) {
+        System.out.println("# OptionsAdaptor.unmarshal = " + v);
+
+        Options options = new Options();
+
+        if (v != null)
+            options.key1 = v.get("key1");
+
+        return options;
+    }
 }
