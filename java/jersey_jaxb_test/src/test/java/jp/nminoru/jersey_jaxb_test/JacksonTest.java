@@ -27,11 +27,7 @@ public class JacksonTest extends MyResourceTest {
 
     @Test
     public void test() throws Exception {
-        Foo request = new Foo();
-
-        request.enumType = EnumType.ABC;
-        request.version0 = 2;
-        request.version1 = 2;
+        String request = "{\"enumType\":\"abc\",\"version0\":2,\"version1\":2, \"options0\":{\"key1\":\"value1\"}}";
 
         Response response = target
             .path("/myresource/foo")
@@ -47,12 +43,15 @@ public class JacksonTest extends MyResourceTest {
 
         assertNotNull(result);
 
-        assertEquals(request.enumType, result.enumType);
+        assertEquals(EnumType.ABC, result.enumType);
 
         // request.version0 は null になっている
         assertNull(result.version0);
 
         // request.version1 は正しい
-        assertEquals(request.version1, result.version1);
+        assertEquals(new Integer(2), result.version1);
+
+        assertNotNull(result.options0);
+        assertEquals("value1",       result.options0.get("key1"));
     }
 }

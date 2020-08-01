@@ -1,19 +1,28 @@
 package jp.nminoru.jersey_jaxb_test.model;
 
+import java.util.HashMap;
+import java.util.Map;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbException;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import jp.nminoru.jersey_jaxb_test.model.EnumType;
 
 
 public class Foo {
+    static final Jsonb Jsonb = JsonbBuilder.create();
+
     @XmlTransient
     public EnumType enumType;
 
     public Integer  version0;
     public Integer  version1;
+    public Map<String, Object> options0;
 
     public Foo() {
         this.enumType = EnumType.UNSPECIFIED;
+        this.options0 = new HashMap<>();
     }
 
     @XmlElement(name = "enumType")
