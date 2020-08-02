@@ -2,8 +2,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
+import java.util.Objects;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.Jsonb;
+
 
 public class jsonb_test {
     Jsonb jsonb = JsonbBuilder.create();
@@ -46,6 +48,10 @@ public class jsonb_test {
             this.name = name;
         }
     }
+    
+    public static class Qux extends HashMap<String, Object> {
+        public String key1;
+    }
 
     public static void main(String[] args) {
         jsonb_test test = new jsonb_test();
@@ -56,6 +62,7 @@ public class jsonb_test {
         test.testPojo4();
         test.testPojo5();
         test.testPojo6();
+        test.testPojo7();        
     }
 
     /**
@@ -142,6 +149,28 @@ public class jsonb_test {
         System.out.println("test6: " + request);
         System.out.println("test6: " + result);
     }
+
+    void testPojo7() {
+        String request = "{\"key1\":\"value1\",\"key2\":\"value2\"}";
+        Qux    qux     = jsonb.fromJson(request, Qux.class);
+        String result  = jsonb.toJson(qux);
+
+        System.out.println("test7: " + request);
+        System.out.println("test7: " + result);
+        System.out.println("test7: " + qux.key1); //
+
+        //
+        Qux    qux2     = new Qux();
+        qux2.key1       = "value1";
+        result          = jsonb.toJson(qux2);
+        System.out.println("test7: " + result);
+
+        Qux    qux3     = new Qux();
+        qux3.key1       = "value1";
+        qux3.put("key1", "value1");
+        result          = jsonb.toJson(qux3);
+        System.out.println("test7: " + result);
+    }    
 
     void printMap(int level, Map<String, Object> jsonMap) {
         for (String key : jsonMap.keySet()) {
