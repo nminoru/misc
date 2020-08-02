@@ -18,7 +18,6 @@ public class JacksonTest extends MyResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        System.out.println("--- JacksonTest: STEP 1 -----------");
         super.setUp(JacksonFeature.class);
     }
 
@@ -28,41 +27,30 @@ public class JacksonTest extends MyResourceTest {
     }
 
     @Test
-    public void test() throws Exception {
-        String request = "{\"enumType0\":\"abc\",\"version0\":2,\"version1\":2, \"options0\":{\"key1\":\"value1\"}, \"options1\":{\"key1\":\"value1\"}}";
+    public void test1() throws Exception {
+        System.out.println("--- JacksonTest: STEP 1 -----------");
 
-        Response response = target
-            .path("/myresource/foo")
-            .request(MediaType.APPLICATION_JSON)
-            .post(Entity.entity(request, MediaType.APPLICATION_JSON_TYPE));
+        super.test1();
+    }
 
-        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-            System.err.println(response.readEntity(String.class));
-            assertTrue(false);
-        }
-
+    @Test
+    public void test2() throws Exception {
         System.out.println("--- JacksonTest: STEP 2 -----------");
 
-        Foo result = response.readEntity(Foo.class);
+        super.test2();
+    }
 
-        assertNotNull(result);
-        assertEquals(EnumType0.ABC,         result.enumType0);
-        assertEquals(EnumType1.unspecified, result.enumType1);
-        assertEquals(1,                     result.int0);
-        assertEquals(new Integer(1),        result.int1);
+    @Test
+    public void test3() throws Exception {
+        System.out.println("--- JacksonTest: STEP 3 -----------");
 
-        // request.version0 は null になっている
-        assertNull(result.version0);
+        super.test3();
+    }
 
-        // request.version1 は正しい
-        assertEquals(new Integer(2), result.version1);
+    @Test
+    public void test4() throws Exception {
+        System.out.println("--- JacksonTest: STEP 4 -----------");
 
-        assertNotNull(result.options0);
-        assertEquals("value1",       result.options0.get("key1"));
-
-        assertNotNull(result.options1);
-        assertEquals("value1",       result.options1._key1);
-
-        System.out.println("--- JacksonTest: STEP 3 -----------");        
+        super.test4();
     }
 }

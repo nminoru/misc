@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import jp.nminoru.jersey_jaxb_test.model.EnumType0;
 import jp.nminoru.jersey_jaxb_test.model.EnumType1;
+import jp.nminoru.jersey_jaxb_test.model.MyHashMap;
 import jp.nminoru.jersey_jaxb_test.model.Options;
 import jp.nminoru.jersey_jaxb_test.model.OptionsAdaptor;
 
@@ -19,6 +20,8 @@ public class Foo {
 
     public EnumType1 enumType1;
 
+    private EnumType1 _enumType2;    
+
     public int      int0;
     public Integer  int1;
 
@@ -29,6 +32,14 @@ public class Foo {
     @XmlTransient
     public Options  options1;
 
+    public MyHashMap options2;
+
+    @XmlTransient
+    public Integer  transperent0 = new Integer(1);
+
+    @XmlTransient
+    public Integer  transperent1 = new Integer(1);
+
     public Foo() {
         this.enumType0 = EnumType0.UNSPECIFIED;
         this.enumType1 = EnumType1.unspecified;
@@ -36,14 +47,15 @@ public class Foo {
         this.int1      = new Integer(1);
         this.options0  = new HashMap<>();
         this.options1  = new Options();
+        this.options2  = new MyHashMap();
     }
 
     @XmlElement(name = "enumType0")
     public String getEnumType0() {
-        if (enumType0 != null && enumType0 != EnumType0.UNSPECIFIED)
-            return enumType0.getLabel();
+        if (enumType0 != null)
+            return enumType0.name();
         else
-            return null;
+            return EnumType0.UNSPECIFIED.name();
     }
 
     @XmlElement(name = "enumType0")
@@ -53,6 +65,19 @@ public class Foo {
         else
             enumType0 = EnumType0.UNSPECIFIED;
     }
+
+    @XmlElement(name = "enumType2")
+    public String getEnumTypeX() {
+        return EnumType1.unspecified.name();
+    }
+
+    @XmlElement(name = "enumType2")
+    public void setEnumTypeX(String enumTypeString) {
+        if (enumTypeString != null)
+            _enumType2 = EnumType1.valueOf(enumTypeString);
+        else
+            _enumType2 = EnumType1.unspecified;
+    }    
 
     /**
      * version0 に重なる getter があった場合、@XmlTransient を指定しても
@@ -82,5 +107,18 @@ public class Foo {
 
         options1 = new Options();
         options1._key1 = map.get("key1");
+    }    
+
+    @XmlElement(name = "transperent1")
+    public Integer getTransparentY() {
+        System.out.println("*** Foo.getTransparent1 ***");
+        return transperent1;
+    }
+
+    @XmlElement(name = "transperent1")
+    public void setTransparentY(int value) {
+        System.out.println("*** Foo.setTransparent1 ***: " + value);
+        
+        transperent1 = value + 1;
     }
 }
