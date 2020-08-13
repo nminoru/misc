@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import jp.nminoru.jersey_jaxb_test.CustomJacksonFeature;
 import jp.nminoru.jersey_jaxb_test.model.EnumType0;
 import jp.nminoru.jersey_jaxb_test.model.EnumType1;
 import jp.nminoru.jersey_jaxb_test.model.Foo;
@@ -18,7 +19,8 @@ public class JacksonTest extends MyResourceTest {
 
     @Before
     public void setUp() throws Exception {
-        super.setUp(JacksonFeature.class);
+        // super.setUp(JacksonFeature.class);
+        super.setUp(CustomJacksonFeature.class);
     }
 
     @After
