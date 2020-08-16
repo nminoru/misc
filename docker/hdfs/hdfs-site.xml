@@ -4,11 +4,11 @@
 <configuration>
   <property>
     <name>dfs.name.dir</name>
-    <value>/opt/hadoop/hadoop-3.2.1/var/lib/hdfs/name</value>
+    <value>/opt/hadoop/hadoop-3.3.0/var/lib/hdfs/name</value>
   </property>
   <property>
     <name>dfs.data.dir</name>
-    <value>/opt/hadoop/hadoop-3.2.1/var/lib/hdfs/data</value>
+    <value>/opt/hadoop/hadoop-3.3.0/var/lib/hdfs/data</value>
   </property>
   <property>
     <name>dfs.replication</name>

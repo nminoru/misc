@@ -2,12 +2,11 @@
 
 set -eux
 
-mv /tmp/core-site.xml /opt/hadoop/hadoop-3.2.1/etc/hadoop/core-site.xml
-mv /tmp/hdfs-site.xml /opt/hadoop/hadoop-3.2.1/etc/hadoop/hdfs-site.xml
+mv /tmp/core-site.xml /opt/hadoop/hadoop-3.3.0/etc/hadoop/core-site.xml
+mv /tmp/hdfs-site.xml /opt/hadoop/hadoop-3.3.0/etc/hadoop/hdfs-site.xml
 
 export JAVA_HOME=/usr/lib/jvm/java-1.8.0/
-export HADOOP_HOME=/opt/hadoop/hadoop-3.2.1/
-
+export HADOOP_HOME=/opt/hadoop/hadoop-3.3.0/
 systemctl enable sshd.service
 
 echo "/sbin/runuser -l hdfs ${HADOOP_HOME}/sbin/start-dfs.sh" >> /etc/rc.d/rc.local

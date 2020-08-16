@@ -1,23 +1,23 @@
 FROM alpine AS builder
 
-COPY ./hadoop-3.2.1.tar.gz /tmp/hadoop-3.2.1.tar.gz
+COPY ./hadoop-3.3.0.tar.gz /tmp/hadoop-3.3.0.tar.gz
 
 WORKDIR /tmp
 
 RUN mkdir -p /tmp/base1 /tmp/base2
 
 RUN cd /tmp/base1 && \
-    tar xvf /tmp/hadoop-3.2.1.tar.gz
+    tar xvf /tmp/hadoop-3.3.0.tar.gz
 
 RUN cd /tmp/base2 && \
-    tar xvf /tmp/hadoop-3.2.1.tar.gz
+    tar xvf /tmp/hadoop-3.3.0.tar.gz
 
-RUN rm -rf /tmp/base1/hadoop-3.2.1/share/doc
-RUN rm -rf /tmp/base1/hadoop-3.2.1/share/hadoop/common
-RUN rm -rf /tmp/base1/hadoop-3.2.1/share/hadoop/client
-RUN rm -rf /tmp/base1/hadoop-3.2.1/share/hadoop/tools
-RUN rm -rf /tmp/base1/hadoop-3.2.1/share/hadoop/mapreduce
-RUN rm -rf /tmp/base1/hadoop-3.2.1/share/hadoop/yarn
+RUN rm -rf /tmp/base1/hadoop-3.3.0/share/doc
+RUN rm -rf /tmp/base1/hadoop-3.3.0/share/hadoop/common
+RUN rm -rf /tmp/base1/hadoop-3.3.0/share/hadoop/client
+RUN rm -rf /tmp/base1/hadoop-3.3.0/share/hadoop/tools
+RUN rm -rf /tmp/base1/hadoop-3.3.0/share/hadoop/mapreduce
+RUN rm -rf /tmp/base1/hadoop-3.3.0/share/hadoop/yarn
 
 FROM centos:7
 
@@ -43,12 +43,12 @@ COPY ./hdfs.service        /tmp/hdfs.service
 
 RUN  /tmp/build1.sh
 
-COPY --from=builder --chown=hdfs:hdfs /tmp/base1/hadoop-3.2.1                        /opt/hadoop/hadoop-3.2.1
-COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.2.1/share/hadoop/common    /opt/hadoop/hadoop-3.2.1/share/hadoop/common
-COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.2.1/share/hadoop/client    /opt/hadoop/hadoop-3.2.1/share/hadoop/client
-COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.2.1/share/hadoop/tools     /opt/hadoop/hadoop-3.2.1/share/hadoop/tools
-COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.2.1/share/hadoop/mapreduce /opt/hadoop/hadoop-3.2.1/share/hadoop/mapreduce
-COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.2.1/share/hadoop/yarn      /opt/hadoop/hadoop-3.2.1/share/hadoop/yarn
+COPY --from=builder --chown=hdfs:hdfs /tmp/base1/hadoop-3.3.0                        /opt/hadoop/hadoop-3.3.0
+COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.3.0/share/hadoop/common    /opt/hadoop/hadoop-3.3.0/share/hadoop/common
+COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.3.0/share/hadoop/client    /opt/hadoop/hadoop-3.3.0/share/hadoop/client
+COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.3.0/share/hadoop/tools     /opt/hadoop/hadoop-3.3.0/share/hadoop/tools
+COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.3.0/share/hadoop/mapreduce /opt/hadoop/hadoop-3.3.0/share/hadoop/mapreduce
+COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.3.0/share/hadoop/yarn      /opt/hadoop/hadoop-3.3.0/share/hadoop/yarn
 
 RUN  /tmp/build2.sh
 
