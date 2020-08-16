@@ -1,0 +1,3 @@
+target/
+krb5.conf
+dependency-reduced-pom.xml
