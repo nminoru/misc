@@ -1,0 +1,76 @@
+version: "3.7"
+
+services:
+  kdc:
+    build:
+      context: .
+      dockerfile: Dockerfile-kdc
+    cap_add:
+      - NET_ADMIN
+    domainname: example.com
+    hostname: kdc
+    networks:
+      app_net:
+        ipv4_address: 172.32.0.2
+    dns:
+      - 172.32.0.2
+    dns_search:
+      - example.com
+    tmpfs:
+      - /run
+      - /run/lock
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - server-keytab:/var/keytabs      
+      
+  http:
+    build:
+      context: .
+      dockerfile: Dockerfile-http
+    domainname: example.com      
+    hostname: www
+    networks:
+      app_net:
+        ipv4_address: 172.32.0.3
+    dns:
+      - 172.32.0.2
+    dns_search:
+      - example.com
+    ports:        
+      - 8080:80
+    tmpfs:
+      - /run
+      - /run/lock
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - server-keytab:/var/keytabs      
+      
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile-client
+    domainname: example.com      
+    hostname: client
+    networks:
+      app_net:
+        ipv4_address: 172.32.0.4
+    dns:
+      - 172.32.0.2
+    dns_search:
+      - example.com      
+    tmpfs:
+      - /run
+      - /run/lock
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - server-keytab:/var/keytabs
+
+networks:
+  app_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.32.0.0/24
+
+volumes:
+  server-keytab:
