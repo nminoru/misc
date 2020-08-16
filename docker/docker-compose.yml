@@ -1,17 +1,6 @@
 version: "3.7"
 
 services:
-  myjupyter:
-    image: myjupyter
-    build:
-      context: .
-      dockerfile: Dockerfile-jupyternotebook
-    logging:
-      driver: syslog
-      options:
-        syslog-facility: daemon
-        tag: myjupyter/{{.Name}}/{{.ID}}
-
   localdns-dnsmasq:
     image: localdns-dnsmasq
     build:
