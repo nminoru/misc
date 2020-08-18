@@ -2,13 +2,6 @@
 
 set -eux
 
-useradd alice
-useradd bob
-
-echo -e "root:root"   | chpasswd
-echo -e "alice:alice" | chpasswd
-echo -e "bob:bob"     | chpasswd
-
 /usr/sbin/kdb5_util -r EXAMPLE.COM -P changeme create -s
 
 /usr/sbin/kadmin.local -q "addprinc -pw password root/admin"

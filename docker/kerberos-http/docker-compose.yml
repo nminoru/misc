@@ -4,7 +4,8 @@ services:
   kdc:
     build:
       context: .
-      dockerfile: Dockerfile-kdc
+      dockerfile: Dockerfile
+      target: kdc
     cap_add:
       - NET_ADMIN
     domainname: example.com
@@ -26,7 +27,8 @@ services:
   http:
     build:
       context: .
-      dockerfile: Dockerfile-http
+      dockerfile: Dockerfile
+      target: http
     domainname: example.com      
     hostname: www
     networks:
@@ -48,7 +50,8 @@ services:
   client:
     build:
       context: .
-      dockerfile: Dockerfile-client
+      dockerfile: Dockerfile
+      target: client
     domainname: example.com      
     hostname: client
     networks:
