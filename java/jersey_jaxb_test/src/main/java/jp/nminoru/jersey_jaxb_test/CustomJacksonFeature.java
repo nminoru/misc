@@ -6,13 +6,18 @@ import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import com.fasterxml.jackson.databind.type.TypeFactory;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 import org.glassfish.jersey.CommonProperties;
 import org.glassfish.jersey.internal.InternalProperties;
 import org.glassfish.jersey.internal.util.PropertiesHelper;
@@ -39,7 +44,7 @@ public class CustomJacksonFeature extends JacksonFeature {
 
         final String jsonFeature = CommonProperties.getValue(config.getProperties(), config.getRuntimeType(),
                 InternalProperties.JSON_FEATURE, JSON_FEATURE, String.class);
-        
+
         // Other JSON providers registered.
         if (!JSON_FEATURE.equalsIgnoreCase(jsonFeature)) {
             return false;
@@ -50,7 +55,7 @@ public class CustomJacksonFeature extends JacksonFeature {
                 JSON_FEATURE);
 
         // Register Jackson.
-        if (!config.isRegistered(CustomJacksonJaxbJsonProvider.class)) {
+        if (!config.isRegistered(CustomJacksonJaxbJsonProvider2.class)) {
             // add the default Jackson exception mappers
             context.register(JsonParseExceptionMapper.class);
             context.register(JsonMappingExceptionMapper.class);
@@ -58,7 +63,8 @@ public class CustomJacksonFeature extends JacksonFeature {
             if (EntityFilteringFeature.enabled(config)) {
                 throw new UnsupportedOperationException();
             } else {
-                context.register(CustomJacksonJaxbJsonProvider.class, MessageBodyReader.class, MessageBodyWriter.class);
+                // context.register(CustomJacksonJaxbJsonProvider1.class, MessageBodyReader.class, MessageBodyWriter.class);
+                context.register(CustomJacksonJaxbJsonProvider2.class);
             }
         }
 
@@ -68,15 +74,49 @@ public class CustomJacksonFeature extends JacksonFeature {
     @Provider
     @Consumes(MediaType.WILDCARD) // NOTE: required to support "non-standard" JSON variants
     @Produces(MediaType.WILDCARD)
-    static class CustomJacksonJaxbJsonProvider extends JacksonJaxbJsonProvider {
+    static class CustomJacksonJaxbJsonProvider1 extends JacksonJaxbJsonProvider {
 
-        public CustomJacksonJaxbJsonProvider() {
+        public CustomJacksonJaxbJsonProvider1() {
             super();
 
             // シリアライズ: フィールドを持たないクラスをエラーとしない
             disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
             // デシリアライズ: クラスに対応するフィールドない JSON が来た時に無視する。
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        }
+    }
+
+    @Provider
+    @Consumes(MediaType.WILDCARD) // NOTE: required to support "non-standard" JSON variants
+    @Produces(MediaType.APPLICATION_JSON)
+    static class CustomJacksonJaxbJsonProvider2 implements ContextResolver<ObjectMapper> {
+
+        private final ObjectMapper mapper;
+
+        public CustomJacksonJaxbJsonProvider2() {
+            this.mapper = new ObjectMapper();
+
+            this.mapper.setAnnotationIntrospector(createJaxbJacksonAnnotationIntrospector());
+
+            // シリアライズ: null フィールドを表示しない
+            this.mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+            // シリアライズ: フィールドを持たないクラスをエラーとしない
+            this.mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+            // デシリアライズ: クラスに対応するフィールドない JSON が来た時に無視する。
+            this.mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        }
+
+        @Override
+        public ObjectMapper getContext(Class<?> type) {
+            return mapper;
+        }
+
+        private static AnnotationIntrospector createJaxbJacksonAnnotationIntrospector() {
+            AnnotationIntrospector jaxbIntrospector = new JaxbAnnotationIntrospector(TypeFactory.defaultInstance());
+            AnnotationIntrospector jacksonIntrospector = new JacksonAnnotationIntrospector();
+
+            return AnnotationIntrospector.pair(jacksonIntrospector, jaxbIntrospector);
         }
     }
 }
