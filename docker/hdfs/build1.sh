@@ -22,6 +22,7 @@ yum makecache -y
 yum install -y sudo rsyslog openssh bash openssl rsync openssh-server openssh-clients
 yum install -y less wget which telnet net-tools bind-utils
 yum install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel java-1.8.0-openjdk-headless
+yum install -y krb5-workstation
 
 echo "export JAVA_HOME=/usr/lib/jvm/java-1.8.0/" >> /root/.bashrc
 
