@@ -15,4 +15,4 @@ sudo docker run -ti \
      -p 8020:8020 \
      -p 9000:9000 \
      --name hdfs-server \
-     hdfs
+     nminoru/hadoop

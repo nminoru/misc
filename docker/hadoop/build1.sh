@@ -12,6 +12,8 @@ echo -e "root:root" | chpasswd
 useradd hadoop
 useradd hdfs
 
+echo "hadoop ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
 yum install -y yum-plugin-priorities
 yum install -y yum-utils
 yum install -y createrepo

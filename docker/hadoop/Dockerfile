@@ -43,16 +43,17 @@ COPY ./hdfs.service        /tmp/hdfs.service
 
 RUN  /tmp/build1.sh
 
-COPY --from=builder --chown=hdfs:hdfs /tmp/base1/hadoop-3.3.0                        /opt/hadoop/hadoop-3.3.0
-COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.3.0/share/hadoop/common    /opt/hadoop/hadoop-3.3.0/share/hadoop/common
-COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.3.0/share/hadoop/client    /opt/hadoop/hadoop-3.3.0/share/hadoop/client
-COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.3.0/share/hadoop/tools     /opt/hadoop/hadoop-3.3.0/share/hadoop/tools
-COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.3.0/share/hadoop/mapreduce /opt/hadoop/hadoop-3.3.0/share/hadoop/mapreduce
-COPY --from=builder --chown=hdfs:hdfs /tmp/base2/hadoop-3.3.0/share/hadoop/yarn      /opt/hadoop/hadoop-3.3.0/share/hadoop/yarn
+COPY --from=builder --chown=hadoop:hadoop /tmp/base1/hadoop-3.3.0                        /opt/hadoop/hadoop-3.3.0
+COPY --from=builder --chown=hadoop:hadoop /tmp/base2/hadoop-3.3.0/share/doc              /opt/hadoop/hadoop-3.3.0/share/doc
+COPY --from=builder --chown=hadoop:hadoop /tmp/base2/hadoop-3.3.0/share/hadoop/common    /opt/hadoop/hadoop-3.3.0/share/hadoop/common
+COPY --from=builder --chown=hadoop:hadoop /tmp/base2/hadoop-3.3.0/share/hadoop/client    /opt/hadoop/hadoop-3.3.0/share/hadoop/client
+COPY --from=builder --chown=hadoop:hadoop /tmp/base2/hadoop-3.3.0/share/hadoop/tools     /opt/hadoop/hadoop-3.3.0/share/hadoop/tools
+COPY --from=builder --chown=hadoop:hadoop /tmp/base2/hadoop-3.3.0/share/hadoop/mapreduce /opt/hadoop/hadoop-3.3.0/share/hadoop/mapreduce
+COPY --from=builder --chown=hadoop:hadoop /tmp/base2/hadoop-3.3.0/share/hadoop/yarn      /opt/hadoop/hadoop-3.3.0/share/hadoop/yarn
 
 RUN  /tmp/build2.sh
 
-USER hdfs
+USER hadoop
 
 RUN  /tmp/user_hdfs.sh
 
