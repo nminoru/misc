@@ -4,7 +4,7 @@ COPY ./hadoop-3.3.0.tar.gz /tmp/hadoop-3.3.0.tar.gz
 
 WORKDIR /tmp
 
-RUN mkdir -p /tmp/base1 /tmp/base2
+RUN mkdir -p /app /tmp/base1 /tmp/base2
 
 RUN cd /tmp/base1 && \
     tar xvf /tmp/hadoop-3.3.0.tar.gz
@@ -34,12 +34,13 @@ RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
     rm -f /lib/systemd/system/basic.target.wants/*;\
     rm -f /lib/systemd/system/anaconda.target.wants/*;
 
-COPY ./core-site.xml       /tmp/core-site.xml
-COPY ./hdfs-site.xml       /tmp/hdfs-site.xml
 COPY ./build1.sh           /tmp/build1.sh
 COPY ./build2.sh           /tmp/build2.sh
-COPY ./user_hdfs.sh        /tmp/user_hdfs.sh
-COPY ./hdfs.service        /tmp/hdfs.service
+
+COPY ./core-site.xml       /app/core-site.xml
+COPY ./hdfs-site.xml       /app/hdfs-site.xml
+COPY ./user_hdfs.sh        /app/user_hdfs.sh
+COPY ./hdfs.service        /app/hdfs.service
 
 RUN  /tmp/build1.sh
 
@@ -55,7 +56,7 @@ RUN  /tmp/build2.sh
 
 USER hadoop
 
-RUN  /tmp/user_hdfs.sh
+RUN  /app/user_hdfs.sh
 
 USER root
 
