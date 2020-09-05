@@ -28,6 +28,7 @@
     <module>jersey_test</module>
     <module>jjwt_test</module>
     <module>jsonb_test</module>
+    <module>jsql_parser_test</module>
     <module>kerby_test</module>
     <module>parquet_test</module>
     <module>postgresql_jdbc_test</module>
