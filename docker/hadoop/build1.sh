@@ -5,7 +5,7 @@ set -eux
 ldconfig
 
 echo "export LANG=ja_JP.UTF-8" >  /etc/locale.conf
-echo "export LANG=ja_JP.UTF-8" >> /root/.bash_profile
+echo "export LANG=ja_JP.UTF-8" >> /root/.bashrc
 
 echo -e "root:root" | chpasswd
 
@@ -26,7 +26,7 @@ yum install -y less wget which telnet net-tools bind-utils
 yum install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel java-1.8.0-openjdk-headless
 yum install -y krb5-workstation
 
-echo "export JAVA_HOME=/usr/lib/jvm/java-1.8.0/" >> /root/.bashrc
+# echo "export JAVA_HOME=/usr/lib/jvm/java-1.8.0/" >> /root/.bashrc
 
 rm -f /root/.ssh/id_rsa
 ssh-keygen -q -N "" -f /root/.ssh/id_rsa

@@ -1,4 +1,4 @@
-FROM alpine AS builder
+FROM centos:7 AS builder
 
 COPY ./hadoop-3.3.0.tar.gz /tmp/hadoop-3.3.0.tar.gz
 
@@ -34,6 +34,8 @@ RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
     rm -f /lib/systemd/system/basic.target.wants/*;\
     rm -f /lib/systemd/system/anaconda.target.wants/*;
 
+COPY ./hadoop.sh           /etc/profile.d/
+
 COPY ./build1.sh           /tmp/build1.sh
 COPY ./build2.sh           /tmp/build2.sh
 
@@ -66,4 +68,3 @@ EXPOSE 88 749 50010 50020 50070 50075 50090 8020 9000
 VOLUME [ "/sys/fs/cgroup"]
 
 CMD ["/usr/sbin/init"]
-

@@ -15,5 +15,5 @@ USER root
 
 FROM common AS datanode
 
-COPY ./core-site.xml         /opt/hadoop/hadoop-3.3.0/etc/hadoop/core-site.xml
-COPY ./datanodehdfs-site.xml /opt/hadoop/hadoop-3.3.0/etc/hadoop/hdfs-site.xml
+COPY ./core-site.xml          /opt/hadoop/hadoop-3.3.0/etc/hadoop/core-site.xml
+COPY ./datanode/hdfs-site.xml /opt/hadoop/hadoop-3.3.0/etc/hadoop/hdfs-site.xml
