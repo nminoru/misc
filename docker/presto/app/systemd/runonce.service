@@ -1,0 +1,10 @@
+[Unit]
+Description=Run once
+Requires=network-online.target
+After=network-online.target mysqld.service
+
+[Service]
+ExecStart=/bin/bash -c "/app/runonce.sh && systemctl disable runonce.service"
+
+[Install]
+WantedBy=multi-user.target

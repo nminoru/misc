@@ -1,0 +1,13 @@
+[Unit]
+Description=Presto
+After=syslog.target network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/presto-server-0.241/bin/launcher run
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

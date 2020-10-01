@@ -1,0 +1,4 @@
+CREATE DATABASE test DEFAULT character SET utf8;
+
+CREATE USER "tester"@"%" IDENTIFIED BY 'k9yuDsfnMy$';
+GRANT ALL PRIVILEGES ON *.* TO "tester"@"%" WITH GRANT OPTION;
