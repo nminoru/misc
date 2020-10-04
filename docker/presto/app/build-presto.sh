@@ -4,7 +4,8 @@ set -eux
 
 cd /tmp
 
-wget https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.241/presto-server-0.241.tar.gz
+# wget https://repo1.maven.org/maven2/com/facebook/presto/presto-server/0.241/presto-server-0.241.tar.gz
+wget http://katsuo:katsuo@centos7.nminoru.jp:18081/repository/documentation/presto-server-0.241.tar.gz
 
 cd /opt
 

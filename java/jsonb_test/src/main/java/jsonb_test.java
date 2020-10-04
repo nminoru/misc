@@ -86,7 +86,7 @@ public class jsonb_test {
 
         System.out.println("test1: " + result);
 
-        dog = jsonb.fromJson(result, Dog.class);
+        dog = jsonb.fromJson((String)null, Dog.class);
     }
 
     /**

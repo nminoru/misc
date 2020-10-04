@@ -16,8 +16,8 @@ RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
 COPY ./app/ /app/
 
 RUN /app/build-base.sh
-RUN /app/build-postgresql.sh
-RUN /app/build-mysql.sh
+# RUN /app/build-postgresql.sh
+# RUN /app/build-mysql.sh
 RUN /app/build-presto.sh
 
 COPY /app/systemd/runonce.service /etc/systemd/system/runonce.service

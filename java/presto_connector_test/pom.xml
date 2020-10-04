@@ -12,16 +12,16 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <java.version>1.8</java.version>
-    <presto.version>0.240</presto.version>
+    <presto.version>0.241</presto.version>
   </properties>
 
   <dependencies>
 
     <dependency>
       <groupId>com.facebook.presto</groupId>
-      <artifactId>presto-spi</artifactId>
+      <artifactId>presto-jdbc</artifactId>
       <version>${presto.version}</version>
-      <scope>provided</scope>
+      <!-- <scope>provided</scope> -->
     </dependency>
 
     <!-- JUnit -->
