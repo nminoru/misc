@@ -14,6 +14,7 @@ import com.azure.storage.file.datalake.DataLakeServiceClient;
 import com.azure.storage.file.datalake.DataLakeServiceClientBuilder;
 import com.azure.storage.file.datalake.models.ListPathsOptions;
 import com.azure.storage.file.datalake.models.PathItem;
+import com.azure.storage.file.datalake.models.PathProperties;
 import org.apache.commons.io.IOUtils;
 
 
@@ -47,6 +48,9 @@ public class ClientTest {
 
         DataLakeFileSystemClient dataLakeFileSystemClient =
             dataLakeServiceClient.getFileSystemClient(ContainerName);
+
+        DataLakeDirectoryClient directoryClient = dataLakeFileSystemClient.getDirectoryClient("");
+        PathProperties properties = directoryClient.getProperties();
 
         ListPathsOptions listPathsOptions = new ListPathsOptions();
         listPathsOptions.setPath("");

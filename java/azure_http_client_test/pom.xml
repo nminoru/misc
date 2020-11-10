@@ -4,10 +4,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>jp.nminoru</groupId>
-  <artifactId>azure_datalake_storage_test</artifactId>
+  <artifactId>azure_http_client_test</artifactId>
   <packaging>jar</packaging>
   <version>0.0.1</version>
-  <name>azure_datalake_storage_test</name>
+  <name>azure_http_client_test</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -16,18 +16,11 @@
 
   <dependencies>
 
-    <!-- Apache Commons -->
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>2.7</version>
-    </dependency>
-
-    <!-- Azure Data Lake Storage(Gen2) -->
+    <!-- Microsoft Azure Netty HTTP Client Library -->
     <dependency>
       <groupId>com.azure</groupId>
-      <artifactId>azure-storage-file-datalake</artifactId>
-      <version>12.2.0</version>
+      <artifactId>azure-core-http-netty</artifactId>
+      <version>1.6.3</version>
     </dependency>
     
     <!-- Logging -->
@@ -72,7 +65,7 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>jp.nminoru.azure_datalake_storage_test.ClientTest</mainClass>
+          <mainClass>jp.nminoru.azure_http_client_test.ClientTest</mainClass>
         </configuration>
       </plugin>
 
