@@ -2,6 +2,8 @@
 
 set -eux
 
+echo init-kdc.sh
+
 /usr/sbin/kdb5_util -r EXAMPLE.COM -P changeme create -s
 
 /usr/sbin/kadmin.local -q "addprinc -pw password root/admin"

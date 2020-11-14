@@ -7,10 +7,12 @@ ldconfig
 echo "export LANG=ja_JP.UTF-8" >  /etc/locale.conf
 echo "export LANG=ja_JP.UTF-8" >> /root/.bashrc
 
-echo -e "root:root" | chpasswd
-
 useradd hadoop
 useradd hdfs
+
+echo -e "root:root"     | chpasswd
+echo -e "hadoop:hadoop" | chpasswd
+echo -e "hdfs:hdfs"     | chpasswd
 
 echo "hadoop ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
@@ -22,11 +24,9 @@ yum clean all
 yum makecache -y
 
 yum install -y sudo rsyslog openssh bash openssl rsync openssh-server openssh-clients
-yum install -y less wget which telnet net-tools bind-utils
+yum install -y less wget curl which telnet net-tools bind-utils
 yum install -y java-1.8.0-openjdk java-1.8.0-openjdk-devel java-1.8.0-openjdk-headless
 yum install -y krb5-workstation
-
-# echo "export JAVA_HOME=/usr/lib/jvm/java-1.8.0/" >> /root/.bashrc
 
 rm -f /root/.ssh/id_rsa
 ssh-keygen -q -N "" -f /root/.ssh/id_rsa

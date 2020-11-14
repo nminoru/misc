@@ -22,7 +22,9 @@ RUN echo -e "bob:bob"     | chpasswd
 RUN yum install -y httpd httpd-tools mailcap apr apr-util mod_auth_kerb rsyslog bind-utils krb5-server krb5-libs krb5-workstation krb5-libs dnsmasq less curl
 
 
-
+#
+#
+#
 FROM builder AS kdc
 
 COPY ./kdc/init-kdc.sh          /init-kdc.sh
@@ -48,7 +50,9 @@ VOLUME [ "/sys/fs/cgroup"]
 CMD ["/usr/sbin/init"]
 
 
-
+#
+#
+#
 FROM builder AS http
 
 COPY ./kdc/krb5.conf      /etc/krb5.conf
@@ -67,7 +71,9 @@ VOLUME [ "/sys/fs/cgroup"]
 CMD ["/usr/sbin/init"]
 
 
-
+#
+#
+#
 FROM builder AS client
 
 COPY ./kdc/krb5.conf      /etc/krb5.conf

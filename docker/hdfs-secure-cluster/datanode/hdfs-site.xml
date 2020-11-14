@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+  <property>
+    <name>dfs.data.dir</name>
+    <value>/opt/hadoop/hadoop-3.3.0/var/lib/hdfs/data</value>
+  </property>
+  
+  <property>
+    <name>dfs.replication</name>
+    <value>1</value>
+  </property>
+
+  <property>
+    <name>dfs.datanode.keytab.file</name>
+    <value>/var/keytabs/hadoop.keytab</value>
+  </property>
+  
+  <property>
+    <name>dfs.datanode.kerberos.principal</name>
+    <value>hdfs/_HOST@EXAMPLE.COM</value>
+  </property>  
+</configuration>

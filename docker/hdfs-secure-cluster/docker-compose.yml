@@ -1,0 +1,85 @@
+version: "3.7"
+
+services:
+  kdc:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: kdc
+    cap_add:
+      - NET_ADMIN
+    domainname: example.com
+    hostname: kdc
+    networks:
+      app_net:
+        ipv4_address: 172.32.0.2
+    dns:
+      - 172.32.0.2
+    dns_search:
+      - example.com
+    tmpfs:
+      - /run
+      - /run/lock
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - server-keytab:/var/keytabs
+      
+  namenode:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: namenode
+    domainname: example.com
+    hostname: namenode
+    networks:
+      app_net:
+        ipv4_address: 172.32.0.3
+    dns:
+      - 172.32.0.2
+    dns_search:
+      - example.com
+    ports:
+      - 8020:8020
+      - 9000:9000
+      - 50010:50010
+      - 50020:50020
+      - 50070:50070
+      - 50075:50075
+      - 50090:50090
+    tmpfs:
+      - /run
+      - /run/lock
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+      - server-keytab:/var/keytabs
+      
+  datanode:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: datanode
+    domainname: example.com
+    hostname: datanode
+    networks:
+      app_net:
+        ipv4_address: 172.32.0.4
+    dns:
+      - 172.32.0.2
+    dns_search:
+      - example.com    
+    tmpfs:
+      - /run
+      - /run/lock
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro      
+      - server-keytab:/var/keytabs
+      
+networks:
+  app_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.32.0.0/24
+        
+volumes:
+  server-keytab:
