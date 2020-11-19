@@ -14,6 +14,8 @@
     <module>amazon_s3_test</module>
     <module>atlas_test</module>
     <module>azure_blob_storage_test</module>
+    <module>azure_datalake_storage_test</module>
+    <module>azure_http_client_test</module>
     <module>bcrypt_test</module>
     <module>csv_test</module>
     <module>docker_test</module>
@@ -30,6 +32,8 @@
     <module>jsonb_test</module>
     <module>jsql_parser_test</module>
     <module>kerby_test</module>
+    <!-- <module>marklogic_sql_jdbc_test</module> -->
+    <!-- <module>method_tracer</module> -->
     <module>parquet_test</module>
     <module>postgresql_jdbc_test</module>
     <module>request_forward_test</module>
@@ -38,6 +42,7 @@
     <module>smbj_test</module>
     <module>sort_test</module>
     <module>websocket_test</module>
+    <!-- <module>zip_compress</module> -->
   </modules>
 
 </project>
