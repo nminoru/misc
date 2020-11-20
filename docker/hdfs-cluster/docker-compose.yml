@@ -11,6 +11,7 @@ services:
     ports:
       - 8020:8020
       - 9000:9000
+      - 9870:9870
       - 50010:50010
       - 50020:50020
       - 50070:50070
@@ -33,7 +34,7 @@ services:
       - /run
       - /run/lock
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro      
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
 networks:
   network1:

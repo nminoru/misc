@@ -2,30 +2,36 @@
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 
 <configuration>
+
+  <!-- NameNode  -->
+
   <property>
     <name>dfs.block.access.token.enable</name>
     <value>true</value>
   </property>
-  
-  <!-- NameNode  -->
-  
+
+  <property>
+    <name>dfs.namenode.kerberos.principal</name>
+    <value>nn/_HOST@EXAMPLE.COM</value>
+  </property>
+
   <property>
     <name>dfs.namenode.keytab.file</name>
     <value>/var/keytabs/hadoop.keytab</value>
   </property>
-  
-  <property>
-    <name>dfs.namenode.kerberos.principal</name>
-    <value>hdfs/_HOST@EXAMPLE.COM</value>
-  </property>
-  
+
   <property>
     <name>dfs.namenode.kerberos.internal.spnego.principal</name>
     <value>HTTP/_HOST@EXAMPLE.COM</value>
-  </property>  
+  </property>
+
+  <property>
+    <name>dfs.web.authentication.kerberos.keytab</name>
+    <value>/var/keytabs/hadoop.keytab</value>
+  </property>
 
   <!-- DataNode -->
-  
+
   <property>
     <name>dfs.name.dir</name>
     <value>/opt/hadoop/hadoop-3.3.0/var/lib/hdfs/name</value>
@@ -37,18 +43,25 @@
   </property>
 
   <property>
+    <name>dfs.datanode.kerberos.principal</name>
+    <value>dn/_HOST@EXAMPLE.COM</value>
+  </property>
+
+  <property>
     <name>dfs.datanode.keytab.file</name>
     <value>/var/keytabs/hadoop.keytab</value>
   </property>
-  
-  <property>
-    <name>dfs.datanode.kerberos.principal</name>
-    <value>hdfs/_HOST@EXAMPLE.COM</value>
-  </property>
 
-  <!-- Web  -->
+  <!-- WebHDFS -->
+
   <property>
     <name>dfs.web.authentication.kerberos.principal</name>
     <value>HTTP/_HOST@EXAMPLE.COM</value>
-  </property>  
+  </property>
+
+  <property>
+    <name>dfs.web.authentication.kerberos.keytab</name>
+    <value>/var/keytabs/hadoop.keytab</value>
+  </property>
+  
 </configuration>

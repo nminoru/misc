@@ -23,7 +23,7 @@ services:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
       - server-keytab:/var/keytabs
-      
+
   namenode:
     build:
       context: .
@@ -41,6 +41,7 @@ services:
     ports:
       - 8020:8020
       - 9000:9000
+      - 9870:9870
       - 50010:50010
       - 50020:50020
       - 50070:50070
@@ -52,7 +53,7 @@ services:
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
       - server-keytab:/var/keytabs
-      
+
   datanode:
     build:
       context: .
@@ -66,20 +67,20 @@ services:
     dns:
       - 172.32.0.2
     dns_search:
-      - example.com    
+      - example.com
     tmpfs:
       - /run
       - /run/lock
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro      
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
       - server-keytab:/var/keytabs
-      
+
 networks:
   app_net:
     ipam:
       driver: default
       config:
         - subnet: 172.32.0.0/24
-        
+
 volumes:
   server-keytab:

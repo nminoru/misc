@@ -2,18 +2,37 @@
 <?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 
 <configuration>
+  
   <property>
     <name>hadoop.security.authentication</name>
-    <value>kerberos</value> 
+    <value>kerberos</value>
   </property>
 
   <property>
     <name>hadoop.security.authorization</name>
     <value>true</value>
   </property>
-  
+
   <property>
     <name>fs.defaultFS</name>
     <value>hdfs://namenode.example.com:9000</value>
   </property>
+
+  <!-- HTTP Web-consoles -->
+
+  <property>
+    <name>hadoop.http.authentication.type</name>
+    <value>kerberos</value>
+  </property>
+  
+  <property>
+    <name>hadoop.http.authentication.kerberos.principal</name>
+    <value>HTTP/_HOST@EXAMPLE.COM</value>
+  </property>
+
+  <property>
+    <name>hadoop.http.authentication.kerberos.keytab</name>
+    <value>/var/keytabs/hadoop.keytab</value>
+  </property>  
+  
 </configuration>
