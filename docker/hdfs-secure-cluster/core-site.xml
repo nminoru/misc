@@ -18,6 +18,16 @@
     <value>hdfs://namenode.example.com:9000</value>
   </property>
 
+  <property>
+    <name>hadoop.security.auth_to_local</name>
+    <value>
+      RULE:[2:$1/$2@$0]([ndj]n/.*@EXAMPLE\.COM)s/.*/hdfs/
+      RULE:[2:$1/$2@$0]([rn]m/.*@EXAMPLE\.COM)s/.*/yarn/
+      RULE:[2:$1/$2@$0](jhs/.*@EXAMPLE\.COM)s/.*/mapred/
+      DEFAULT
+    </value>
+  </property>  
+
   <!-- HTTP Web-consoles -->
 
   <property>
