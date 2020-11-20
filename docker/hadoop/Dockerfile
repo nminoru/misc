@@ -4,7 +4,7 @@ COPY ./hadoop-3.3.0.tar.gz /tmp/hadoop-3.3.0.tar.gz
 
 WORKDIR /tmp
 
-RUN mkdir -p /app /tmp/base1 /tmp/base2
+RUN mkdir -p /tmp/base1 /tmp/base2
 
 RUN cd /tmp/base1 && \
     tar xvf /tmp/hadoop-3.3.0.tar.gz
@@ -34,17 +34,11 @@ RUN (cd /lib/systemd/system/sysinit.target.wants/; for i in *; do [ $i == \
     rm -f /lib/systemd/system/basic.target.wants/*;\
     rm -f /lib/systemd/system/anaconda.target.wants/*;
 
-COPY ./hadoop.sh           /etc/profile.d/
+COPY ./app /app
+COPY ./app/hadoop.sh    /etc/profile.d/
+COPY ./app/hdfs.service /etc/systemd/system/hdfs.service
 
-COPY ./build1.sh           /tmp/build1.sh
-COPY ./build2.sh           /tmp/build2.sh
-
-COPY ./core-site.xml       /app/core-site.xml
-COPY ./hdfs-site.xml       /app/hdfs-site.xml
-COPY ./user_hdfs.sh        /app/user_hdfs.sh
-COPY ./hdfs.service        /app/hdfs.service
-
-RUN  /tmp/build1.sh
+RUN  /app/build1.sh
 
 COPY --from=builder --chown=hadoop:hadoop /tmp/base1/hadoop-3.3.0                        /opt/hadoop/hadoop-3.3.0
 COPY --from=builder --chown=hadoop:hadoop /tmp/base2/hadoop-3.3.0/share/doc              /opt/hadoop/hadoop-3.3.0/share/doc
@@ -54,7 +48,7 @@ COPY --from=builder --chown=hadoop:hadoop /tmp/base2/hadoop-3.3.0/share/hadoop/t
 COPY --from=builder --chown=hadoop:hadoop /tmp/base2/hadoop-3.3.0/share/hadoop/mapreduce /opt/hadoop/hadoop-3.3.0/share/hadoop/mapreduce
 COPY --from=builder --chown=hadoop:hadoop /tmp/base2/hadoop-3.3.0/share/hadoop/yarn      /opt/hadoop/hadoop-3.3.0/share/hadoop/yarn
 
-RUN  /tmp/build2.sh
+RUN  /app/build2.sh
 
 USER hadoop
 

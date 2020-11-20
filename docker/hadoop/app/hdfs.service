@@ -4,12 +4,14 @@ After=syslog.target network.target sshd.target
 
 [Service]
 Environment="JAVA_HOME=/usr/lib/jvm/java-1.8.0/"
-Type=simple
+Type=oneshot
 ExecStart=/opt/hadoop/hadoop-3.3.0/sbin/start-dfs.sh
 ExecStop=/opt/hadoop/hadoop-3.3.0/sbin/stop-dfs.sh
 # Restart=always
 Restart=no
-User=hdfs
+User=hadoop
+# SuccessExitStatus=3
+RemainAfterExit=yes
 
 [Install]
 WantedBy=multi-user.target
