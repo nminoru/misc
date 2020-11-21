@@ -17,6 +17,11 @@ services:
       - 172.32.0.2
     dns_search:
       - example.com
+    ports:
+      - 88:88
+      - 88:88/udp    
+      - 749:749
+      - 749:749/udp      
     tmpfs:
       - /run
       - /run/lock

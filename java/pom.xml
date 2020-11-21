@@ -41,6 +41,7 @@
     <module>sardine_test</module>
     <module>smbj_test</module>
     <module>sort_test</module>
+    <module>spnego_test</module>        
     <module>websocket_test</module>
     <!-- <module>zip_compress</module> -->
   </modules>
