@@ -19,7 +19,9 @@ services:
       - example.com
     ports:
       - 88:88
+      - 88:88/udp    
       - 749:749
+      - 749:749/udp
     tmpfs:
       - /run
       - /run/lock
