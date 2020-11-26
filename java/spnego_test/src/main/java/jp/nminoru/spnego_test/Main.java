@@ -158,13 +158,12 @@ public class Main {
             serviceName = gssManager.createName(servicePrincipal,
                                                 GSSName.NT_HOSTBASED_SERVICE);
 
-            gssContext  = gssManager.createContext(serviceName,
-                                                   // GSS_KRB5_MECH_OID,
-                                                   SPNEGO_OID,
-                                                   null,
-                                                   GSSContext.DEFAULT_LIFETIME);
-            gssContext.requestCredDeleg(true);
-            gssContext.requestMutualAuth(true);
+            gssContext  = createGSSContext(gssManager, serviceName, SPNEGO_OID);
+            if (gssContext == null)
+                gssContext = createGSSContext(gssManager, serviceName, GSS_KRB5_MECH_OID);
+
+            if (gssContext == null)
+                throw new RuntimeException("unknown error");
 
             byte[]  inToken = new byte[0];
             byte[]  outToken;
@@ -174,8 +173,6 @@ public class Main {
 
          loop:
             while (!established) {
-                System.out.println("### STEP (count: " + count + ") ###");
-
                 outToken = gssContext.initSecContext(inToken, 0, inToken.length);
 
                 try (CloseableHttpClient httpClient =
@@ -233,6 +230,25 @@ public class Main {
                 gssContext = null;
             }
         }
+    }
+
+    GSSContext createGSSContext(GSSManager gssManager, GSSName serviceName, Oid oid) throws GSSException {
+        GSSContext gssContext = null;
+
+        try {
+            gssContext  = gssManager.createContext(serviceName, oid,
+                                                   null,
+                                                   GSSContext.DEFAULT_LIFETIME);
+            gssContext.requestCredDeleg(true);
+            gssContext.requestMutualAuth(true);
+        } catch (GSSException e) {
+            if (e.getMajor() == GSSException.BAD_MECH)
+                return null;
+            else
+                throw e;
+        }
+
+        return gssContext;
     }
 
     static class UserPasswordCallbackHandler implements CallbackHandler {
