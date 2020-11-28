@@ -1,0 +1,50 @@
+□
+
+status: 403
+Content-Length: 644
+Content-Type: application/xml
+Server: Microsoft-HTTPAPI/2.0
+x-ms-request-id: a3b3ce5f-801e-004d-28f5-c51022000000
+x-ms-error-code: AuthenticationFailed
+Date: Sun, 29 Nov 2020 02:15:20 GMT
+﻿<?xml version="1.0" encoding="utf-8"?><Error><Code>AuthenticationFailed</Code><Message>Server failed to authenticate the request. Make sure the value of Authorization header is formed correctly including the signature.
+RequestId:a3b3ce5f-801e-004d-28f5-c51022000000
+Time:2020-11-29T02:15:21.3325643Z</Message><AuthenticationErrorDetail>The MAC signature found in the HTTP request 'dAK/9zHZB8O3l7yh+i39Ff8OSxEjjB6x50EdLoBycyA=' is not the same as any computed signature. Server used following string to sign: 'GET
+
+
+
+x-ms-date:Sun, 29 Nov 2020 02:15:21 GMT
+x-ms-version:2019-12-12
+/nminoru/test?comp=list'.</AuthenticationErrorDetail></Error>
+
+
+
+□
+
+status: 200
+Content-Length: 0
+Last-Modified: Thu, 26 Nov 2020 12:31:16 GMT
+ETag: "0x8D892072B7799D4"
+Server: Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0
+x-ms-request-id: d8608ca9-201e-0062-4bf5-c59118000000
+x-ms-version: 2019-12-12
+x-ms-lease-status: unlocked
+x-ms-lease-state: available
+x-ms-has-immutability-policy: false
+x-ms-has-legal-hold: false
+x-ms-default-encryption-scope: $account-encryption-key
+x-ms-deny-encryption-scope-override: false
+Date: Sun, 29 Nov 2020 02:15:41 GMT
+
+
+
+□ 
+
+status: 200
+Transfer-Encoding: chunked
+Content-Type: application/xml
+Server: Windows-Azure-Blob/1.0 Microsoft-HTTPAPI/2.0
+x-ms-request-id: 21a3066d-b01e-00c6-60f5-c5abfc000000
+x-ms-version: 2019-12-12
+Date: Sun, 29 Nov 2020 02:15:41 GMT
+﻿<?xml version="1.0" encoding="utf-8"?><EnumerationResults ServiceEndpoint="https://nminoru.blob.core.windows.net/" ContainerName="test"><Blobs><Blob><Name>details.txt</Name><Properties><Creation-Time>Thu, 26 Nov 2020 12:34:04 GMT</Creation-Time><Last-Modified>Thu, 26 Nov 2020 12:34:04 GMT</Last-Modified><Etag>0x8D892078F8E8666</Etag><Content-Length>423</Content-Length><Content-Type>text/plain</Content-Type><Content-Encoding /><Content-Language /><Content-CRC64 /><Content-MD5>rNFY1LyUsGOfuydYg8vGNg==</Content-MD5><Cache-Control /><Content-Disposition /><BlobType>BlockBlob</BlobType><AccessTier>Hot</AccessTier><AccessTierInferred>true</AccessTierInferred><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><ServerEncrypted>true</ServerEncrypted></Properties><OrMetadata /></Blob><Blob><Name>folder1</Name><Properties><Creation-Time>Sun, 29 Nov 2020 02:14:23 GMT</Creation-Time><Last-Modified>Sun, 29 Nov 2020 02:14:23 GMT</Last-Modified><Etag>0x8D8940C7D8498CE</Etag><Content-Length>0</Content-Length><Content-Type>application/json; charset=utf-8</Content-Type><Content-Encoding /><Content-Language /><Content-CRC64>AAAAAAAAAAA=</Content-CRC64><Content-MD5 /><Cache-Control /><Content-Disposition /><BlobType>BlockBlob</BlobType><AccessTier>Hot</AccessTier><AccessTierInferred>true</AccessTierInferred><LeaseStatus>unlocked</LeaseStatus><LeaseState>available</LeaseState><ServerEncrypted>true</ServerEncrypted></Properties><OrMetadata /></Blob></Blobs><NextMarker /></EnumerationResults>

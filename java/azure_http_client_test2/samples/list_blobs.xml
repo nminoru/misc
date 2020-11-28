@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EnumerationResults ServiceEndpoint="https://nminoru.blob.core.windows.net/" ContainerName="test">
+  <Blobs>
+    <Blob>
+      <Name>details.txt</Name>
+      <Properties>
+        <Creation-Time>Thu, 26 Nov 2020 12:34:04 GMT</Creation-Time>
+        <Last-Modified>Thu, 26 Nov 2020 12:34:04 GMT</Last-Modified>
+        <Etag>0x8D892078F8E8666</Etag>
+        <Content-Length>423</Content-Length>
+        <Content-Type>text/plain</Content-Type>
+        <Content-Encoding />
+        <Content-Language />
+        <Content-CRC64 />
+        <Content-MD5>rNFY1LyUsGOfuydYg8vGNg==</Content-MD5>
+        <Cache-Control />
+        <Content-Disposition />
+        <BlobType>BlockBlob</BlobType>
+        <AccessTier>Hot</AccessTier>
+        <AccessTierInferred>true</AccessTierInferred>
+        <LeaseStatus>unlocked</LeaseStatus>
+        <LeaseState>available</LeaseState>
+        <ServerEncrypted>true</ServerEncrypted>
+      </Properties>
+      <OrMetadata />
+    </Blob>
+    <Blob>
+      <Name>folder1</Name>
+      <Properties>
+        <Creation-Time>Sun, 29 Nov 2020 02:14:23 GMT</Creation-Time>
+        <Last-Modified>Sun, 29 Nov 2020 02:14:23 GMT</Last-Modified>
+        <Etag>0x8D8940C7D8498CE</Etag>
+        <Content-Length>0</Content-Length>
+        <Content-Type>application/json; charset=utf-8</Content-Type>
+        <Content-Encoding />
+        <Content-Language />
+        <Content-CRC64>AAAAAAAAAAA=</Content-CRC64>
+        <Content-MD5 />
+        <Cache-Control />
+        <Content-Disposition />
+        <BlobType>BlockBlob</BlobType>
+        <AccessTier>Hot</AccessTier>
+        <AccessTierInferred>true</AccessTierInferred>
+        <LeaseStatus>unlocked</LeaseStatus>
+        <LeaseState>available</LeaseState>
+        <ServerEncrypted>true</ServerEncrypted>
+      </Properties>
+      <OrMetadata />
+    </Blob>
+  </Blobs>
+  <NextMarker />
+</EnumerationResults>

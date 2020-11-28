@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<EnumerationResults ServiceEndpoint="https://nminoru.blob.core.windows.net/" ContainerName="test">
+  <Delimiter>/</Delimiter>
+  <Blobs>
+    <Blob>
+      <Name>details.txt</Name>
+      <Properties>
+        <Creation-Time>Sun, 29 Nov 2020 11:06:20 GMT</Creation-Time>
+        <Last-Modified>Sun, 29 Nov 2020 11:06:20 GMT</Last-Modified>
+        <Etag>0x8D89456CD19BB8C</Etag>
+        <Content-Length>423</Content-Length>
+        <Content-Type>text/plain</Content-Type>
+        <Content-Encoding />
+        <Content-Language />
+        <Content-CRC64 />
+        <Content-MD5>rNFY1LyUsGOfuydYg8vGNg==</Content-MD5>
+        <Cache-Control />
+        <Content-Disposition />
+        <BlobType>BlockBlob</BlobType>
+        <AccessTier>Hot</AccessTier>
+        <AccessTierInferred>true</AccessTierInferred>
+        <LeaseStatus>unlocked</LeaseStatus>
+        <LeaseState>available</LeaseState>
+        <ServerEncrypted>true</ServerEncrypted>
+      </Properties>
+      <OrMetadata />
+    </Blob>
+    <BlobPrefix>
+      <Name>folder1/</Name>
+    </BlobPrefix>
+    <BlobPrefix>
+      <Name>test/</Name>
+    </BlobPrefix>
+  </Blobs>
+  <NextMarker />
+</EnumerationResults>
