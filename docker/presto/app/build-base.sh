@@ -2,7 +2,6 @@
 
 set -eux
 
-# echo -e "root:3E6hW2qr2V$" | chpasswd
 echo -e "root:root" | chpasswd
 
 yum clean all
