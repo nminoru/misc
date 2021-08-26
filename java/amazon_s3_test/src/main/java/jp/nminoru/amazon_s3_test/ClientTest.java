@@ -26,51 +26,65 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 public class ClientTest {
 
-    public static String BucketName  = "Bucket";
-    public static String Region      = "Region";
-    public static String AccessKeyId = "AccessKeyId";
-    public static String SecretKey   = "SecretKey";
+    public static String endpoint    = "Endpoint";    
+    public static String bucketName  = "Bucket";
+    public static String region      = "Region";
+    public static String accessKeyId = "AccessKeyId";
+    public static String secretKey   = "SecretKey";
 
     public static void main(String[] args) {
         System.out.println("### start ###");
 
-        BucketName  = System.getenv("AMAZON_S3_BUCKET");
-        Region      = System.getenv("AMAZON_S3_REGION");
-        AccessKeyId = System.getenv("AMAZON_S3_ACCESS_KEY_ID");
-        SecretKey   = System.getenv("AMAZON_S3_SECRET_KEY");
+        endpoint    = System.getenv("AMAZON_S3_ENDPOINT");
+        bucketName  = System.getenv("AMAZON_S3_BUCKET");
+        region      = System.getenv("AMAZON_S3_REGION");
+        accessKeyId = System.getenv("AMAZON_S3_ACCESS_KEY_ID");
+        secretKey   = System.getenv("AMAZON_S3_SECRET_KEY");
 
         ClientConfiguration clientConf = new ClientConfiguration();
 
         BasicAWSCredentials credentials =
-            new BasicAWSCredentials(AccessKeyId, SecretKey);
+            new BasicAWSCredentials(accessKeyId, secretKey);
 
-        AmazonS3 s3 = AmazonS3ClientBuilder.standard()
-            .withRegion(Region)
-            .withClientConfiguration(clientConf)
-            .withCredentials(new AWSStaticCredentialsProvider(credentials))
-            .build();
+        AmazonS3 s3;
 
-        if (s3.doesBucketExistV2(BucketName)) {
+        if (endpoint == null) {
+            s3 = AmazonS3ClientBuilder.standard()
+                .withRegion(region)
+                .withClientConfiguration(clientConf)
+                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                .build();
+        } else {
+            s3 = AmazonS3ClientBuilder.standard()
+                .withEndpointConfiguration(new EndpointConfiguration(endpoint, region))
+                .withClientConfiguration(clientConf)
+                .withCredentials(new AWSStaticCredentialsProvider(credentials))
+                // buckete 名をつけた virtual-host を使わない
+                .withPathStyleAccessEnabled(true)
+                .build();            
+        }
+
+        if (s3.doesBucketExistV2(bucketName)) {
             System.out.println("### have a bucket ###");
 
             System.out.println("### listFolder ###");
-            listFolder(s3, BucketName);
+            listFolder(s3, bucketName);
 
             //
             System.out.println("### createFolder ###");
-            createFolder(s3, BucketName);
+            createFolder(s3, bucketName);
 
             //
             System.out.println("### copyFolder ###");
-            copyFolder(s3, BucketName);
+            copyFolder(s3, bucketName);
 
             //
             System.out.println("### listFolder ###");
-            listFolder(s3, BucketName);
+            listFolder(s3, bucketName);
 
             //
             System.out.println("### etc ###");
-            S3Object object = s3.getObject(new GetObjectRequest(BucketName, "def/"));
+            S3Object object = s3.getObject(new GetObjectRequest(bucketName, "def/"));
             System.out.println("key0:  " + object.getKey());
 
             ObjectMetadata metadata1 = object.getObjectMetadata();
@@ -78,7 +92,7 @@ public class ClientTest {
 
             //
             System.out.println("### removeFolder ###");
-            deleteFolder(s3, BucketName);
+            deleteFolder(s3, bucketName);
         }
 
         System.out.println("### end ###");
@@ -146,13 +160,13 @@ public class ClientTest {
             keys.add(new KeyVersion(summary.getKey()));
 
             if (keys.size() > 0) {
-                deleteObjects(s3, BucketName, keys);
+                deleteObjects(s3, bucketName, keys);
                 keys = new ArrayList<KeyVersion>();
             }
         }
 
         if (keys.size() > 0)
-            deleteObjects(s3, BucketName, keys);
+            deleteObjects(s3, bucketName, keys);
     }
 
     static void deleteObjects(AmazonS3 s3, String bucketName, List<KeyVersion> keys) {
