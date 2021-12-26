@@ -19,27 +19,29 @@ import com.spotify.docker.client.messages.HostConfig;
 import com.spotify.docker.client.messages.NetworkSettings;
 import com.spotify.docker.client.messages.NetworkStats;
 import com.spotify.docker.client.messages.PortBinding;
+import com.spotify.docker.client.messages.Image;
 
 
 public class ClientTest {
 
-    public static final String TARGET_IMAGE_NAME = "jupyter/datascience-notebook";
+    public static final String TARGET_IMAGE_NAME = "jupyter/scipy-notebook:latest";
     // public static final String TARGET_IMAGE_NAME = "busybox";
 
     public static void main(String[] args) throws DockerCertificateException, DockerException, InterruptedException {
         ClientTest clientTest = new ClientTest();
 
-        clientTest.test(TARGET_IMAGE_NAME);
+        // clientTest.test1(TARGET_IMAGE_NAME);
+        clientTest.test2();
     }
 
-    final DockerClient docker;
+    final DockerClient client;
 
     public ClientTest() throws DockerCertificateException, DockerException {
-        // docker = DefaultDockerClient.fromEnv().build();
-        docker = DefaultDockerClient.builder().uri("http://127.0.0.1:2376/").build();
+        // client = DefaultDockerClient.fromEnv().build();
+        client = DefaultDockerClient.builder().uri("http://127.0.0.1:2376/").build();
     }
 
-    public void test(String imageName) throws DockerException, InterruptedException {
+    public void test1(String imageName) throws DockerException, InterruptedException {
 
         // Pull an image
         
@@ -77,9 +79,9 @@ public class ClientTest {
                 })
             .build();
 
-        final ContainerCreation creation = docker.createContainer(containerConfig, "hogehoge");
+        final ContainerCreation creation = client.createContainer(containerConfig, "hogehoge");
         final String containerId = creation.id();
-        final LogStream logs = docker.logs(containerId,
+        final LogStream logs = client.logs(containerId,
                                            DockerClient.LogsParam.stdout(),
                                            DockerClient.LogsParam.stderr(),
                                            DockerClient.LogsParam.follow());
@@ -93,7 +95,7 @@ public class ClientTest {
         // Inspect container
 
         // Start container
-        docker.startContainer(containerId);
+        client.startContainer(containerId);
 
         inspect(containerId);
 
@@ -118,19 +120,19 @@ public class ClientTest {
         System.out.println("Phase: stop container");
         
         // Kill container
-        docker.killContainer(containerId);
+        client.killContainer(containerId);
 
         System.out.println("Phase: remove container");
 
         // Remove container
-        docker.removeContainer(containerId);
+        client.removeContainer(containerId);
 
         // Close the docker client
-        docker.close();
+        client.close();
     }
 
     void inspect(String containerId) throws DockerException, InterruptedException {
-        final ContainerInfo info = docker.inspectContainer(containerId);
+        final ContainerInfo info = client.inspectContainer(containerId);
 
         System.out.println("[Name]");
         System.out.println("\t" + info.name());
@@ -146,7 +148,7 @@ public class ClientTest {
         }
         System.out.println();
 
-        final ContainerStats stats = docker.stats(containerId);
+        final ContainerStats stats = client.stats(containerId);
 
         long rxBytes = 0;        
         long txBytes = 0;
@@ -169,5 +171,36 @@ public class ClientTest {
 
         System.out.println("\trxBytes: " + rxBytes);
         System.out.println("\ttxBytes: " + txBytes);        
+    }
+
+    /**
+     * Docker 20.10 で /images/json のパラメータが使えなくなったのの確認
+     */
+    public void test2() throws DockerException, InterruptedException {
+        List<Image> imageList;
+
+        // byName を指定してイメージをリストアップする
+        imageList = client.listImages(DockerClient.ListImagesParam.byName(TARGET_IMAGE_NAME));
+        for (Image image : imageList) {
+            System.out.println("image: " + image.id());
+            for (String digest : image.repoDigests()) {
+                System.out.println("\tdigest: " + digest);
+            }            
+            for (String tag : image.repoTags()) {
+                System.out.println("\ttag: " + tag);
+            }
+            if (image.labels() != null) {
+                for (Map.Entry<String, String> entry : image.labels().entrySet()) {
+                    System.out.println("\tlabel: " + entry.getKey() + " = " + entry.getValue());
+                }
+            }
+        }
+            
+        // List<Image> images = new ArrayList<>();
+        // List<ListImagesParam> params = new ArrayList<>();
+        // for (Entry<String, String> entry : labels.entrySet()) {
+        // params.add(DockerClient.ListImagesParam.withLabel(entry.getKey(), entry.getValue()));
+        // }
+        // images = client.listImages(params.toArray(new ListImagesParam[0]));        
     }
 }
