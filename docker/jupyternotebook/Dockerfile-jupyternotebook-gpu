@@ -1,0 +1,54 @@
+FROM jupyter/scipy-notebook
+
+#
+# 
+#
+
+USER root
+
+RUN mkdir -p /var/log/supervisor
+
+RUN echo "${NB_USER}:password" | chpasswd
+RUN gpasswd -a "${NB_USER}" sudo
+
+RUN echo "%sudo ALL=(ALL:ALL) ALL" >> /etc/sudoers
+
+RUN echo "c.NotebookApp.token = ''" >> ./.jupyter/jupyter_notebook_config.py
+
+#
+# GPU install
+#
+
+COPY cuda-ubuntu2004.pin /etc/apt/preferences.d/cuda-repository-pin-600
+
+RUN apt-get update
+RUN apt-get -y install gnupg2 software-properties-common
+RUN apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub
+RUN add-apt-repository "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/ /" 
+RUN apt-get update 
+RUN apt-get -y install cuda
+
+RUN echo 'export PATH=$PATH:/usr/local/cuda-11.6/bin' >> /etc/bash.bashrc
+RUN echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda-11.6/lib64' >> /etc/bash.bashrc
+
+RUN wget https://developer.nvidia.com/compute/cudnn/secure/8.3.3/local_installers/11.5/cudnn-local-repo-ubuntu2004-8.3.3.40_1.0-1_amd64.deb -O /tmp/cudnn-local-repo-ubuntu2004_amd64.deb \
+    && apt-get -y install /tmp/cudnn-local-repo-ubuntu2004-8.3.2.44_1.0-1_amd64.deb \
+    && rm /tmp/cudnn-local-repo-ubuntu2004_amd64.deb
+
+RUN apt-key add /var/cudnn-local-repo-ubuntu2004-8.3.2.44/7fa2af80.pub
+RUN apt-get update
+RUN apt-get install libcudnn8
+RUN apt-get install libcudnn8-dev
+RUN apt-get install libcudnn8-samples
+
+RUN echo 'export PATH="/usr/local/cuda/bin:$PATH"' >> /etc/bash.bashrc
+RUN echo 'export LD_LIBRARY_PATH="/usr/local/cuda/lib64:$LD_LIBRARY_PATH"' >> /etc/bash.bashrc
+
+RUN pip install tensorflow-gpu==2.6.0
+RUN pip install torch torchvision
+
+#
+# 
+#
+
+USER $NB_UID
