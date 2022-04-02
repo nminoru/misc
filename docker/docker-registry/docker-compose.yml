@@ -1,0 +1,17 @@
+version: "3.7"
+
+services:
+  registry:
+    image: registry:2
+    restart: always
+    ports:
+      - 5000:5000
+    volumes:
+      - ./server.pem:/ssl/server.pem
+    environment:
+      - REGISTRY_STORAGE_DELETE_ENABLED=true
+#      - REGISTRY_AUTH=token
+#      - REGISTRY_AUTH_TOKEN_REALM=http://localhost:5000/jwt/token
+#      - REGISTRY_AUTH_TOKEN_SERVICE=docker-registry
+#      - REGISTRY_AUTH_TOKEN_ISSUER=docker-registry-issuer
+#      - REGISTRY_AUTH_TOKEN_ROOTCERTBUNDLE=/ssl/server.pem
