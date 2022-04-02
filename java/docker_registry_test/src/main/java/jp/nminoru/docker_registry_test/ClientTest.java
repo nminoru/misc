@@ -14,24 +14,25 @@ import jp.nminoru.docker_registry_test.model.JwtResponse;
 
 public class ClientTest {
 
-    public final static String serverUrl = "http://127.0.0.1:5000/";
-    public final static String username  = "<username>";
-    public final static String password  = "<password>";
+    public final static String serverUrl1 = "http://gitlab.example.com/";
+    public final static String username   = "<username>";
+    public final static String password   = "<password>";
+
+    public final static String serverUrl2 = "http://registry.example.com/";
 
     public static void main(String[] args) {
 
-        Client client = ClientBuilder.newBuilder()
-            .property(ClientProperties.FOLLOW_REDIRECTS, Boolean.valueOf(true))
+        Client client1 = ClientBuilder.newBuilder()
             .register(JsonBindingFeature.class)
             .register(HttpAuthenticationFeature.basic(username, password))
             .build();
 
-        Response response1 = client
-            .target(serverUrl)
+        Response response1 = client1
+            .target(serverUrl1)
             .path("/jwt/auth")
-            .queryParam("service",      "container_registry")
-            // .queryParam("client_id", "client")
-            // .queryParam("scope",     "registry:catalog:*")
+            .queryParam("service",   "container_registry")
+            .queryParam("client_id", "client")
+            .queryParam("scope",     "registry:catalog:*")
             .request()
             .get();
 
@@ -42,8 +43,12 @@ public class ClientTest {
 
         JwtResponse jwtRes = response1.readEntity(JwtResponse.class);
 
-        Response response2 = client
-            .target("http://127.0.0.1:5000/")
+        Client client2 = ClientBuilder.newBuilder()
+            .register(JsonBindingFeature.class)
+            .build();        
+
+        Response response2 = client2
+            .target(serverUrl2)
             .path("/v2/_catalog")
             .request()
             .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwtRes.token)            
