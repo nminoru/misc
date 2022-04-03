@@ -33,7 +33,9 @@ public class ClientTest {
     public final static Pattern pattern1 = Pattern.compile("Bearer realm=\"(.+)\",service=\"(.+)\",scope=\"(.+)\",error=\".+\"");
     public final static Pattern pattern2 = Pattern.compile("Bearer realm=\"(.+)\",service=\"(.+)\",scope=\"(.+)\"");
     public final static Pattern pattern3 = Pattern.compile("Bearer realm=\"(.+)\",service=\"(.+)\"");
-
+    
+    public final static Pattern scopePattern       = Pattern.compile("repository:(.+):(.+)");
+    
     public final static Pattern commentLinePattern = Pattern.compile("^\\s*#.*$");
     public final static Pattern tagLinePattern     = Pattern.compile("(.+)\t(.+)\t(.+)");
 
@@ -65,6 +67,15 @@ public class ClientTest {
         public String realm;
         public String service;
         public String scope;
+
+        public String getFixedScope() {
+            Matcher m = scopePattern.matcher(scope);
+            
+            if (m.matches())
+                return "repository:" + m.group(1) + ":*";
+
+            return scope;
+        }
     }
     
     public interface Code<T> {
@@ -111,7 +122,7 @@ public class ClientTest {
                 .queryParam("client_id", "client");
 
             if (info.scope != null)
-                target = target.queryParam("scope", info.scope);
+                target = target.queryParam("scope", info.getFixedScope());
 
             Response response = target.request().get();
 
@@ -125,7 +136,10 @@ public class ClientTest {
             try {
                 return code.call(authorization);
             } catch (UnauthorizedException e2) {
-                System.out.println("WWW-Authenticate: " + authenticateString);
+                Response errorResponse2 = e2.response;
+                String   authenticateString2 = errorResponse2.getHeaderString(HttpHeaders.WWW_AUTHENTICATE);
+                
+                System.err.println("WWW-Authenticate: " + authenticateString2);
                 throw new RuntimeException("");
             }
         }
@@ -156,6 +170,35 @@ public class ClientTest {
     Client client = ClientBuilder.newBuilder()
         .register(JsonBindingFeature.class)
         .build();
+
+    void showVersion() {
+        
+        executeCode((authorization) ->
+            {
+                Invocation.Builder builder = client
+                    .target(serverUrl)
+                    .path("/v2/")
+                    .request();
+
+                if (authorization != null)
+                    builder = builder.header(HttpHeaders.AUTHORIZATION, authorization);
+
+                Response response = builder.get();
+
+                if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode())
+                    throw new UnauthorizedException(response);
+
+                System.out.println("status: " + response.getStatus());
+
+                for (String key : response.getHeaders().keySet()) {
+                    System.out.println(key + ": " + response.getHeaderString(key));
+                }
+                
+                System.out.println(response.readEntity(String.class));
+
+                return (Void)null;
+            });        
+    }
 
     void lookupTags() {
 
@@ -247,13 +290,46 @@ public class ClientTest {
 
             if (m.matches()) {
                 String repository = m.group(1);
-                String tag        = m.group(3);
+                String tag        = m.group(2);                
+                String digest1    = m.group(3);
+
+                System.out.println("repository: " + "[" + repository + "]");                
+                System.out.println("tag: "     + "[" + tag + "]");
+
+                String digest2 = executeCode((authorization) ->
+                    {
+                        Invocation.Builder builder = client
+                            .target(serverUrl)
+                            .path("/v2/" + repository + "/manifests/" + tag)
+                            .request();
+
+                        if (authorization != null)
+                            builder = builder.header(HttpHeaders.AUTHORIZATION, authorization);
+
+                        Response response = builder.head();
+                            
+                        if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode())
+                            throw new UnauthorizedException(response);
+
+                        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+                            System.err.println("status: " + response.getStatus());
+                            System.err.println(response.readEntity(String.class));
+                            throw new RuntimeException();
+                        }
+
+                        String ret = response.getHeaderString("Docker-Content-Digest");
+
+                        return ret;
+                    });
+
+                System.out.println("digest1: " + digest1);
+                System.out.println("digest2: " + digest2);                                    
                 
                 executeCode((authorization) ->
                         {
                             Invocation.Builder builder = client
                                 .target(serverUrl)
-                                .path("/v2/" + repository + "/manifests/" + tag)
+                                .path("/v2/" + repository + "/manifests/" + digest1)
                                 .request();
 
                             if (authorization != null)
@@ -264,8 +340,11 @@ public class ClientTest {
                             if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode())
                                 throw new UnauthorizedException(response);
 
-                            if (response.getStatus() != Response.Status.ACCEPTED.getStatusCode())
+                            if (response.getStatus() != Response.Status.ACCEPTED.getStatusCode()) {
+                                System.err.println(response.readEntity(String.class));
+                                // return (Void)null;
                                 throw new RuntimeException("");
+                            }
 
                             return (Void)null;
                         });                                    
@@ -286,8 +365,12 @@ public class ClientTest {
 
         switch (command) {
 
+            case "--version":
+            default:
+                clientTest.showVersion();
+                break;
+                
             case "--list-tags":
-            default:        
                 clientTest.lookupTags();
                 break;
 

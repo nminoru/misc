@@ -37,9 +37,3 @@ java -jar target/docker_registry_test-0.0.1.jar --list-tags
 ```
 java -jar target/docker_registry_test-0.0.1.jar --delete-tags < (削除したいタグのリスト)
 ```
-
-
-
-
-
-
