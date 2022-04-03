@@ -1,7 +1,12 @@
 package jp.nminoru.docker_registry_test;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import jakarta.ws.rs.client.Client;
@@ -21,14 +26,20 @@ import jp.nminoru.docker_registry_test.model.Tags;
 
 public class ClientTest {
 
+    public final static String  URL      = "DOCKER_REGISTRY_URL";    
+    public final static String  USER     = "DOCKER_REGISTRY_USER";
+    public final static String  PASSWORD = "DOCKER_REGISTRY_PASSWORD";
+
     public final static Pattern pattern1 = Pattern.compile("Bearer realm=\"(.+)\",service=\"(.+)\",scope=\"(.+)\",error=\".+\"");
     public final static Pattern pattern2 = Pattern.compile("Bearer realm=\"(.+)\",service=\"(.+)\",scope=\"(.+)\"");
-    public final static Pattern pattern3 = Pattern.compile("Bearer realm=\"(.+)\",service=\"(.+)\"");    
+    public final static Pattern pattern3 = Pattern.compile("Bearer realm=\"(.+)\",service=\"(.+)\"");
 
-    public final static String username   = "<user>";
-    public final static String password   = "<password>";
+    public final static Pattern commentLinePattern = Pattern.compile("^\\s*#.*$");
+    public final static Pattern tagLinePattern     = Pattern.compile("(.+)\t(.+)\t(.+)");
 
-    public final static String serverUrl = "http://registry.example.com/";
+    public static String serverUrl = "http://registry.example.com/";    
+    public static String username   = "<user>";
+    public static String password   = "<password>";
 
     String authorization;
 
@@ -38,6 +49,22 @@ public class ClientTest {
         UnauthorizedException(Response response) {
             this.response = response;
         }
+    }
+
+    static class TokenServerInfo {
+        TokenServerInfo(String realm, String service, String scope) {
+            this.realm   = realm;
+            this.service = service;
+            this.scope   = scope;
+        }
+        
+        TokenServerInfo(String realm, String service) {
+            this(realm, service, null);
+        }        
+        
+        public String realm;
+        public String service;
+        public String scope;
     }
     
     public interface Code<T> {
@@ -51,50 +78,17 @@ public class ClientTest {
             // WWW-Authenticate ヘッダーを解析してトークンサーバーを探す
             Response errorResponse = e1.response;
 
-            String authenticate = errorResponse.getHeaderString(HttpHeaders.WWW_AUTHENTICATE);
+            String authenticateString = errorResponse.getHeaderString(HttpHeaders.WWW_AUTHENTICATE);
 
-            if (authenticate == null)
-                throw new RuntimeException("");
-
-            Matcher m;
-
-            String realm   = null;
-            String service = null;
-            String scope   = null;
-
-            m = pattern1.matcher(authenticate);
-            if (m.matches()) {
-                realm   = m.group(1);                
-                service = m.group(2);
-                scope   = m.group(3);
-            } else {
-                m = pattern2.matcher(authenticate);
-                
-                if (m.matches()) {
-                    realm   = m.group(1);                
-                    service = m.group(2);
-                    scope   = m.group(3);                    
-                } else {
-
-                    m = pattern3.matcher(authenticate);
-                
-                    if (m.matches()) {
-                        realm   = m.group(1);                
-                        service = m.group(2);                        
-                    } else {
-                        throw new RuntimeException("");
-                    }
-                }
-            }
-
-            // System.out.println("realm: " + realm);
-            // System.out.println("service: " + service);
-            // System.out.println("scope: " + scope);
+            if (authenticateString == null)
+                throw new RuntimeException("WWW-Authenticate header is not found");
             
+            TokenServerInfo info = parseWwwAuthenticate(authenticateString);
+
             String url;
             String path;
             try {
-                URI uri1 = URI.create(realm);                
+                URI uri1 = URI.create(info.realm);                
                 URI uri2 = new URI(uri1.getScheme(), null, uri1.getHost(), uri1.getPort(), null, null, null);
                 
                 url  = uri2.toASCIIString();
@@ -113,11 +107,11 @@ public class ClientTest {
             WebTarget target = client
                 .target(url)
                 .path(path)
-                .queryParam("service",   service)
+                .queryParam("service",   info.service)
                 .queryParam("client_id", "client");
 
-            if (scope != null)
-                target = target.queryParam("scope", scope);
+            if (info.scope != null)
+                target = target.queryParam("scope", info.scope);
 
             Response response = target.request().get();
 
@@ -131,20 +125,39 @@ public class ClientTest {
             try {
                 return code.call(authorization);
             } catch (UnauthorizedException e2) {
-                System.out.println("WWW-Authenticate: " + authenticate);
-                System.out.println("realm: " + realm);
-                System.out.println("service: " + service);
-                System.out.println("scope: " + scope);                
+                System.out.println("WWW-Authenticate: " + authenticateString);
                 throw new RuntimeException("");
             }
         }
     }
 
-    void run() {
+    TokenServerInfo parseWwwAuthenticate(String authenticateString) {
+        Matcher m;
 
-        Client client = ClientBuilder.newBuilder()
-            .register(JsonBindingFeature.class)
-            .build();
+        String realm   = null;
+        String service = null;
+        String scope   = null;
+
+        m = pattern1.matcher(authenticateString);
+        if (m.matches())
+            return new TokenServerInfo(m.group(1), m.group(2), m.group(3));
+
+        m = pattern2.matcher(authenticateString);
+        if (m.matches())
+            return new TokenServerInfo(m.group(1), m.group(2), m.group(3));
+
+        m = pattern3.matcher(authenticateString);
+        if (m.matches())
+            return new TokenServerInfo(m.group(1), m.group(2));
+
+        throw new RuntimeException("cannnot parse the content of the WWW-Authenticate header");
+    }
+
+    Client client = ClientBuilder.newBuilder()
+        .register(JsonBindingFeature.class)
+        .build();
+
+    void lookupTags() {
 
         Repositories repositories = executeCode((authorization) ->
             {
@@ -186,15 +199,101 @@ public class ClientTest {
 
             if (tags.tags != null) {
                 for (String tag : tags.tags) {
-                    System.out.println(repository + "\t" + tag);
+
+                    String digest = executeCode((authorization) ->
+                        {
+                            Invocation.Builder builder = client
+                                .target(serverUrl)
+                                .path("/v2/" + repository + "/manifests/" + tag)
+                                .request();
+
+                            if (authorization != null)
+                                builder = builder.header(HttpHeaders.AUTHORIZATION, authorization);
+
+                            Response response = builder.head();
+                            
+                            if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode())
+                                throw new UnauthorizedException(response);
+
+                            String ret = response.getHeaderString("Docker-Content-Digest");
+
+                            return ret;
+                        });                    
+                    
+                    System.out.println(repository + "\t" + tag + "\t" + digest);
                 }
             }
         }
     }
 
-    public static void main(String[] args) {
+    void deleteTags() throws IOException {
+        List<String> lines = new ArrayList<>();
+        
+        // 標準入力を1行ずつ読み出す。
+        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));        
+        String line;
+        while ((line = stdin.readLine()) != null) {
+            
+            // コメント行ならスキップ            
+            Matcher m = commentLinePattern.matcher(line);
+            if (m.matches())
+                continue;
+
+            lines.add(line);
+        }
+
+        for (String tagLine : lines) {
+            Matcher m = tagLinePattern.matcher(tagLine);
+
+            if (m.matches()) {
+                String repository = m.group(1);
+                String tag        = m.group(3);
+                
+                executeCode((authorization) ->
+                        {
+                            Invocation.Builder builder = client
+                                .target(serverUrl)
+                                .path("/v2/" + repository + "/manifests/" + tag)
+                                .request();
+
+                            if (authorization != null)
+                                builder = builder.header(HttpHeaders.AUTHORIZATION, authorization);
+
+                            Response response = builder.delete();
+                            
+                            if (response.getStatus() == Response.Status.UNAUTHORIZED.getStatusCode())
+                                throw new UnauthorizedException(response);
+
+                            if (response.getStatus() != Response.Status.ACCEPTED.getStatusCode())
+                                throw new RuntimeException("");
+
+                            return (Void)null;
+                        });                                    
+                
+            }
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        // 環境変数の読み込み
+        serverUrl = System.getenv(URL);
+        username  = System.getenv(USER);
+        password  = System.getenv(PASSWORD);
+        
         ClientTest clientTest = new ClientTest();
 
-        clientTest.run();
+        String command = (args.length >= 1) ? args[0] : "";
+
+        switch (command) {
+
+            case "--list-tags":
+            default:        
+                clientTest.lookupTags();
+                break;
+
+            case "--delete-tags":
+                clientTest.deleteTags();
+                break;
+        }
     }
 }
