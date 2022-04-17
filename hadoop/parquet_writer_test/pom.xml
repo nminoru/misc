@@ -7,12 +7,12 @@
   <name>parquet_writer_test</name>
   <artifactId>parquet_writer_test</artifactId>
   <packaging>jar</packaging>
-  <version>1.9.0</version>
+  <version>1.9.1</version>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <hadoop.version>2.3.0</hadoop.version>
-    <parquet.version>1.9.0</parquet.version>
+    <hadoop.version>3.3.2</hadoop.version>
+    <parquet.version>1.12.2</parquet.version>
   </properties>
 
   <dependencies>
@@ -66,11 +66,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.6.1</version>
+        <version>3.8.1</version>
         <inherited>true</inherited>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
+	  <compilerArgument>${compilerArgument}</compilerArgument>          
         </configuration>
       </plugin>
 
