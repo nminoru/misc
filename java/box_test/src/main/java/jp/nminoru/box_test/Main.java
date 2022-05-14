@@ -31,7 +31,10 @@ public class Main {
     void listFolder(BoxFolder folder, int depth) {
         for (BoxItem.Info itemInfo : folder) {
             StringBuilder indent = new StringBuilder();
-            for (int i = 0; i < depth; i++) {
+
+            indent.append(itemInfo.getID());
+            
+            for (int i = 0; i < depth + 1; i++) {
                 indent.append("    ");
             }
 
