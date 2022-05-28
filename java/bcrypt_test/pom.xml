@@ -19,14 +19,14 @@
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>
-      <version>5.2.5.RELEASE</version>
+      <version>5.7.1</version>
     </dependency>
 
     <!-- JUnit -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
-      <version>5.5.2</version>
+      <version>5.8.2</version>
       <scope>test</scope>
     </dependency>
 
@@ -37,7 +37,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.0</version>
+        <version>3.10.1</version>
         <inherited>true</inherited>
         <configuration>
           <source>${java.version}</source>
@@ -49,7 +49,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>1.6.0</version>
+        <version>3.0.0</version>
         <executions>
           <execution>
             <goals>
