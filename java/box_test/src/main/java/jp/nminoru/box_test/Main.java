@@ -1,25 +1,35 @@
 package jp.nminoru.box_test;
 
 import com.box.sdk.BoxAPIConnection;
+import com.box.sdk.BoxCCGAPIConnection;
 import com.box.sdk.BoxFolder;
 import com.box.sdk.BoxItem;
 import com.box.sdk.BoxUser;
 
 
 public class Main {
-    public static final String BOX_TOKEN       = "BOX_TOKEN";
-    public static final int    MAX_DEPTH       = 10;
+    public static final String BOX_CLIENT_ID     = "BOX_CLIENT_ID";
+    public static final String BOX_CLIENT_SECRET = "BOX_CLIENT_SECRET";
+    public static final String BOX_USER_ID       = "BOX_USER_ID";
+    public static final int    MAX_DEPTH         = 10;
 
     public static void main(String[] args) {
-        String token = System.getenv(BOX_TOKEN);
+        String clientId     = System.getenv(BOX_CLIENT_ID);
+        String clientSecret = System.getenv(BOX_CLIENT_SECRET);
+        String userId       = System.getenv(BOX_USER_ID);
         
         Main main = new Main();
 
-        main.run(token);
+        System.out.println("BOX_CLIENT_ID    : " + clientId);
+        System.out.println("BOX_CLIENT_SECRET: " + clientSecret);
+        System.out.println("BOX_USER_ID      : " + userId);
+
+        main.run(clientId, clientSecret, userId);
     }
     
-    void run(String token) {
-        BoxAPIConnection api = new BoxAPIConnection(token);
+    void run(String clientId, String clientSecret, String userId) {
+        // BoxAPIConnection api = BoxCCGAPIConnection.applicationServiceAccountConnection(clientId, clientSecret, userId);
+        BoxAPIConnection api = BoxCCGAPIConnection.userConnection(clientId, clientSecret, userId);
 
         BoxUser.Info userInfo = BoxUser.getCurrentUser(api).getInfo();
         System.out.format("Welcome, %s <%s>!\n\n", userInfo.getName(), userInfo.getLogin());

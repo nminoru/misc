@@ -9,7 +9,8 @@ mvn compile
 
 環境変数を設定する。
 
-- BOX_TOKEN
+- BOX_CILENT_ID
+- BOX_ACCESS_TOKEN
 
 ```
 mvn exec:java
