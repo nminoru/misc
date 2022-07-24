@@ -1,0 +1,17 @@
+version: '3.7'
+
+services:
+
+  postgresql:
+    build:
+      context: postgresql
+      dockerfile: Dockerfile    
+    restart: always
+    ports:
+      - 15432:5432
+    environment:
+      - POSTGRES_USER=testuser
+      - POSTGRES_PASSWORD=testpassword
+      - POSTGRES_DB=test
+#      - POSTGRES_INITDB_ARGS="--encoding=UTF8 --locale=C"
+      
