@@ -1,0 +1,3 @@
+FROM jupyter/scipy-notebook:feacdbfc2e89
+
+COPY dot.condarc /opt/conda/.condarc
