@@ -1,0 +1,195 @@
+=== File Nmae : /var/lib/katsuo/datalake/temp.docx ===
+date : 2022-10-23T05:10:00Z
+cp:revision : 3
+Total-Time : 1
+dc:description : Word comment
+extended-properties:AppVersion : 16.0000
+Keywords : Word keyword
+Category : Word category
+subject : Word subtitle
+dc:creator : 中村 実
+extended-properties:Company : 
+description : Word comment
+dcterms:created : 2022-10-23T05:09:00Z
+dcterms:modified : 2022-10-23T05:10:00Z
+Last-Modified : 2022-10-23T05:10:00Z
+title : Word title
+Last-Save-Date : 2022-10-23T05:10:00Z
+Template : Normal.dotm
+meta:save-date : 2022-10-23T05:10:00Z
+dc:title : Word title
+Application-Name : Microsoft Office Word
+extended-properties:TotalTime : 1
+modified : 2022-10-23T05:10:00Z
+cp:subject : Word subtitle
+Content-Type : application/vnd.openxmlformats-officedocument.wordprocessingml.document
+X-Parsed-By : org.apache.tika.parser.DefaultParser,org.apache.tika.parser.microsoft.ooxml.OOXMLParser
+creator : 中村 実
+meta:author : 中村 実
+dc:subject : Word keyword
+meta:creation-date : 2022-10-23T05:09:00Z
+extended-properties:Application : Microsoft Office Word
+meta:last-author : 中村 実
+Creation-Date : 2022-10-23T05:09:00Z
+xmpTPg:NPages : 1
+Last-Author : 中村 実
+Page-Count : 1
+Revision-Number : 3
+Application-Version : 16.0000
+extended-properties:Template : Normal.dotm
+extended-properties:DocSecurityString : None
+meta:keyword : Word keyword
+Author : 中村 実
+publisher : 
+cp:category : Word category
+meta:page-count : 1
+dc:publisher : 
+
+=== File Nmae : /var/lib/katsuo/datalake/temp.jpeg ===
+dc:description : JPEG title
+Number of Tables : 4 Huffman tables
+Exif IFD0:Windows XP Author : JPEG creator
+Compression Type : Baseline
+Exif IFD0:Artist : JPEG creator
+Data Precision : 8 bits
+Number of Components : 3
+tiff:ImageLength : 192
+description : JPEG title
+Component 2 : Cb component: Quantization table 1, Sampling factors 1 horiz/1 vert
+Thumbnail Height Pixels : 0
+Exif IFD0:Image Description : JPEG title
+Component 1 : Y component: Quantization table 0, Sampling factors 2 horiz/2 vert
+X Resolution : 96 dots
+Exif IFD0:Windows XP Title : JPEG title
+File Size : 8104 bytes
+Exif IFD0:Windows XP Subject : JPEG subtitle
+Component 3 : Cr component: Quantization table 1, Sampling factors 1 horiz/1 vert
+Exif IFD0:Unknown tag (0x5111) : 3779
+File Name : apache-tika-2150468644407429184.tmp
+tiff:BitsPerSample : 8
+Content-Type : image/jpeg
+X-Parsed-By : org.apache.tika.parser.DefaultParser,org.apache.tika.parser.jpeg.JpegParser
+Resolution Units : inch
+File Modified Date : 日 10 23 15:33:04 +09:00 2022
+Exif IFD0:Windows XP Comment : JPEG comment
+Exif IFD0:Unknown tag (0x0301) : 20000/9091
+Exif IFD0:Unknown tag (0x0303) : 0
+Exif IFD0:Padding : [2060 values]
+Image Height : 192 pixels
+Thumbnail Width Pixels : 0
+Image Width : 1 pixels
+Exif SubIFD:Padding : [2060 values]
+XMP Value Count : 6
+Exif IFD0:Unknown tag (0x5112) : 3779
+Exif IFD0:Unknown tag (0x5110) : 1
+tiff:ImageWidth : 1
+Y Resolution : 96 dots
+
+=== File Nmae : /var/lib/katsuo/datalake/temp.png ===
+Transparency Alpha : none
+tiff:ImageLength : 192
+Compression CompressionTypeName : deflate
+Data BitsPerSample : 8 8 8
+Data PlanarConfiguration : PixelInterleaved
+Dimension VerticalPixelSize : 0.26462027
+IHDR : width=1, height=192, bitDepth=8, colorType=RGB, compressionMethod=deflate, filterMethod=adaptive, interlaceMethod=none
+Chroma ColorSpaceType : RGB
+tiff:BitsPerSample : 8 8 8
+Content-Type : image/png
+height : 192
+gAMA : 45455
+X-Parsed-By : org.apache.tika.parser.DefaultParser,org.apache.tika.parser.image.ImageParser
+pHYs : pixelsPerUnitXAxis=3779, pixelsPerUnitYAxis=3779, unitSpecifier=meter
+Chroma Gamma : 0.45455
+Dimension PixelAspectRatio : 1.0
+sRGB : Perceptual
+Compression NumProgressiveScans : 1
+Dimension HorizontalPixelSize : 0.26462027
+Chroma BlackIsZero : true
+Compression Lossless : true
+width : 1
+Dimension ImageOrientation : Normal
+tiff:ImageWidth : 1
+Chroma NumChannels : 3
+Data SampleFormat : UnsignedIntegral
+
+=== File Nmae : /var/lib/katsuo/datalake/temp.pptx ===
+date : 2022-10-23T05:06:47Z
+cp:revision : 1
+dc:description : PowerPoint comment
+extended-properties:AppVersion : 16.0000
+Keywords : PowerPoint tag
+extended-properties:PresentationFormat : ワイド画面
+subject : PowerPoint description
+dc:creator : 中村 実
+extended-properties:Company : 
+description : PowerPoint comment
+dcterms:created : 2022-10-23T05:06:37Z
+dcterms:modified : 2022-10-23T05:06:47Z
+Last-Modified : 2022-10-23T05:06:47Z
+title : PowerPoint title
+Last-Save-Date : 2022-10-23T05:06:47Z
+meta:save-date : 2022-10-23T05:06:47Z
+dc:title : PowerPoint title
+Application-Name : Microsoft Office PowerPoint
+modified : 2022-10-23T05:06:47Z
+cp:subject : PowerPoint description
+Content-Type : application/vnd.openxmlformats-officedocument.presentationml.presentation
+Slide-Count : 1
+X-Parsed-By : org.apache.tika.parser.DefaultParser,org.apache.tika.parser.microsoft.ooxml.OOXMLParser
+creator : 中村 実
+meta:author : 中村 実
+dc:subject : PowerPoint tag
+meta:creation-date : 2022-10-23T05:06:37Z
+extended-properties:Application : Microsoft Office PowerPoint
+meta:last-author : 中村 実
+meta:slide-count : 1
+Creation-Date : 2022-10-23T05:06:37Z
+xmpTPg:NPages : 1
+Last-Author : 中村 実
+Revision-Number : 1
+Application-Version : 16.0000
+extended-properties:DocSecurityString : None
+meta:keyword : PowerPoint tag
+Author : 中村 実
+publisher : 
+Presentation-Format : ワイド画面
+dc:publisher : 
+
+=== File Nmae : /var/lib/katsuo/datalake/temp.xlsx ===
+date : 2015-06-05T18:19:39Z
+dc:description : Excel comment
+extended-properties:AppVersion : 16.0300
+Keywords : Excel tag
+Category : Excel catagory
+subject : Excel description
+dc:creator : nminoru
+extended-properties:Company : 
+description : Excel comment
+dcterms:created : 2015-06-05T18:19:34Z
+dcterms:modified : 2015-06-05T18:19:39Z
+Last-Modified : 2015-06-05T18:19:39Z
+title : Excel title
+Last-Save-Date : 2015-06-05T18:19:39Z
+protected : false
+meta:save-date : 2015-06-05T18:19:39Z
+dc:title : Excel title
+Application-Name : Microsoft Excel
+modified : 2015-06-05T18:19:39Z
+cp:subject : Excel description
+Content-Type : application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+X-Parsed-By : org.apache.tika.parser.DefaultParser,org.apache.tika.parser.microsoft.ooxml.OOXMLParser
+creator : nminoru
+meta:author : nminoru
+dc:subject : Excel tag
+meta:creation-date : 2015-06-05T18:19:34Z
+extended-properties:Application : Microsoft Excel
+Creation-Date : 2015-06-05T18:19:34Z
+Application-Version : 16.0300
+extended-properties:DocSecurityString : None
+meta:keyword : Excel tag
+Author : nminoru
+publisher : 
+cp:category : Excel catagory
+dc:publisher : 
+
