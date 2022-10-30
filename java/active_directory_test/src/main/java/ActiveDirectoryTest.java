@@ -167,66 +167,69 @@ public class ActiveDirectoryTest {
 
         boolean success = false;
 
-        lc.login();
-
         try {
-            Subject subject = lc.getSubject();
-            KerberosPrincipal krbPrincipal = subject.getPrincipals(KerberosPrincipal.class).iterator().next();
-
-            GSSManager manager = GSSManager.getInstance();
-            GSSName name = manager.createName(krbPrincipal.toString(), GSSName.NT_USER_NAME);
-            Set<Oid> mechs = new HashSet<>(Arrays.asList(manager.getMechsForName(name.getStringNameType())));
-
-            Oid mech;
-            Oid spnegoOid = new Oid("1.3.6.1.5.5.2");
-            Oid kerberos5Oid = new Oid("1.2.840.113554.1.2.2");
-
-            System.out.println("enable support for kerbros: " + mechs.contains(kerberos5Oid));
-            System.out.println("enable support for spnego: " + mechs.contains(spnegoOid));
-
-            if (mechs.contains(spnegoOid)) {
-                mech = spnegoOid;
-            } else if (mechs.contains(kerberos5Oid)) {
-                mech = kerberos5Oid;
-            } else {
-                throw new IllegalArgumentException("No mechanism found");
-            }
-            
-            GSSCredential credential = Subject.doAs(subject,
-                new PrivilegedExceptionAction<GSSCredential>() {
-                    @Override
-                    public GSSCredential run() throws GSSException {
-                        return manager.createCredential(name, GSSCredential.DEFAULT_LIFETIME, mech, GSSCredential.INITIATE_ONLY);
-                    }
-                });
-
-            // TODO: credential から SPNEGO トークンを作ることができるはず。
-
             System.out.println("Go Kerbros");
+                
+            lc.login();
 
-            System.out.println("krb.principal: " + krbPrincipal.getName());
-            System.out.println("krb.realm: " + krbPrincipal.getRealm());
+            try {
+                Subject subject = lc.getSubject();
+                KerberosPrincipal krbPrincipal = subject.getPrincipals(KerberosPrincipal.class).iterator().next();
 
-            //
-            // Kerberos を使ったアクセス
-            //
-            AuthenticationContext authCtx =
-                new GSSAuthenticationContext(krbPrincipal.getName(),
-                                             krbPrincipal.getRealm(),
-                                             subject,
-                                             credential);
+                GSSManager manager = GSSManager.getInstance();
+                GSSName name = manager.createName(krbPrincipal.toString(), GSSName.NT_USER_NAME);
+                Set<Oid> mechs = new HashSet<>(Arrays.asList(manager.getMechsForName(name.getStringNameType())));
 
-            connectSmb(authCtx);
+                Oid mech;
+                Oid spnegoOid = new Oid("1.3.6.1.5.5.2");
+                Oid kerberos5Oid = new Oid("1.2.840.113554.1.2.2");
 
-            System.out.println("Done Kerbros");
+                System.out.println("enable support for kerbros: " + mechs.contains(kerberos5Oid));
+                System.out.println("enable support for spnego: " + mechs.contains(spnegoOid));
 
-            // 成功
-            success = true;
-        } finally {
-            lc.logout();
+                if (mechs.contains(spnegoOid)) {
+                    mech = spnegoOid;
+                } else if (mechs.contains(kerberos5Oid)) {
+                    mech = kerberos5Oid;
+                } else {
+                    throw new IllegalArgumentException("No mechanism found");
+                }
+            
+                GSSCredential credential = Subject.doAs(subject,
+                    new PrivilegedExceptionAction<GSSCredential>() {
+                        @Override
+                        public GSSCredential run() throws GSSException {
+                            return manager.createCredential(name, GSSCredential.DEFAULT_LIFETIME, mech, GSSCredential.INITIATE_ONLY);
+                        }
+                    });
+
+                // TODO: credential から SPNEGO トークンを作ることができるはず。
+
+                System.out.println("krb.principal: " + krbPrincipal.getName());
+                System.out.println("krb.realm: " + krbPrincipal.getRealm());
+
+                //
+                // Kerberos を使ったアクセス
+                //
+                AuthenticationContext authCtx =
+                    new GSSAuthenticationContext(krbPrincipal.getName(),
+                                                 krbPrincipal.getRealm(),
+                                                 subject,
+                                                 credential);
+
+                connectSmb(authCtx);
+                
+                // 成功
+                success = true;
+            } finally {
+                lc.logout();
+                System.out.println("Done Kerbros");                
+            }
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
         }
 
-        // 失敗
+         // 失敗
         return success;
     }
 
