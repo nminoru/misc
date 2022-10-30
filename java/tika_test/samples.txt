@@ -1,3 +1,45 @@
+=== File Nmae : /var/lib/katsuo/datalake/temp.doc ===
+cp:revision : 2
+date : 2022-10-25T01:21:00Z
+Company : 
+Keywords : Word keyword
+Category : Word category
+subject : Word subtitle
+dc:creator : 中村 実
+extended-properties:Company : 
+dcterms:created : 2022-10-25T01:21:00Z
+dcterms:modified : 2022-10-25T01:21:00Z
+Last-Modified : 2022-10-25T01:21:00Z
+title : Word title
+Last-Save-Date : 2022-10-25T01:21:00Z
+Template : Normal.dotm
+meta:save-date : 2022-10-25T01:21:00Z
+dc:title : Word title
+Application-Name : Microsoft Office Word
+modified : 2022-10-25T01:21:00Z
+cp:subject : Word subtitle
+Content-Type : application/msword
+X-Parsed-By : org.apache.tika.parser.DefaultParser,org.apache.tika.parser.microsoft.OfficeParser
+creator : 中村 実
+meta:author : 中村 実
+dc:subject : Word keyword
+extended-properties:Application : Microsoft Office Word
+meta:creation-date : 2022-10-25T01:21:00Z
+meta:last-author : 中村 実
+Comments : Word comment
+Creation-Date : 2022-10-25T01:21:00Z
+xmpTPg:NPages : 1
+Last-Author : 中村 実
+w:comments : Word comment
+Page-Count : 1
+Revision-Number : 2
+extended-properties:Template : Normal.dotm
+meta:keyword : Word keyword
+Author : 中村 実
+comment : Word comment
+meta:page-count : 1
+cp:category : Word category
+
 === File Nmae : /var/lib/katsuo/datalake/temp.docx ===
 date : 2022-10-23T05:10:00Z
 cp:revision : 3
@@ -65,12 +107,12 @@ File Size : 8104 bytes
 Exif IFD0:Windows XP Subject : JPEG subtitle
 Component 3 : Cr component: Quantization table 1, Sampling factors 1 horiz/1 vert
 Exif IFD0:Unknown tag (0x5111) : 3779
-File Name : apache-tika-2150468644407429184.tmp
+File Name : apache-tika-2248594398730908784.tmp
 tiff:BitsPerSample : 8
 Content-Type : image/jpeg
 X-Parsed-By : org.apache.tika.parser.DefaultParser,org.apache.tika.parser.jpeg.JpegParser
 Resolution Units : inch
-File Modified Date : 日 10 23 15:33:04 +09:00 2022
+File Modified Date : 火 10 25 11:24:44 +09:00 2022
 Exif IFD0:Windows XP Comment : JPEG comment
 Exif IFD0:Unknown tag (0x0301) : 20000/9091
 Exif IFD0:Unknown tag (0x0303) : 0
@@ -112,6 +154,45 @@ Dimension ImageOrientation : Normal
 tiff:ImageWidth : 1
 Chroma NumChannels : 3
 Data SampleFormat : UnsignedIntegral
+
+=== File Nmae : /var/lib/katsuo/datalake/temp.ppt ===
+cp:revision : 1
+date : 2022-10-25T01:24:47Z
+Company : 
+Keywords : PowerPoint tag
+subject : PowerPoint description
+dc:creator : 中村 実
+extended-properties:Company : 
+dcterms:created : 2022-10-23T05:06:37Z
+dcterms:modified : 2022-10-25T01:24:47Z
+Last-Modified : 2022-10-25T01:24:47Z
+title : PowerPoint title
+Last-Save-Date : 2022-10-25T01:24:47Z
+meta:save-date : 2022-10-25T01:24:47Z
+dc:title : PowerPoint title
+Application-Name : Microsoft Office PowerPoint
+modified : 2022-10-25T01:24:47Z
+Edit-Time : 116700000
+cp:subject : PowerPoint description
+Content-Type : application/vnd.ms-powerpoint
+Slide-Count : 1
+X-Parsed-By : org.apache.tika.parser.DefaultParser,org.apache.tika.parser.microsoft.OfficeParser
+creator : 中村 実
+meta:author : 中村 実
+dc:subject : PowerPoint tag
+extended-properties:Application : Microsoft Office PowerPoint
+meta:creation-date : 2022-10-23T05:06:37Z
+meta:last-author : 中村 実
+Comments : PowerPoint comment
+meta:slide-count : 1
+Creation-Date : 2022-10-23T05:06:37Z
+xmpTPg:NPages : 1
+Last-Author : 中村 実
+w:comments : PowerPoint comment
+Revision-Number : 1
+meta:keyword : PowerPoint tag
+Author : 中村 実
+comment : PowerPoint comment
 
 === File Nmae : /var/lib/katsuo/datalake/temp.pptx ===
 date : 2022-10-23T05:06:47Z
@@ -155,6 +236,41 @@ Author : 中村 実
 publisher : 
 Presentation-Format : ワイド画面
 dc:publisher : 
+
+=== File Nmae : /var/lib/katsuo/datalake/temp.xls ===
+date : 2022-10-25T02:24:00Z
+Company : 
+Keywords : Excel tag
+Category : Excel catagory
+subject : Excel description
+dc:creator : nminoru
+extended-properties:Company : 
+dcterms:created : 2015-06-05T18:19:34Z
+dcterms:modified : 2022-10-25T02:24:00Z
+Last-Modified : 2022-10-25T02:24:00Z
+title : Excel title
+Last-Save-Date : 2022-10-25T02:24:00Z
+meta:save-date : 2022-10-25T02:24:00Z
+dc:title : Excel title
+Application-Name : Microsoft Excel
+modified : 2022-10-25T02:24:00Z
+cp:subject : Excel description
+Content-Type : application/vnd.ms-excel
+X-Parsed-By : org.apache.tika.parser.DefaultParser,org.apache.tika.parser.microsoft.OfficeParser
+creator : nminoru
+meta:author : nminoru
+dc:subject : Excel tag
+extended-properties:Application : Microsoft Excel
+meta:creation-date : 2015-06-05T18:19:34Z
+meta:last-author : nminoru
+Comments : Excel comment
+Creation-Date : 2015-06-05T18:19:34Z
+Last-Author : nminoru
+w:comments : Excel comment
+meta:keyword : Excel tag
+Author : nminoru
+comment : Excel comment
+cp:category : Excel catagory
 
 === File Nmae : /var/lib/katsuo/datalake/temp.xlsx ===
 date : 2015-06-05T18:19:39Z
