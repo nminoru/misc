@@ -11,8 +11,8 @@
 
   <properties>
     <java.version>1.8</java.version>
-    <hadoop.version>3.3.0</hadoop.version>
-    <parquet.version>1.11.0</parquet.version>
+    <hadoop.version>3.3.4</hadoop.version>
+    <parquet.version>1.12.3</parquet.version>
     <slf4j.version>1.7.30</slf4j.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
