@@ -57,23 +57,33 @@ import org.ietf.jgss.Oid;
 public class ActiveDirectoryTest {
 
     // Active Diretory の設定
-    static final String DomainName = "<AD domain name>";
-    static final String UserName = "<username>";
-    static final String Password = "<password>";
-    static final String LdapHostName = "<LDAP hostname>";
-    static final String KerberosHostName = "<Kerberos hostname>";
+    static String DomainName = "<AD domain name>";
+    static String UserName = "<username>";
+    static String Password = "<password>";
+    static String LdapHostName = "<LDAP hostname>";
+    static String KerberosHostName = "<Kerberos hostname>";
 
     // テスト用のSMBサーバー
-    static final String SmbHostName = "<SMB hostname>";
-    static final String ShareName = "<SMB share name>";
+    static String SmbHostName = "<SMB hostname>";
+    static String ShareName = "<SMB share name>";
 
     public static void main(String[] args) throws Exception {
+        DomainName       = System.getenv("SMB_DOMAIN");
+        UserName         = System.getenv("SMB_USERNAME");
+        Password         = System.getenv("SMB_PASSWORD");
+        LdapHostName     = System.getenv("SMB_LDAP");
+        KerberosHostName = System.getenv("SMB_KDC");
+        SmbHostName      = System.getenv("SMB_HOST");
+        ShareName        = System.getenv("SMB_SHARENAME");
+
         ActiveDirectoryTest activeDirectoryTest = new ActiveDirectoryTest();
 
         // Subject subject = activeDirectoryTest.login();
 
         // activeDirectoryTest.connectLdap();
-        activeDirectoryTest.connectKerberos();
+        if (!activeDirectoryTest.connectKerberos()) {
+            activeDirectoryTest.connectNTLM();
+        }
     }
 
     void connectLdap() {
@@ -84,11 +94,11 @@ public class ActiveDirectoryTest {
         env.put(Context.PROVIDER_URL,            "ldap://" + LdapHostName);
         env.put(Context.SECURITY_PRINCIPAL,      UserName + "@" + DomainName);
         env.put(Context.SECURITY_CREDENTIALS,    Password);
-        
+
         // env.put(Context.SECURITY_PROTOCOL,       "ssl");
         // env.put(Context.REFERRAL,                "follow");
         env.put(Context.REFERRAL,                "ignore");
-        
+
         DirContext dirContext = null;
 
         try {
@@ -133,7 +143,7 @@ public class ActiveDirectoryTest {
         return creds;
     }
 
-    void connectKerberos() throws GSSException, IOException, LoginException, PrivilegedActionException {
+    boolean connectKerberos() throws GSSException, IOException, LoginException, PrivilegedActionException {
         String realmName = DomainName.toUpperCase();
 
         System.out.println("realmName: " + realmName);
@@ -155,6 +165,8 @@ public class ActiveDirectoryTest {
                                            new UserPasswordCallbackHandler(principal, Password),
                                            new CustomLoginConfiguration(loginParams));
 
+        boolean success = false;
+
         lc.login();
 
         try {
@@ -171,7 +183,7 @@ public class ActiveDirectoryTest {
 
             System.out.println("enable support for kerbros: " + mechs.contains(kerberos5Oid));
             System.out.println("enable support for spnego: " + mechs.contains(spnegoOid));
-            
+
             if (mechs.contains(spnegoOid)) {
                 mech = spnegoOid;
             } else if (mechs.contains(kerberos5Oid)) {
@@ -179,7 +191,7 @@ public class ActiveDirectoryTest {
             } else {
                 throw new IllegalArgumentException("No mechanism found");
             }
-
+            
             GSSCredential credential = Subject.doAs(subject,
                 new PrivilegedExceptionAction<GSSCredential>() {
                     @Override
@@ -190,13 +202,32 @@ public class ActiveDirectoryTest {
 
             // TODO: credential から SPNEGO トークンを作ることができるはず。
 
-            System.out.println("Kerbros OK");
+            System.out.println("Go Kerbros");
 
-            connectSmb(subject, krbPrincipal, credential);
+            System.out.println("krb.principal: " + krbPrincipal.getName());
+            System.out.println("krb.realm: " + krbPrincipal.getRealm());
 
+            //
+            // Kerberos を使ったアクセス
+            //
+            AuthenticationContext authCtx =
+                new GSSAuthenticationContext(krbPrincipal.getName(),
+                                             krbPrincipal.getRealm(),
+                                             subject,
+                                             credential);
+
+            connectSmb(authCtx);
+
+            System.out.println("Done Kerbros");
+
+            // 成功
+            success = true;
         } finally {
             lc.logout();
         }
+
+        // 失敗
+        return success;
     }
 
     String generateToken(ExtendedGSSContext context) throws Exception {
@@ -222,25 +253,14 @@ public class ActiveDirectoryTest {
         return result;
     }
 
-    void connectSmb(Subject subject, KerberosPrincipal krbPrincipal, GSSCredential credential) throws IOException {
-        System.out.println("krb.principal: " + krbPrincipal.getName());
-        System.out.println("krb.realm: " + krbPrincipal.getRealm());
-        
-        //
-        // Kerberos を使ったアクセス
-        //
-        AuthenticationContext ac =
-            new GSSAuthenticationContext(krbPrincipal.getName(),
-                                         krbPrincipal.getRealm(),
-                                         subject,
-                                         credential);
-        
+    void connectSmb(AuthenticationContext ac) throws IOException {
+
         //
         // ユーザ・パスワードを与える場合は以下のようなコードになる
         //
         // AuthenticationContext ac =
         //     new AuthenticationContext(userName, password.toCharArray(), domainName);
-        
+
         SMBClient client = new SMBClient();
         try (Connection connection = client.connect(SmbHostName)) {
             Session session = connection.authenticate(ac);
@@ -268,6 +288,17 @@ public class ActiveDirectoryTest {
                 }
             }
         }
+    }
+
+    void connectNTLM() throws IOException {
+        System.out.println("Go NTLM");
+
+        AuthenticationContext authCtx =
+            new AuthenticationContext(UserName, Password.toCharArray(), DomainName);
+
+        connectSmb(authCtx);
+
+        System.out.println("Done NTLM");
     }
 
     static class UserPasswordCallbackHandler implements CallbackHandler {

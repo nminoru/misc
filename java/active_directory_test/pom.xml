@@ -26,14 +26,14 @@
     <dependency>
       <groupId>com.hierynomus</groupId>
       <artifactId>smbj</artifactId>
-      <version>0.9.1</version>
+      <version>0.10.0</version>
     </dependency>
 
     <!-- Logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.7.25</version>
+      <version>1.7.30</version>
     </dependency>
 
     <dependency>
