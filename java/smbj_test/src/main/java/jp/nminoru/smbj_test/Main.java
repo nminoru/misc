@@ -1,6 +1,7 @@
 package jp.nminoru.smbj_test;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import com.hierynomus.msfscc.FileAttributes;
 import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.protocol.commons.EnumWithValue;
@@ -47,7 +48,9 @@ public class Main {
                         System.out.println("\tHIDDEN");
                     
                     System.out.println("\t" + f.getEaSize());
-                    System.out.println("\t" +  new String(Hex.encodeHex(f.getFileId())));
+                    long fileId = f.getFileId();
+                    byte[] bytes = ByteBuffer.allocate(4).putLong(fileId).array();
+                    System.out.println("\t" +  new String(Hex.encodeHex(bytes)));
                 }
             }
         }
