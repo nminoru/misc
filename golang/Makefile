@@ -1,4 +1,4 @@
-TARGETS = bigcache-test json-test setfile-test sscanf-test string-test time-test
+TARGETS = json-test setfile-test sscanf-test string-test time-test
 
 all: $(TARGETS)
 
