@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
+import javax.naming.AuthenticationException;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -31,6 +32,7 @@ import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.security.auth.kerberos.KerberosPrincipal;
 import javax.security.auth.login.AppConfigurationEntry;
 import javax.security.auth.login.Configuration;
+import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import com.hierynomus.smbj.auth.GSSAuthenticationContext;
@@ -120,6 +122,10 @@ public class ActiveDirectoryTest {
             // TODO: ここで LDAP の検索を行う
         // } catch (NamingException e) {
         //     e.printStackTrace();
+        } catch (AuthenticationException e) {
+            // ユーザー認証失敗
+            System.err.println("# User authentication failed");
+            e.printStackTrace(System.err);
         } catch (Exception e) {
             e.printStackTrace(System.err);
         } finally {
@@ -238,6 +244,16 @@ public class ActiveDirectoryTest {
                 lc.logout();
                 System.out.println("Done Kerbros");
             }
+        } catch (FailedLoginException e) {
+            // ユーザー認証失敗
+            System.err.println("# User authentication failed");
+            e.printStackTrace(System.err);
+        } catch (LoginException e) {
+            String message = e.getMessage();
+            if (message.startsWith("Pre-authentication information was invalid")) {
+                System.err.println("# User authentication failed");
+            }
+            e.printStackTrace(System.err);
         } catch (Exception e) {
             e.printStackTrace(System.err);
         }
