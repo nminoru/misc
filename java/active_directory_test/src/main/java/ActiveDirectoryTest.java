@@ -78,12 +78,23 @@ public class ActiveDirectoryTest {
 
         ActiveDirectoryTest activeDirectoryTest = new ActiveDirectoryTest();
 
-        // Subject subject = activeDirectoryTest.login();
-
-        // activeDirectoryTest.connectLdap();
-        if (!activeDirectoryTest.connectKerberos()) {
-            activeDirectoryTest.connectNTLM();
+        if (args.length > 0) {
+            switch (args[0]) {
+                case "kerberos":
+                    activeDirectoryTest.connectKerberos();
+                    return;
+                case "ntlm":
+                    activeDirectoryTest.connectNTLM();
+                    return;
+                case "ldap":
+                    activeDirectoryTest.connectLdap();
+                    return;
+                default:
+                    break;
+            }
         }
+
+        System.out.println("Usage kerberos|ntlm|ldap");
     }
 
     void connectLdap() {
@@ -107,8 +118,10 @@ public class ActiveDirectoryTest {
             System.out.println("OK: connect LDAP");
 
             // TODO: ここで LDAP の検索を行う
-        } catch (NamingException e) {
-            e.printStackTrace();
+        // } catch (NamingException e) {
+        //     e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
         } finally {
             try {
                 if (dirContext != null)
@@ -169,7 +182,7 @@ public class ActiveDirectoryTest {
 
         try {
             System.out.println("Go Kerbros");
-                
+
             lc.login();
 
             try {
@@ -194,7 +207,7 @@ public class ActiveDirectoryTest {
                 } else {
                     throw new IllegalArgumentException("No mechanism found");
                 }
-            
+
                 GSSCredential credential = Subject.doAs(subject,
                     new PrivilegedExceptionAction<GSSCredential>() {
                         @Override
@@ -218,12 +231,12 @@ public class ActiveDirectoryTest {
                                                  credential);
 
                 connectSmb(authCtx);
-                
+
                 // 成功
                 success = true;
             } finally {
                 lc.logout();
-                System.out.println("Done Kerbros");                
+                System.out.println("Done Kerbros");
             }
         } catch (Exception e) {
             e.printStackTrace(System.err);
@@ -256,50 +269,17 @@ public class ActiveDirectoryTest {
         return result;
     }
 
-    void connectSmb(AuthenticationContext ac) throws IOException {
-
-        //
-        // ユーザ・パスワードを与える場合は以下のようなコードになる
-        //
-        // AuthenticationContext ac =
-        //     new AuthenticationContext(userName, password.toCharArray(), domainName);
-
-        SMBClient client = new SMBClient();
-        try (Connection connection = client.connect(SmbHostName)) {
-            Session session = connection.authenticate(ac);
-
-            try (DiskShare share = (DiskShare) session.connectShare(ShareName)) {
-                for (FileIdBothDirectoryInformation f : share.list("", "*")) {
-                    long fileAttributes = f.getFileAttributes();
-
-                    System.out.println("File : " + f.getFileName());
-                    System.out.println("\t" + f.getCreationTime());
-                    System.out.println("\t" + f.getLastAccessTime());
-                    System.out.println("\t" + f.getLastWriteTime());
-                    System.out.println("\t" + f.getChangeTime());
-                    System.out.println("\t" + f.getAllocationSize());
-                    System.out.println("\t" + fileAttributes);
-
-                    if (EnumWithValue.EnumUtils.isSet(fileAttributes, FileAttributes.FILE_ATTRIBUTE_DIRECTORY))
-                        System.out.println("\tDIRECTORY");
-
-                    if (EnumWithValue.EnumUtils.isSet(fileAttributes, FileAttributes.FILE_ATTRIBUTE_HIDDEN))
-                        System.out.println("\tHIDDEN");
-
-                    System.out.println("\t" + f.getEaSize());
-                    System.out.println("\t" +  new String(Hex.encodeHex(f.getFileId())));
-                }
-            }
-        }
-    }
-
     void connectNTLM() throws IOException {
         System.out.println("Go NTLM");
 
         AuthenticationContext authCtx =
             new AuthenticationContext(UserName, Password.toCharArray(), DomainName);
 
-        connectSmb(authCtx);
+        try {
+            connectSmb(authCtx);
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        }
 
         System.out.println("Done NTLM");
     }
@@ -345,6 +325,43 @@ public class ActiveDirectoryTest {
                                           params);
 
             return new AppConfigurationEntry[]{configEntry};
+        }
+    }
+
+    void connectSmb(AuthenticationContext ac) throws IOException {
+
+        //
+        // ユーザ・パスワードを与える場合は以下のようなコードになる
+        //
+        // AuthenticationContext ac =
+        //     new AuthenticationContext(userName, password.toCharArray(), domainName);
+
+        SMBClient client = new SMBClient();
+        try (Connection connection = client.connect(SmbHostName)) {
+            Session session = connection.authenticate(ac);
+
+            try (DiskShare share = (DiskShare) session.connectShare(ShareName)) {
+                for (FileIdBothDirectoryInformation f : share.list("", "*")) {
+                    long fileAttributes = f.getFileAttributes();
+
+                    System.out.println("File : " + f.getFileName());
+                    System.out.println("\t" + f.getCreationTime());
+                    System.out.println("\t" + f.getLastAccessTime());
+                    System.out.println("\t" + f.getLastWriteTime());
+                    System.out.println("\t" + f.getChangeTime());
+                    System.out.println("\t" + f.getAllocationSize());
+                    System.out.println("\t" + fileAttributes);
+
+                    if (EnumWithValue.EnumUtils.isSet(fileAttributes, FileAttributes.FILE_ATTRIBUTE_DIRECTORY))
+                        System.out.println("\tDIRECTORY");
+
+                    if (EnumWithValue.EnumUtils.isSet(fileAttributes, FileAttributes.FILE_ATTRIBUTE_HIDDEN))
+                        System.out.println("\tHIDDEN");
+
+                    System.out.println("\t" + f.getEaSize());
+                    System.out.println("\t" +  new String(Hex.encodeHex(f.getFileId())));
+                }
+            }
         }
     }
 }
