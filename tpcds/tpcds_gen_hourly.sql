@@ -96,7 +96,7 @@ SELECT
     wr_account_credit,
     wr_net_loss,
     wr_dummy
-INTO web_returns4 FROM web_returns3 LEFT OUTER JOIN web_sales4 ON (ws_item_sk = wr_item_sk AND ws_order_number = wr_order_number);
+INTO web_returns4 FROM web_returns3 LEFT OUTER JOIN web_sales4 ON (ws_item_sk = wr_item_sk AND ws_order_number = wr_order_number)
 WHERE web_sales4.ws_item_sk IS NOT NULL AND web_sales4.ws_order_number IS NOT NULL;
 
 END;
