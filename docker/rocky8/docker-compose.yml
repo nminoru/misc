@@ -1,0 +1,8 @@
+services:
+  rockylinux:
+    image: rockylinux:8
+    build:
+      context: rockylinux
+      dockerfile: Dockerfile    
+    restart: always
+
