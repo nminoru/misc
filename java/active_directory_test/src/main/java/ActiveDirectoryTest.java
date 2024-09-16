@@ -19,6 +19,7 @@ import javax.naming.AuthenticationException;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.Attributes;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
@@ -58,34 +59,48 @@ import org.ietf.jgss.Oid;
 
 public class ActiveDirectoryTest {
 
-    // Active Diretory の設定
-    static String DomainName = "<AD domain name>";
-    static String UserName = "<username>";
-    static String Password = "<password>";
-    static String LdapHostName = "<LDAP hostname>";
+    enum Method {
+	Smb,
+	Ldap
+    };
+
+    // オプションから与えられる値
+    static String DomainName       = "<AD domain name>";
+    static String UserName         = "<username>";
+    static String Password         = "<password>";
+    static String LdapHostName     = "<LDAP hostname>";
     static String KerberosHostName = "<Kerberos hostname>";
+    static String UserDn           = "<user dn>";
+    static String Filter           = "<filter>";
 
     // テスト用のSMBサーバー
-    static String SmbHostName = "<SMB hostname>";
-    static String ShareName = "<SMB share name>";
+    static String SmbHostName      = "<SMB hostname>";
+    static String ShareName        = "<SMB share name>";
 
     public static void main(String[] args) throws Exception {
-        DomainName       = System.getenv("SMB_DOMAIN");
-        UserName         = System.getenv("SMB_USERNAME");
-        Password         = System.getenv("SMB_PASSWORD");
-        LdapHostName     = System.getenv("SMB_LDAP");
-        KerberosHostName = System.getenv("SMB_KDC");
-        SmbHostName      = System.getenv("SMB_HOST");
-        ShareName        = System.getenv("SMB_SHARENAME");
+        DomainName       = System.getenv("ADT_DOMAIN");
+        UserName         = System.getenv("ADT_USERNAME");
+        Password         = System.getenv("ADT_PASSWORD");
+        LdapHostName     = System.getenv("ADT_LDAP");
+        KerberosHostName = System.getenv("ADT_KDC");
+	
+        SmbHostName      = System.getenv("ADT_SMB_HOST");
+        ShareName        = System.getenv("ADT_SMB_SHARENAME");
+
+	UserDn           = System.getenv("ADT_LDAP_USER_DN");
+	Filter           = System.getenv("ADT_LDAP_FILTER");	
 
         ActiveDirectoryTest activeDirectoryTest = new ActiveDirectoryTest();
 
         if (args.length > 0) {
             switch (args[0]) {
-                case "kerberos":
-                    activeDirectoryTest.connectKerberos();
+	        case "kerberos+smb":
+                    activeDirectoryTest.connectKerberos(Method.Smb);
                     return;
-                case "ntlm":
+	        case "kerberos+ldap":
+                    activeDirectoryTest.connectKerberos(Method.Ldap);
+                    return;		    
+	        case "ntlm":
                     activeDirectoryTest.connectNTLM();
                     return;
                 case "ldap":
@@ -120,8 +135,8 @@ public class ActiveDirectoryTest {
             System.out.println("OK: connect LDAP");
 
             // TODO: ここで LDAP の検索を行う
-        // } catch (NamingException e) {
-        //     e.printStackTrace();
+	    // } catch (NamingException e) {
+	    //     e.printStackTrace();
         } catch (AuthenticationException e) {
             // ユーザー認証失敗
             System.err.println("# User authentication failed");
@@ -137,6 +152,70 @@ public class ActiveDirectoryTest {
             }
         }
     }
+
+    void connectLdapViaKerberos() {
+        Hashtable<String, String> env = new Hashtable<>();
+
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.PROVIDER_URL,            "ldap://" + LdapHostName);
+        env.put(Context.REFERRAL,                "follow");
+        env.put("java.naming.ldap.attributes.binary", "objectSid");
+
+	// LDAP署名対応
+        env.put("javax.security.sasl.qop",       "auth-int");	
+	
+        // env.put(Context.SECURITY_PRINCIPAL,      UserName + "@" + DomainName);
+        // env.put(Context.SECURITY_CREDENTIALS,    Password);
+	
+        env.put(Context.SECURITY_AUTHENTICATION, "GSSAPI");
+        env.put("javax.security.sasl.server.authentication", "true");	
+
+        DirContext dirContext = null;
+
+        try {
+            dirContext = new InitialDirContext(env);
+
+            System.out.println("OK: connect LDAP");
+
+	    // CN 検索
+            // attrs = search("cn=" + searchUserName);
+
+	    SearchControls constraints = new SearchControls();
+	    constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+
+	    NamingEnumeration<SearchResult> results = null;
+	    try {
+		results = dirContext.search(UserDn, Filter, constraints);
+	    } finally {
+		if (results != null) {
+		    while (results.hasMore()) {
+			SearchResult sr = results.next();
+			System.out.println("SearchResult: " + sr.toString());
+		    }
+		    
+		    try {
+			results.close();
+		    } catch (NamingException e) {
+			System.out.println("Failed to close connection to LDAP server");
+			e.printStackTrace(System.err);
+		    }
+		}
+	    }
+        } catch (AuthenticationException e) {
+            // ユーザー認証失敗
+            System.err.println("# User authentication failed");
+            e.printStackTrace(System.err);
+        } catch (Exception e) {
+            e.printStackTrace(System.err);
+        } finally {
+            try {
+                if (dirContext != null)
+                    dirContext.close();
+            } catch (NamingException e) {
+                e.printStackTrace();
+            }
+        }
+    }    
 
     Subject serviceSubject;
     GSSCredential serviceCredentials;
@@ -162,14 +241,14 @@ public class ActiveDirectoryTest {
         return creds;
     }
 
-    boolean connectKerberos() throws GSSException, IOException, LoginException, PrivilegedActionException {
+    boolean connectKerberos(Method method) throws GSSException, IOException, LoginException, PrivilegedActionException {
         String realmName = DomainName.toUpperCase();
 
         System.out.println("realmName: " + realmName);
 
         System.setProperty("java.security.krb5.kdc",   KerberosHostName);
         System.setProperty("java.security.krb5.realm", realmName);
-        System.setProperty("java.security.auth.login.config", "./jaas.conf");
+        // System.setProperty("java.security.auth.login.config", "./jaas.conf");
         System.setProperty("javax.security.auth.useSubjectCredsOnly", "true");
         System.setProperty("java.security.krb5.debug", "true");
         System.setProperty("sun.security.krb5.debug",  "true");
@@ -223,20 +302,38 @@ public class ActiveDirectoryTest {
                     });
 
                 // TODO: credential から SPNEGO トークンを作ることができるはず。
-
                 System.out.println("krb.principal: " + krbPrincipal.getName());
                 System.out.println("krb.realm: " + krbPrincipal.getRealm());
 
                 //
                 // Kerberos を使ったアクセス
                 //
-                AuthenticationContext authCtx =
-                    new GSSAuthenticationContext(krbPrincipal.getName(),
-                                                 krbPrincipal.getRealm(),
-                                                 subject,
-                                                 credential);
-
-                connectSmb(authCtx);
+		switch (method) {
+		    
+		case Smb:
+		    {
+			AuthenticationContext authCtx =
+			    new GSSAuthenticationContext(krbPrincipal.getName(),
+							 krbPrincipal.getRealm(),
+							 subject,
+							 credential);
+			connectSmb(authCtx);
+		    }
+		    break;
+		    
+		case Ldap:
+		    {
+			Subject.doAs(subject,
+				     new PrivilegedExceptionAction<Void>() {
+					 @Override
+					 public Void run() throws GSSException {
+					     connectLdapViaKerberos();
+					     return (Void)null;
+					 }
+				     });
+		    }
+		    break;
+		}
 
                 // 成功
                 success = true;
@@ -345,7 +442,6 @@ public class ActiveDirectoryTest {
     }
 
     void connectSmb(AuthenticationContext ac) throws IOException {
-
         //
         // ユーザ・パスワードを与える場合は以下のようなコードになる
         //
