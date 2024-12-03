@@ -122,6 +122,10 @@ public class ActiveDirectoryTest {
         env.put(Context.PROVIDER_URL,            "ldap://" + LdapHostName);
         env.put(Context.SECURITY_PRINCIPAL,      UserName + "@" + DomainName);
         env.put(Context.SECURITY_CREDENTIALS,    Password);
+        env.put("java.naming.ldap.attributes.binary", "objectSid");
+
+	// LDAP署名対応
+	env.put("javax.security.sasl.qop",       "auth-int");
 
         // env.put(Context.SECURITY_PROTOCOL,       "ssl");
         // env.put(Context.REFERRAL,                "follow");
@@ -134,9 +138,29 @@ public class ActiveDirectoryTest {
 
             System.out.println("OK: connect LDAP");
 
-            // TODO: ここで LDAP の検索を行う
-	    // } catch (NamingException e) {
-	    //     e.printStackTrace();
+	    // CN 検索
+            // attrs = search("cn=" + searchUserName);
+	    SearchControls constraints = new SearchControls();
+	    constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
+	    
+	    NamingEnumeration<SearchResult> results = null;
+	    try {
+		results = dirContext.search(UserDn, Filter, constraints);
+	    } finally {
+		if (results != null) {
+		    while (results.hasMore()) {
+			SearchResult sr = results.next();
+			System.out.println("SearchResult: " + sr.toString());
+		    }
+		    
+		    try {
+			results.close();
+		    } catch (NamingException e) {
+			System.out.println("Failed to close connection to LDAP server");
+			e.printStackTrace(System.err);
+		    }
+		}
+	    }
         } catch (AuthenticationException e) {
             // ユーザー認証失敗
             System.err.println("# User authentication failed");
@@ -162,7 +186,7 @@ public class ActiveDirectoryTest {
         env.put("java.naming.ldap.attributes.binary", "objectSid");
 
 	// LDAP署名対応
-        env.put("javax.security.sasl.qop",       "auth-int");	
+        env.put("javax.security.sasl.qop",       "auth-int");
 	
         // env.put(Context.SECURITY_PRINCIPAL,      UserName + "@" + DomainName);
         // env.put(Context.SECURITY_CREDENTIALS,    Password);
