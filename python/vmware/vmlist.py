@@ -20,8 +20,17 @@ si = SmartConnect(
     sslContext=context
 )
 
+content = si.RetrieveContent()
+
 for datacenter in content.rootFolder.childEntity:
     for vm_obj in datacenter.vmFolder.childEntity:
-        print(vm_obj.name + " : " + vm_obj._moId)
+        # print(vm_obj._moId + ',' + vm_obj.name)
+        
+        raw_path = vm_obj.config.files.vmPathName  # 例: "[datastore1] VMName/VMName.vmx" 
+        datastore_name = raw_path.split(']')[0].strip('[') 
+        vm_subpath = raw_path.split(']')[1].strip().rsplit('/', 1)[0] 
+        full_path = f"/vmfs/volumes/{datastore_name}/{vm_subpath}/"
+
+        print(vm_obj._moId + ',' + vm_obj.name + "," + full_path)
         
 Disconnect(si)
