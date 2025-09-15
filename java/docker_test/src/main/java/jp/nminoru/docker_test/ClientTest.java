@@ -24,10 +24,12 @@ import com.spotify.docker.client.messages.Image;
 
 public class ClientTest {
 
-    public static final String TARGET_IMAGE_NAME = "jupyter/scipy-notebook:latest";
-    // public static final String TARGET_IMAGE_NAME = "busybox";
+    // public static final String TARGET_IMAGE_NAME = "jupyter/scipy-notebook:latest";
+    public static final String TARGET_IMAGE_NAME = "redis";
 
     public static void main(String[] args) throws DockerCertificateException, DockerException, InterruptedException {
+	System.out.println("test start");
+	
         ClientTest clientTest = new ClientTest();
 
         // clientTest.test1(TARGET_IMAGE_NAME);
