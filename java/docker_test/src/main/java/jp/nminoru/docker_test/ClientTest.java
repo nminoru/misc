@@ -25,14 +25,14 @@ import com.spotify.docker.client.messages.Image;
 public class ClientTest {
 
     // public static final String TARGET_IMAGE_NAME = "jupyter/scipy-notebook:latest";
-    public static final String TARGET_IMAGE_NAME = "redis";
+    public static final String TARGET_IMAGE_NAME = "redis:latest";
 
     public static void main(String[] args) throws DockerCertificateException, DockerException, InterruptedException {
 	System.out.println("test start");
 	
         ClientTest clientTest = new ClientTest();
 
-        // clientTest.test1(TARGET_IMAGE_NAME);
+        clientTest.test1(TARGET_IMAGE_NAME);
         clientTest.test2();
     }
 
@@ -46,9 +46,8 @@ public class ClientTest {
     public void test1(String imageName) throws DockerException, InterruptedException {
 
         // Pull an image
-        
-        // System.out.println("Phase: pull image");         
-        // docker.pull(imageName);
+        System.out.println("Phase: pull image");         
+        client.pull(imageName);
         
         System.out.println("Phase: create container"); 
 
