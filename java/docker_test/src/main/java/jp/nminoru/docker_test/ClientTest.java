@@ -29,11 +29,14 @@ public class ClientTest {
 
     public static void main(String[] args) throws DockerCertificateException, DockerException, InterruptedException {
 	System.out.println("test start");
-	
+
         ClientTest clientTest = new ClientTest();
 
+	System.out.print("*** test1 ***");
         clientTest.test1(TARGET_IMAGE_NAME);
+	System.out.print("*** test2 ***");
         clientTest.test2();
+	System.out.print("*** test end ***");
     }
 
     final DockerClient client;
@@ -46,10 +49,10 @@ public class ClientTest {
     public void test1(String imageName) throws DockerException, InterruptedException {
 
         // Pull an image
-        System.out.println("Phase: pull image");         
+        System.out.println("Phase: pull image");
         client.pull(imageName);
-        
-        System.out.println("Phase: create container"); 
+
+        System.out.println("Phase: create container");
 
         // Bind container ports to host ports
         final String[] ports = {"8888"};
@@ -61,11 +64,11 @@ public class ClientTest {
 
             // PortBinding.of("0.0.0.0", port);
             portBinding = PortBinding.randomPort("0.0.0.0");
-            
+
             hostPorts.add(portBinding);
             portBindings.put(port, hostPorts);
         }
-        
+
         final HostConfig hostConfig = HostConfig.builder().portBindings(portBindings).build();
 
         // Create container with exposed ports
@@ -110,16 +113,16 @@ public class ClientTest {
         System.out.println(logs.readFully());
 
         inspect(containerId);
-        
+
         // Exec command inside running container with attached STDOUT and STDERR
         // final String[] command = {"sh", "-c", "ls"};
         // final ExecCreation execCreation = docker.execCreate(id, command, DockerClient.ExecCreateParam.attachStdout(),
         // DockerClient.ExecCreateParam.attachStderr());
         // final LogStream output = docker.execStart(execCreation.id());
-        // 
+        //
 
         System.out.println("Phase: stop container");
-        
+
         // Kill container
         client.killContainer(containerId);
 
@@ -151,12 +154,12 @@ public class ClientTest {
 
         final ContainerStats stats = client.stats(containerId);
 
-        long rxBytes = 0;        
+        long rxBytes = 0;
         long txBytes = 0;
-        
+
         if (stats.network() != null) {
             NetworkStats networkStats = stats.network();
-            
+
             rxBytes += networkStats.rxBytes();
             txBytes += networkStats.txBytes();
         }
@@ -164,14 +167,14 @@ public class ClientTest {
         if (stats.networks() != null) {
             for (String key : stats.networks().keySet()) {
                 NetworkStats networkStats = stats.networks().get(key);
-                
+
                 rxBytes += networkStats.rxBytes();
                 txBytes += networkStats.txBytes();
             }
         }
 
         System.out.println("\trxBytes: " + rxBytes);
-        System.out.println("\ttxBytes: " + txBytes);        
+        System.out.println("\ttxBytes: " + txBytes);
     }
 
     /**
@@ -186,7 +189,7 @@ public class ClientTest {
             System.out.println("image: " + image.id());
             for (String digest : image.repoDigests()) {
                 System.out.println("\tdigest: " + digest);
-            }            
+            }
             for (String tag : image.repoTags()) {
                 System.out.println("\ttag: " + tag);
             }
@@ -196,12 +199,12 @@ public class ClientTest {
                 }
             }
         }
-            
+
         // List<Image> images = new ArrayList<>();
         // List<ListImagesParam> params = new ArrayList<>();
         // for (Entry<String, String> entry : labels.entrySet()) {
         // params.add(DockerClient.ListImagesParam.withLabel(entry.getKey(), entry.getValue()));
         // }
-        // images = client.listImages(params.toArray(new ListImagesParam[0]));        
+        // images = client.listImages(params.toArray(new ListImagesParam[0]));
     }
 }
