@@ -14,7 +14,7 @@ import com.hierynomus.smbj.share.DiskShare;
 import org.apache.commons.codec.binary.Hex;
 
 public class Main {
-    
+
     public static void main(String[] args) throws IOException {
         String serverName = getEnv("SMB_SERVER");
         String domainName = getEnv("SMB_DOMAIN");
@@ -23,7 +23,7 @@ public class Main {
         String shareName  = getEnv("SMB_SHARENAME");
 
         SMBClient client = new SMBClient();
-        
+
         try (Connection connection = client.connect(serverName)) {
             AuthenticationContext ac = new AuthenticationContext(userName, password.toCharArray(), domainName);
             Session session = connection.authenticate(ac);
@@ -32,7 +32,7 @@ public class Main {
             try (DiskShare share = (DiskShare) session.connectShare(shareName)) {
                 for (FileIdBothDirectoryInformation f : share.list("", "*")) {
                     long fileAttributes = f.getFileAttributes();
-                    
+
                     System.out.println("File : " + f.getFileName());
                     System.out.println("\t" + f.getCreationTime());
                     System.out.println("\t" + f.getLastAccessTime());
@@ -46,11 +46,19 @@ public class Main {
 
                     if (EnumWithValue.EnumUtils.isSet(fileAttributes, FileAttributes.FILE_ATTRIBUTE_HIDDEN))
                         System.out.println("\tHIDDEN");
-                    
+
                     System.out.println("\t" + f.getEaSize());
+
+		    // byte[] bytes = f.getFileId();
+
                     long fileId = f.getFileId();
-                    byte[] bytes = ByteBuffer.allocate(4).putLong(fileId).array();
-                    System.out.println("\t" +  new String(Hex.encodeHex(bytes)));
+                    byte[] bytes1 = ByteBuffer.allocate(8).putLong(fileId).array();
+		    byte[] bytes2 = new byte[8];
+
+		    for (int i = 0 ; i < 8 ; i++)
+			bytes2[7 - i] = bytes1[i];
+
+                    System.out.println("\t" +  new String(Hex.encodeHex(bytes2)));
                 }
             }
         }
