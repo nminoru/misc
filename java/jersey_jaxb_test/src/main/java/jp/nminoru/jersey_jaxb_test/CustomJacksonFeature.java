@@ -1,15 +1,15 @@
 package jp.nminoru.jersey_jaxb_test;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Configuration;
-import javax.ws.rs.core.Feature;
-import javax.ws.rs.core.FeatureContext;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.MessageBodyReader;
-import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Provider;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Configuration;
+import jakarta.ws.rs.core.Feature;
+import jakarta.ws.rs.core.FeatureContext;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.ext.ContextResolver;
+import jakarta.ws.rs.ext.MessageBodyReader;
+import jakarta.ws.rs.ext.MessageBodyWriter;
+import jakarta.ws.rs.ext.Provider;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -81,6 +81,7 @@ public class CustomJacksonFeature extends JacksonFeature {
 
             // シリアライズ: フィールドを持たないクラスをエラーとしない
             disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+	    
             // デシリアライズ: クラスに対応するフィールドない JSON が来た時に無視する。
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         }
@@ -103,6 +104,7 @@ public class CustomJacksonFeature extends JacksonFeature {
 
             // シリアライズ: フィールドを持たないクラスをエラーとしない
             this.mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+	    
             // デシリアライズ: クラスに対応するフィールドない JSON が来た時に無視する。
             this.mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         }

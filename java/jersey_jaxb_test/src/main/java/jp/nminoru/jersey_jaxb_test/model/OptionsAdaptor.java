@@ -2,8 +2,7 @@ package jp.nminoru.jersey_jaxb_test.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 
 public class OptionsAdaptor extends XmlAdapter<Map<String, Object>, Options> {
 

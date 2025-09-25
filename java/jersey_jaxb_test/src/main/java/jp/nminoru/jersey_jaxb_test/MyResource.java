@@ -1,14 +1,15 @@
 package jp.nminoru.jersey_jaxb_test;
 
 import java.util.List;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Path;
-import javax.ws.rs.POST;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 import jp.nminoru.jersey_jaxb_test.model.Baz;
 import jp.nminoru.jersey_jaxb_test.model.Foo;
+import jp.nminoru.jersey_jaxb_test.model.FooFoo;
 
 
 @Path("/myresource")
@@ -21,6 +22,14 @@ public class MyResource {
     public Foo postFoo(Foo request) {
         return request;
     }
+
+    @Path("/foofoo")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public FooFoo postFoo(FooFoo request) {
+        return request;
+    }    
 
     @Path("/baz")
     @POST

@@ -1,8 +1,8 @@
 package jp.nminoru.jersey_jaxb_test;
 
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
 import org.junit.After;
 import org.junit.Before;
@@ -18,6 +18,10 @@ public class MoxyTest extends MyResourceTest {
 
     @Before
     public void setUp() throws Exception {
+	System.out.println("-------------------------------------------------------");
+	System.out.println("  Moxy Test                                            ");
+	System.out.println("-------------------------------------------------------");
+
         super.setUp(MoxyJsonFeature.class);
     }
 
@@ -27,10 +31,17 @@ public class MoxyTest extends MyResourceTest {
     }
 
     @Test
-    public void test1() throws Exception {
-        System.out.println("--- MoxyTest: STEP 1 -----------");
+    public void test1_1() throws Exception {
+        System.out.println("--- MoxyTest: STEP 1-1 -----------");
 
-        super.test1();
+        super.test1_1();
+    }
+
+    @Test
+    public void test1_2() throws Exception {
+        System.out.println("--- MoxyTest: STEP 1-2 -----------");
+
+        super.test1_2();
     }
 
     @Test

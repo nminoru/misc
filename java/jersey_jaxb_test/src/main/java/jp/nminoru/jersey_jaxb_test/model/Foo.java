@@ -2,9 +2,9 @@ package jp.nminoru.jersey_jaxb_test.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlTransient;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import jp.nminoru.jersey_jaxb_test.model.EnumType0;
 import jp.nminoru.jersey_jaxb_test.model.EnumType1;
@@ -35,16 +35,16 @@ public class Foo {
     public MyHashMap options2;
 
     @XmlTransient
-    public Integer  transperent0 = new Integer(1);
+    public Integer  transperent0 = Integer.valueOf(1);
 
     @XmlTransient
-    public Integer  transperent1 = new Integer(1);
+    public Integer  transperent1 = Integer.valueOf(1);
 
     public Foo() {
         this.enumType0 = EnumType0.UNSPECIFIED;
         this.enumType1 = EnumType1.unspecified;
         this.int0      = 1;
-        this.int1      = new Integer(1);
+        this.int1      = Integer.valueOf(1);
         this.options0  = new HashMap<>();
         this.options1  = new Options();
         this.options2  = new MyHashMap();
@@ -53,9 +53,9 @@ public class Foo {
     @XmlElement(name = "enumType0")
     public String getEnumType0() {
         if (enumType0 != null)
-            return enumType0.name();
+            return enumType0.getLabel();
         else
-            return EnumType0.UNSPECIFIED.name();
+            return EnumType0.UNSPECIFIED.getLabel();
     }
 
     @XmlElement(name = "enumType0")

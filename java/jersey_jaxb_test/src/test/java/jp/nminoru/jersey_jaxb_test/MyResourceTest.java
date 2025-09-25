@@ -1,13 +1,13 @@
 package jp.nminoru.jersey_jaxb_test;
 
 import java.util.List;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.ClientBuilder;
+import jakarta.ws.rs.client.Entity;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.junit.After;
 import org.junit.Before;
@@ -38,10 +38,11 @@ public class MyResourceTest {
         server.shutdownNow();
     }
 
-    protected void test1() throws Exception {
-        System.out.println("--- JsonBindingTest: STEP 1 -----------");
+    protected void test1_1() throws Exception {
+        System.out.println("--- JsonBindingTest: STEP 1-1 -----------");
 
-        String request = "{\"enumType0\":\"abc\",\"version0\":2,\"version1\":2, \"options0\":{\"key1\":\"value1\"}, \"options1\":{\"key1\":\"value1\"}, \"options2\":{\"key1\":\"value1\"}}";
+        String request = """
+	    {"enumType0":"abc","version0":2,"version1":2, "options0":{"key1":"value1"}, "options1":{"key1":"value1"}, "options2":{"key1":"value1"}}""";
 
         Response response = target
             .path("/myresource/foo")
@@ -58,12 +59,53 @@ public class MyResourceTest {
         Foo result = response.readEntity(Foo.class);
 
         assertNotNull(result);
-        // assertEquals(EnumType0.ABC,         result.enumType0);
+        assertEquals(EnumType0.ABC,         result.enumType0);
         assertEquals(EnumType1.unspecified, result.enumType1);
         assertEquals(1,                     result.int0);
-        assertEquals(new Integer(1),        result.int1);
-        assertEquals(new Integer(2),        result.version0);
-        assertEquals(new Integer(2),        result.version1);
+        assertEquals(Integer.valueOf(1),    result.int1);
+        assertEquals(Integer.valueOf(2),    result.version0);
+        assertEquals(Integer.valueOf(2),    result.version1);
+
+        assertNotNull(result.options0);
+        // assertEquals("value1",       result.options0.get("key1"));
+
+        assertNotNull(result.options1);
+        // assertEquals("value1",       result.options1._key1);
+
+        assertNotNull(result.options2);
+        assertNull(result.options2.key1); // fill できない
+        assertEquals("value1",       result.options2.get("key1"));
+
+        System.out.println("-------------");
+    }
+
+    protected void test1_2() throws Exception {
+        System.out.println("--- JsonBindingTest: STEP 1- -----------");
+
+        String request = """
+	    {"enumType0":"abc","version0":2,"version1":2, "options0":{"key1":"value1"}, "options1":{"key1":"value1"}, "options2":{"key1":"value1"}}""";
+
+        Response response = target
+            .path("/myresource/foofoo")
+            .request(MediaType.APPLICATION_JSON)
+            .post(Entity.entity(request, MediaType.APPLICATION_JSON_TYPE));
+
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+            System.err.println(response.readEntity(String.class));
+            assertTrue(false);
+        }
+
+        System.out.println("-------------");
+
+        Foo result = response.readEntity(Foo.class);
+
+        assertNotNull(result);
+        assertEquals(EnumType0.ABC,         result.enumType0);
+        assertEquals(EnumType1.unspecified, result.enumType1);
+        assertEquals(1,                     result.int0);
+        assertEquals(Integer.valueOf(1),    result.int1);
+        assertEquals(Integer.valueOf(2),    result.version0);
+        assertEquals(Integer.valueOf(2),    result.version1);
 
         assertNotNull(result.options0);
         // assertEquals("value1",       result.options0.get("key1"));
@@ -79,7 +121,8 @@ public class MyResourceTest {
     }
 
     protected void test2() throws Exception {
-        String request = "{\"transperent0\":10, \"transperent1\":11}";
+        String request = """
+	    {"transperent0":10, "transperent1":11}""";
 
         Response response = target
             .path("/myresource/foo")
@@ -107,7 +150,8 @@ public class MyResourceTest {
             assertTrue(false);
         }
 
-        String request2 = "{\"child1\":{},\"child2\":null}";
+        String request2 = """
+	    {"child1":{},"child2":null}""";
 
         Response response2 = target
             .path("/myresource/baz")
@@ -121,7 +165,8 @@ public class MyResourceTest {
     }
 
     protected void test4() throws Exception {
-        String request1 = "[\"ABC\", \"EFG\", \"HIJ\"]";
+        String request1 = """
+	    ["ABC", "EFG", "HIJ"]""";
 
         Response response1 = target
             .path("/myresource/qux")
