@@ -19,6 +19,8 @@ import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlEnum;
+import jakarta.xml.bind.annotation.XmlEnumValue;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.adapters.XmlAdapter;
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -37,6 +39,7 @@ public class jaxb_test {
         public List<List<String>> multidimarr;
         private String phoneNumbers;
         public Map<String, Object> attributes;
+	public Rabbit rabbit = Rabbit.UNSPECIFIED;
 
         @XmlElement(name="phone-number")
         public String getPhoneNumbers() {
@@ -54,6 +57,35 @@ public class jaxb_test {
         @XmlElement(name="options")
         @XmlJavaTypeAdapter(JsonObjectAdapter.class)
         public JsonObject options;
+    }
+
+    @XmlEnum
+    public static enum Rabbit {
+	@XmlEnumValue("abc")
+	ABC("abc"),
+	@XmlEnumValue("xyz")	
+	XYZ("xyz"),
+	@XmlEnumValue("unspecified")		
+	UNSPECIFIED("unspecified");
+
+	private final String label;
+
+	private Rabbit(String label) {
+	    this.label = label;
+	}
+
+	public String getLabel() {
+	    return label;
+	}
+
+	public static Rabbit indexOf(String enumType) {
+	    for (Rabbit value : Rabbit.values()) {
+		if (value.label.equals(enumType))
+		    return value;
+	    }
+
+	    throw new IllegalArgumentException();
+	}	
     }
 
     public static class JsonObjectAdapter extends XmlAdapter<String, JsonObject> {
@@ -144,7 +176,13 @@ public class jaxb_test {
 
     static {
         try {
-            jaxbContext = JAXBContextFactory.createContext(new Class[]{Dog.class, Cat.class}, null);
+            jaxbContext = JAXBContextFactory.createContext(
+                              new Class[]{
+				  Dog.class,
+				  Cat.class,
+				  Rabbit.class
+			      },
+			      null);
         } catch (JAXBException e) {
         }
     }
