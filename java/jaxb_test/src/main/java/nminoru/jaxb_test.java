@@ -6,24 +6,26 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-import javax.xml.bind.PropertyException;
-import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
 import javax.xml.transform.stream.StreamSource;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
+import jakarta.xml.bind.PropertyException;
+import jakarta.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.eclipse.persistence.jaxb.JAXBContextFactory;
 import org.eclipse.persistence.jaxb.MarshallerProperties;
+
+
 
 public class jaxb_test {
 
@@ -35,7 +37,7 @@ public class jaxb_test {
         public List<List<String>> multidimarr;
         private String phoneNumbers;
         public Map<String, Object> attributes;
-        
+
         @XmlElement(name="phone-number")
         public String getPhoneNumbers() {
             return phoneNumbers;
@@ -50,7 +52,7 @@ public class jaxb_test {
         public String name;
 
         @XmlElement(name="options")
-        @XmlJavaTypeAdapter(JsonObjectAdapter.class)        
+        @XmlJavaTypeAdapter(JsonObjectAdapter.class)
         public JsonObject options;
     }
 
@@ -66,15 +68,15 @@ public class jaxb_test {
         @Override
         public JsonObject unmarshal(String v) throws Exception {
             System.out.println("JsonObjectAdapter: " + v);
-            
+
             if (null == v)
                 return null;
-            
+
             JsonReader jsonReader = Json.createReader(new StringReader(v));
             return jsonReader.readObject();
         }
     }
-    
+
     public static void main(String[] args) throws JAXBException, PropertyException {
         // JAXBContext jaxbContext = JAXBContext.newInstance(Dog.class);
         Dog dog = new Dog();
@@ -88,7 +90,7 @@ public class jaxb_test {
 
         List<String> array = new ArrayList<>();
         array.add("123");
-        array.add("456"); 
+        array.add("456");
         dog.multidimarr = new ArrayList<>();
         dog.multidimarr.add(array);
         dog.multidimarr.add(array);
@@ -101,11 +103,11 @@ public class jaxb_test {
         System.out.println();
 
         dog = unmarshal("{\"name\":\"abc\", \"age\":34}", Dog.class);
-        
+
         System.out.println("name: " + dog.name);
         System.out.println("age: " + dog.age);
         System.out.println();
-        
+
         dog = unmarshal("{\"name\":\"xyz\", \"age\":12, \"bar\":\"baz\"}", Dog.class);
 
         System.out.println("name: " + dog.name);
@@ -118,26 +120,26 @@ public class jaxb_test {
         dog.attributes.put("key2", "value2");
         dog.attributes.put("key3", "value3");
         result = marshal(dog);
-        System.out.println(result);        
-        System.out.println();        
+        System.out.println(result);
+        System.out.println();
 
         JsonReader jsonReader = Json.createReader(new StringReader("{\"prop\":\"value\", \"id\":0, \"path\":\"/\"}"));
 
         Cat cat = new Cat();
-        
+
         cat.name = "NAME";
         cat.options = jsonReader.readObject();
 
         result = marshal(cat);
-        System.out.println(result);        
+        System.out.println(result);
         System.out.println();
 
         cat = unmarshal(result, Cat.class);
         System.out.println("name: " + cat.name);
         System.out.println("options: " + cat.options.toString());
-        System.out.println();        
+        System.out.println();
     }
-    
+
     static JAXBContext jaxbContext;
 
     static {
@@ -149,24 +151,24 @@ public class jaxb_test {
 
     static String marshal(Object object) throws JAXBException {
         Marshaller marshaller = jaxbContext.createMarshaller();
-        
+
         marshaller.setProperty(MarshallerProperties.MEDIA_TYPE, "application/json");
         marshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
         StringWriter marshllerOutput = new StringWriter();
-        
+
         marshaller.marshal(object, marshllerOutput);
 
         return marshllerOutput.toString();
     }
-    
+
     static <T> T unmarshal(String jsonString, Class<T> type) throws JAXBException {
         Unmarshaller unmarshaller = jaxbContext.createUnmarshaller();
-        
+
         unmarshaller.setProperty(MarshallerProperties.MEDIA_TYPE, "application/json");
         unmarshaller.setProperty(MarshallerProperties.JSON_INCLUDE_ROOT, false);
-        
+
         StringReader reader = new StringReader(jsonString);
         JAXBElement<T> element = unmarshaller.unmarshal(new StreamSource(reader), type);
 
