@@ -16,8 +16,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+// import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
 import org.glassfish.jersey.CommonProperties;
 import org.glassfish.jersey.internal.InternalProperties;
 import org.glassfish.jersey.internal.util.PropertiesHelper;
@@ -81,7 +82,7 @@ public class CustomJacksonFeature extends JacksonFeature {
 
             // シリアライズ: フィールドを持たないクラスをエラーとしない
             disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-	    
+
             // デシリアライズ: クラスに対応するフィールドない JSON が来た時に無視する。
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         }
@@ -97,14 +98,14 @@ public class CustomJacksonFeature extends JacksonFeature {
         public CustomJacksonJaxbJsonProvider2() {
             this.mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
-            this.mapper.setAnnotationIntrospector(createJaxbJacksonAnnotationIntrospector());
+            this.mapper.setAnnotationIntrospector(createJaxbJacksonAnnotationIntrospector(mapper));
 
             // シリアライズ: null フィールドを表示しない
             this.mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 
             // シリアライズ: フィールドを持たないクラスをエラーとしない
             this.mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-	    
+
             // デシリアライズ: クラスに対応するフィールドない JSON が来た時に無視する。
             this.mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         }
@@ -114,8 +115,11 @@ public class CustomJacksonFeature extends JacksonFeature {
             return mapper;
         }
 
-        private static AnnotationIntrospector createJaxbJacksonAnnotationIntrospector() {
-            AnnotationIntrospector jaxbIntrospector = new JaxbAnnotationIntrospector(TypeFactory.defaultInstance());
+        private static AnnotationIntrospector createJaxbJacksonAnnotationIntrospector(ObjectMapper mapper) {
+	    // Java EE では JaxbAnnotationIntrospector を使っていたが、
+	    // Jakarta EE 対応時に JakartaXmlBindAnnotationIntrospector に変更する
+	    // AnnotationIntrospector jaxbIntrospector    = new JaxbAnnotationIntrospector(mapper.getTypeFactory());
+	    AnnotationIntrospector jaxbIntrospector    = new JakartaXmlBindAnnotationIntrospector(mapper.getTypeFactory());
             AnnotationIntrospector jacksonIntrospector = new JacksonAnnotationIntrospector();
 
             return AnnotationIntrospector.pair(jacksonIntrospector, jaxbIntrospector);
