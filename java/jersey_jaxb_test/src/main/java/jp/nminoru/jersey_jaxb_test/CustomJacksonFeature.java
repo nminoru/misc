@@ -95,7 +95,7 @@ public class CustomJacksonFeature extends JacksonFeature {
         private final ObjectMapper mapper;
 
         public CustomJacksonJaxbJsonProvider2() {
-            this.mapper = new ObjectMapper();
+            this.mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
             this.mapper.setAnnotationIntrospector(createJaxbJacksonAnnotationIntrospector());
 
