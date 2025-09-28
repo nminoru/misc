@@ -51,6 +51,10 @@ public class ClientTest {
         AccountKey    = System.getenv("ABFS_ACCOUNT_KEY");
         ContainerName = System.getenv("ABFS_CONTAINER_NAME");
 
+	System.out.println("ABFS_ACCOUNT_NAME   = " + AccountName);
+	System.out.println("ABFS_ACCOUNT_KEY    = " + AccountKey);
+	System.out.println("ABFS_CONTAINER_NAME = " + ContainerName);
+
         String abfs_uri = String.format("https://%s.dfs.core.windows.net/", AccountName);
 
         StorageSharedKeyCredential storageSharedKeyCredential =
