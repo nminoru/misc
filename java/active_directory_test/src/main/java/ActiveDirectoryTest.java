@@ -49,7 +49,6 @@ import com.sun.security.auth.callback.TextCallbackHandler;
 import com.sun.security.auth.module.Krb5LoginModule;
 import com.sun.security.jgss.ExtendedGSSContext;
 import com.sun.security.jgss.ExtendedGSSCredential;
-import org.apache.commons.codec.binary.Hex;
 import org.ietf.jgss.GSSCredential;
 import org.ietf.jgss.GSSException;
 import org.ietf.jgss.GSSManager;
@@ -83,12 +82,12 @@ public class ActiveDirectoryTest {
         Password         = System.getenv("ADT_PASSWORD");
         LdapHostName     = System.getenv("ADT_LDAP");
         KerberosHostName = System.getenv("ADT_KDC");
-	
+
         SmbHostName      = System.getenv("ADT_SMB_HOST");
         ShareName        = System.getenv("ADT_SMB_SHARENAME");
 
 	UserDn           = System.getenv("ADT_LDAP_USER_DN");
-	Filter           = System.getenv("ADT_LDAP_FILTER");	
+	Filter           = System.getenv("ADT_LDAP_FILTER");
 
         ActiveDirectoryTest activeDirectoryTest = new ActiveDirectoryTest();
 
@@ -99,7 +98,7 @@ public class ActiveDirectoryTest {
                     return;
 	        case "kerberos+ldap":
                     activeDirectoryTest.connectKerberos(Method.Ldap);
-                    return;		    
+                    return;
 	        case "ntlm":
                     activeDirectoryTest.connectNTLM();
                     return;
@@ -136,13 +135,14 @@ public class ActiveDirectoryTest {
         try {
             dirContext = new InitialDirContext(env);
 
+	    System.out.println();
             System.out.println("OK: connect LDAP");
 
 	    // CN 検索
             // attrs = search("cn=" + searchUserName);
 	    SearchControls constraints = new SearchControls();
 	    constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
-	    
+
 	    NamingEnumeration<SearchResult> results = null;
 	    try {
 		results = dirContext.search(UserDn, Filter, constraints);
@@ -150,9 +150,10 @@ public class ActiveDirectoryTest {
 		if (results != null) {
 		    while (results.hasMore()) {
 			SearchResult sr = results.next();
+			System.out.println();
 			System.out.println("SearchResult: " + sr.toString());
 		    }
-		    
+
 		    try {
 			results.close();
 		    } catch (NamingException e) {
@@ -187,18 +188,19 @@ public class ActiveDirectoryTest {
 
 	// LDAP署名対応
         env.put("javax.security.sasl.qop",       "auth-int");
-	
+
         // env.put(Context.SECURITY_PRINCIPAL,      UserName + "@" + DomainName);
         // env.put(Context.SECURITY_CREDENTIALS,    Password);
-	
+
         env.put(Context.SECURITY_AUTHENTICATION, "GSSAPI");
-        env.put("javax.security.sasl.server.authentication", "true");	
+        env.put("javax.security.sasl.server.authentication", "true");
 
         DirContext dirContext = null;
 
         try {
             dirContext = new InitialDirContext(env);
 
+	    System.out.println();
             System.out.println("OK: connect LDAP");
 
 	    // CN 検索
@@ -214,9 +216,10 @@ public class ActiveDirectoryTest {
 		if (results != null) {
 		    while (results.hasMore()) {
 			SearchResult sr = results.next();
+			System.out.println();
 			System.out.println("SearchResult: " + sr.toString());
 		    }
-		    
+
 		    try {
 			results.close();
 		    } catch (NamingException e) {
@@ -239,7 +242,7 @@ public class ActiveDirectoryTest {
                 e.printStackTrace();
             }
         }
-    }    
+    }
 
     Subject serviceSubject;
     GSSCredential serviceCredentials;
@@ -268,6 +271,7 @@ public class ActiveDirectoryTest {
     boolean connectKerberos(Method method) throws GSSException, IOException, LoginException, PrivilegedActionException {
         String realmName = DomainName.toUpperCase();
 
+	System.out.println();
         System.out.println("realmName: " + realmName);
 
         System.setProperty("java.security.krb5.kdc",   KerberosHostName);
@@ -290,7 +294,9 @@ public class ActiveDirectoryTest {
         boolean success = false;
 
         try {
+	    System.out.println();
             System.out.println("Go Kerbros");
+	    System.out.println();
 
             lc.login();
 
@@ -333,7 +339,7 @@ public class ActiveDirectoryTest {
                 // Kerberos を使ったアクセス
                 //
 		switch (method) {
-		    
+
 		case Smb:
 		    {
 			AuthenticationContext authCtx =
@@ -344,7 +350,7 @@ public class ActiveDirectoryTest {
 			connectSmb(authCtx);
 		    }
 		    break;
-		    
+
 		case Ldap:
 		    {
 			Subject.doAs(subject,
@@ -364,6 +370,7 @@ public class ActiveDirectoryTest {
             } finally {
                 lc.logout();
                 System.out.println("Done Kerbros");
+		System.out.println();
             }
         } catch (FailedLoginException e) {
             // ユーザー認証失敗
@@ -495,7 +502,6 @@ public class ActiveDirectoryTest {
                         System.out.println("\tHIDDEN");
 
                     System.out.println("\t" + f.getEaSize());
-                    System.out.println("\t" +  new String(Hex.encodeHex(f.getFileId())));
                 }
             }
         }
