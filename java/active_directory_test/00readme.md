@@ -28,4 +28,11 @@ java -jar active_directory_test-0.0.1.jar [kerberos+smb | kerberos+ldap | ntlm |
 ## ADT_METHOD が "LDAP" の時のみ有効
 
 - ADT_LDAP_USER_DN  "dc=example,dc=com"
-- ADT_LDAP_FILTER   "cn=username"
+
+CNを検索する場合は
+
+- ADT_LDAP_FILTER   "(cn=username)"
+
+UPNを検索する場合は
+
+- ADT_LDAP_FILTER   "(userPrincipalName=username@example.com)"
