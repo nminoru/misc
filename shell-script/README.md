@@ -9,5 +9,5 @@ install-xfce4-on-ubuntu-24-04.sh
 一緒に開発ツールをインストールする
 
 ```sh
-install-xfce4-on-ubuntu-24-04.sh chrome code dbeaver 
+install-xfce4-on-ubuntu-24-04.sh azure terraform chrome code dbeaver
 ```
